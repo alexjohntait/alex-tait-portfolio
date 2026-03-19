@@ -29,7 +29,7 @@ body {
   font-family: 'Varela Round', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: var(--text);
 }
- 
+
 /* ── ACCORDION ── */
 .site {
   display: flex;
@@ -318,6 +318,7 @@ body.admin-mode .proj-img-hint.show-hint {
   line-height: 1.7;
   color: #555;
   max-width: 540px;
+  width: 66%;
 }
 
 /* Scroll hint arrow at bottom of first slide */
@@ -802,7 +803,7 @@ body.admin-mode .gumroad-btn::after {
 }
 .proj-col .proj-desc {
   font-size: 13px;
-  max-width: 100%;
+  max-width: 66%;
 }
 
 /* Admin cycle upload hint */
@@ -3551,6 +3552,8 @@ function triggerMediaUpload(slot, idx, type, btn) {
           vid.setAttribute('data-slot', slot);
           vid.setAttribute('data-idx', idx);
           vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
+          vid.setAttribute('autoplay',''); vid.setAttribute('muted',''); vid.setAttribute('playsinline','');
+          vid.setAttribute('autoplay',''); vid.setAttribute('muted',''); vid.setAttribute('playsinline','');
           pimg.appendChild(vid);
         }
         vid.src = ev.target.result;
@@ -4646,6 +4649,7 @@ body.admin-mode .proj-img-hint.show-hint {
   line-height: 1.7;
   color: #555;
   max-width: 540px;
+  width: 66%;
 }
 
 /* Scroll hint arrow at bottom of first slide */
@@ -5130,7 +5134,7 @@ body.admin-mode .gumroad-btn::after {
 }
 .proj-col .proj-desc {
   font-size: 13px;
-  max-width: 100%;
+  max-width: 66%;
 }
 
 /* Admin cycle upload hint */
@@ -7879,6 +7883,8 @@ function triggerMediaUpload(slot, idx, type, btn) {
           vid.setAttribute('data-slot', slot);
           vid.setAttribute('data-idx', idx);
           vid.autoplay = true; vid.muted = true; vid.loop = true; vid.playsInline = true;
+          vid.setAttribute('autoplay',''); vid.setAttribute('muted',''); vid.setAttribute('playsinline','');
+          vid.setAttribute('autoplay',''); vid.setAttribute('muted',''); vid.setAttribute('playsinline','');
           pimg.appendChild(vid);
         }
         vid.src = ev.target.result;
