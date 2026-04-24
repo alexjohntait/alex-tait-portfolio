@@ -19,29 +19,25 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--bg); font-family: 'Lexend', sans-serif; color: var(--text); overflow-x: hidden; transition: background-color 0.4s ease; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
 
         /* --- UI: THEME TOGGLE (Bottom Right) --- */
         #theme-toggle { 
             position: fixed; bottom: 30px; right: 30px; z-index: 20000; 
             cursor: pointer; width: 44px; height: 44px; opacity: 0.5;
             display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); border-radius: 50%;
+            background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%;
         }
         .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
-        /* --- UI: DESKTOP ZOOM --- */
+        /* --- UI: DESKTOP ZOOM (No Label) --- */
         #zoom-container {
             position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
-            z-index: 1000; display: flex; flex-direction: column; align-items: center; gap: 20px;
-            pointer-events: none;
+            z-index: 1000; display: flex; flex-direction: column; align-items: center; pointer-events: none;
         }
-        /* v185: Hidden "2x" label for cleaner Desktop HUD */
-        #zoom-label { display: none; }
-        
         .slider-wrapper {
-            height: 240px; width: 44px; background: rgba(0,0,0,0.4);
+            height: 240px; width: 44px; background: rgba(128,128,128,0.1);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border-radius: 22px; border: 1px solid var(--line);
             position: relative; pointer-events: auto; cursor: ns-resize;
@@ -55,7 +51,7 @@
         #zoom-slider { -webkit-appearance: none; width: 200px; height: 100%; background: transparent; transform: rotate(-90deg); position: absolute; outline: none; cursor: pointer; z-index: 2; }
         #zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 40px; width: 2px; background: var(--pepper-pink); box-shadow: 0 0 10px var(--pepper-pink); }
 
-        /* --- MAIN SPLIT --- */
+        /* --- MAIN LAYOUT --- */
         #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; }
 
         /* --- GRID --- */
@@ -72,67 +68,63 @@
         .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
         .rail-item:hover { grid-row: span 2; grid-column: span 2; z-index: 10; }
 
-        /* --- SIDEBAR (DESKTOP) --- */
-        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .sidebar-header { padding: 80px 40px 60px 40px; flex-grow: 1; }
+        /* --- SIDEBAR --- */
+        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow-y: auto; scrollbar-width: none; }
+        .sidebar-header { padding: 80px 40px 60px 40px; flex-shrink: 0; }
         .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; }
 
-        .sidebar-nav-row { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-top: 1px solid var(--line); }
+        /* Navigation / Categories */
+        .sidebar-nav-row { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
         .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; }
-        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; }
+        .project-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; }
+
+        /* v186: Contact Accordion (Desktop View) */
+        #contact-accordion { border-bottom: 1px solid var(--line); cursor: pointer; transition: 0.3s; }
+        .accordion-trigger { display: flex; justify-content: space-between; align-items: center; padding: 30px 40px; }
+        .accordion-arrow { font-size: 14px; opacity: 0.3; transition: transform 0.4s; }
+        .accordion-content { height: 0; overflow: hidden; padding: 0 40px; transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s; }
+        .accordion-content.active { height: auto; padding-bottom: 40px; }
+        .contact-link { font-size: 18px; font-weight: 400; line-height: 1.8; opacity: 0.6; text-decoration: none; color: inherit; display: block; }
+        .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
 
         /* --- MOBILE RE-ARCHITECTURE --- */
         @media (max-width: 768px) {
-            #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; overflow-x: hidden; }
+            #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
             #zoom-container { display: none; }
             
-            /* 1. Bio at Top */
-            .sidebar-header { padding: 60px 25px 30px 25px; flex-grow: 0; }
+            /* Sidebar Header (About) */
+            .sidebar-header { padding: 60px 25px 30px 25px; }
             .about-text { font-size: 32px; }
 
-            /* 2. Stacked Categories */
-            .sidebar-nav-row { 
-                display: flex; flex-direction: column; order: 2;
-                border-top: none; border-bottom: none;
-                padding: 0 25px 40px 25px; 
-            }
-            .nav-col { padding: 0; border: none; margin-bottom: 0; }
-            .nav-col .label { font-size: 24px; opacity: 0.9; font-weight: 500; margin-bottom: 5px; }
-            .project-link { display: none; } /* Keeping sidebar list for desktop only */
-            
-            /* 3. Grid under Categories */
+            /* Categories Stacking */
+            .sidebar-nav-row { display: flex; flex-direction: column; border-bottom: none; padding: 0 25px 20px 25px; }
+            .nav-col { padding: 10px 0; border: none; }
+            .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
+            .project-link { display: none; }
+
+            /* Contact Accordion Mobile */
+            .accordion-trigger { padding: 20px 25px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+            .accordion-trigger .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
+            .accordion-content { padding: 0 25px; }
+            .contact-link { font-size: 20px; }
+
+            /* Grid */
             #grid-rail { 
-                display: grid; order: 3;
-                grid-template-columns: repeat(var(--mobile-cols), 1fr); 
+                display: grid; grid-template-columns: repeat(var(--mobile-cols), 1fr); 
                 grid-template-rows: none; grid-auto-flow: row;
-                width: 100vw; height: auto; overflow: visible;
-                -webkit-mask-image: none; 
-                border-top: 1px solid var(--line);
+                width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none;
             }
             .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); }
-            .rail-item:hover { grid-row: auto; grid-column: auto; }
-
-            /* 4. Contact at the Absolute Bottom */
-            #mobile-contact-footer {
-                order: 4; padding: 60px 25px 120px 25px;
-                display: flex; flex-direction: column; gap: 5px;
-            }
-            #mobile-contact-footer .label { font-size: 24px; opacity: 0.9; font-weight: 500; }
-            .contact-link { font-size: 24px; opacity: 0.9; font-weight: 500; line-height: 1.2; padding: 2px 0; }
 
             #mobile-zoom-toggle {
                 position: fixed; bottom: 30px; left: 30px; z-index: 20000;
-                width: 44px; height: 44px; background: rgba(0,0,0,0.2); 
+                width: 44px; height: 44px; background: rgba(128,128,128,0.1); 
                 backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line);
-                display: flex; align-items: center; justify-content: center; font-size: 10px;
-                color: var(--text); opacity: 0.6;
+                display: flex; align-items: center; justify-content: center; font-size: 10px; opacity: 0.6;
             }
         }
-
-        /* Hide mobile footer on desktop */
-        @media (min-width: 769px) { #mobile-contact-footer { display: none; } }
 
         /* --- PROJECT OVERLAY --- */
         .overlay { position: fixed; inset: 0; z-index: 10000; background: var(--bg); transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); visibility: hidden; display: grid; grid-template-columns: 1fr 400px; }
@@ -175,21 +167,18 @@
             <div class="nav-col"><div class="label">Commercial</div><div id="list-commercial"></div></div>
             <div class="nav-col"><div class="label">Editorial</div><div id="list-editorial"></div></div>
             <div class="nav-col"><div class="label">Personal</div><div id="list-personal"></div></div>
-            <div class="nav-col desktop-only-contact">
-                <div class="label">Contact</div>
-                <div class="contact-stack">
-                    <a href="mailto:alexjohntait@gmail.com" class="contact-link">alexjohntait@gmail.com</a>
-                    <div class="contact-link">+44(0) 7875127072</div>
-                    <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
-                </div>
-            </div>
         </div>
 
-        <div id="mobile-contact-footer">
-            <div class="label">Contact</div>
-            <a href="mailto:alexjohntait@gmail.com" class="contact-link">alexjohntait@gmail.com</a>
-            <div class="contact-link">+44(0) 7875127072</div>
-            <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
+        <div id="contact-accordion" onclick="toggleAccordion()">
+            <div class="accordion-trigger">
+                <div class="label">Contact</div>
+                <div class="accordion-arrow" id="arr-icon">↓</div>
+            </div>
+            <div class="accordion-content" id="acc-content">
+                <a href="mailto:alexjohntait@gmail.com" class="contact-link">alexjohntait@gmail.com</a>
+                <div class="contact-link">+44(0) 7875127072</div>
+                <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
+            </div>
         </div>
     </aside>
 </main>
@@ -207,6 +196,13 @@
 <script>
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all';
+
+function toggleAccordion() {
+    const content = document.getElementById('acc-content');
+    const arrow = document.getElementById('arr-icon');
+    content.classList.toggle('active');
+    arrow.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+}
 
 function toggleMobileGrid() {
     const root = document.documentElement;
@@ -274,6 +270,13 @@ function openProject(id) {
 }
 
 function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('close-btn').style.display = 'none'; }
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+}
 run();
 </script>
 </body>
