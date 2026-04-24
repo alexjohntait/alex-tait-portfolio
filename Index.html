@@ -6,166 +6,175 @@
     <title>Alex Tait — Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg: #000000; --text: #ffffff; --line: rgba(255,255,255,0.15); --accent: #3b59ff;
+            --bg: #000000; --text: #ffffff; --line: rgba(255,255,255,0.15); 
             --pepper-pink: #ff00ff;
+            --grid-rows: 4; 
         }
         [data-theme="light"] { 
             --bg: #ffffff; --text: #000000; --line: rgba(0,0,0,0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--bg); font-family: 'Manrope', sans-serif; color: var(--text); overflow: hidden; transition: background-color 0.4s ease; }
+        body, html { width: 100%; height: 100%; background: var(--bg); font-family: 'Lexend', sans-serif; color: var(--text); overflow: hidden; transition: background-color 0.4s ease; }
 
-        /* --- UI --- */
-        #theme-toggle { position: fixed; top: 35px; left: 20px; z-index: 20000; cursor: pointer; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.3; transition: 0.3s; }
+        /* --- UI: THEME TOGGLE (v181: BOTTOM RIGHT) --- */
+        #theme-toggle { 
+            position: fixed; bottom: 40px; right: 40px; z-index: 20000; 
+            cursor: pointer; width: 18px; height: 18px; opacity: 0.3; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
         #theme-toggle:hover { opacity: 1; color: var(--pepper-pink); }
-        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 300; cursor: pointer; opacity: 0.4; z-index: 20001; transition: 0.3s; display: none; }
-        .close-trigger:hover { opacity: 1; color: var(--pepper-pink); }
+        .mode-icon { width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 50%; }
+        [data-theme="light"] .mode-icon { background: currentColor; }
 
-        /* --- GLOBAL GRID SYSTEM --- */
-        .blueprint-grid {
-            display: grid; 
-            grid-template-columns: 140px 140px 140px 1fr 350px; 
-            width: 100%;
+        /* --- UI: OBSIDIAN ZOOM CONTROLLER --- */
+        #zoom-container {
+            position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
+            z-index: 1000; display: flex; flex-direction: column; align-items: center; gap: 20px;
+            pointer-events: none;
+        }
+        #zoom-label { font-size: 11px; font-weight: 600; color: var(--text); letter-spacing: 0.1em; }
+        
+        .slider-wrapper {
+            height: 240px; width: 44px; background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 22px; border: 1px solid var(--line);
+            position: relative; pointer-events: auto; cursor: ns-resize;
+            display: flex; justify-content: center; overflow: hidden;
+        }
+        .slider-wrapper::before {
+            content: ''; position: absolute; inset: 20px 0;
+            background-image: repeating-linear-gradient(to bottom, var(--line) 0px, var(--line) 1px, transparent 1px, transparent 12px);
+            width: 12px; margin: 0 auto; opacity: 0.5;
+        }
+        #zoom-slider {
+            -webkit-appearance: none; width: 200px; height: 100%;
+            background: transparent; transform: rotate(-90deg);
+            position: absolute; outline: none; cursor: pointer; z-index: 2;
+        }
+        #zoom-slider::-webkit-slider-thumb { 
+            -webkit-appearance: none; height: 40px; width: 2px; 
+            background: var(--pepper-pink); box-shadow: 0 0 10px var(--pepper-pink);
         }
 
-        /* --- HOME SECTION --- */
-        #top-container { height: 55vh; border-bottom: 1px solid var(--line); }
-        .index-col { padding: 100px 20px 40px 20px; border-right: 1px solid var(--line); overflow-y: auto; scrollbar-width: none; }
-        .index-col::-webkit-scrollbar { display: none; }
-        .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.3; margin-bottom: 15px; }
-        .project-link { font-size: 11px; font-weight: 500; line-height: 2.2; cursor: pointer; opacity: 0.5; transition: 0.2s; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; color: inherit; }
-        .project-link:hover, .project-link.active { opacity: 1; color: var(--pepper-pink) !important; }
+        /* --- MAIN SPLIT --- */
+        #main-container {
+            display: grid; grid-template-columns: 2fr 1fr;
+            width: 100vw; height: 100vh;
+        }
 
-        #hero-panel { display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--line); background: #000 !important; padding: 60px; overflow: hidden; }
-        #hero-media { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        .about-text { font-family: 'Manrope', sans-serif; font-size: 38px; line-height: 1.05; font-weight: 800; letter-spacing: -0.04em; text-align: left; margin-top: -6px; }
-        .name-highlight { color: var(--pepper-pink); }
-        .about-email { font-size: 14px; font-weight: 800; margin-top: 35px; display: block; opacity: 0.3; text-decoration: none; color: inherit; letter-spacing: 0.05em; }
-
-        /* --- RAIL --- */
-        #rail-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; background: var(--bg); }
-        .filter-group { display: flex; gap: 30px; }
-        .filter-toggle { cursor: pointer; opacity: 0.3; }
-        .filter-toggle.active { opacity: 1; color: var(--pepper-pink); }
-
-        #grid-rail { display: grid; grid-template-rows: repeat(2, 1fr); grid-auto-flow: column; grid-auto-columns: calc(22vh); width: 100%; height: 44vh; overflow-x: auto; overflow-y: hidden; background: var(--bg); scrollbar-width: none; }
-        .rail-item { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; position: relative; }
-        .rail-item:hover, .rail-item.highlighted { grid-row: 1 / 3; grid-column: span 2; z-index: 10; }
+        /* --- LEFT SIDE: FEATHERED GRID --- */
+        #grid-rail { 
+            display: grid; grid-template-rows: repeat(var(--grid-rows), 1fr); grid-auto-flow: column; 
+            grid-auto-columns: calc(100vh / var(--grid-rows)); 
+            width: 100%; height: 100vh; overflow-x: auto; overflow-y: hidden; 
+            background: var(--bg); scrollbar-width: none;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-mask-image: linear-gradient(to right, black 80%, transparent 98%);
+            mask-image: linear-gradient(to right, black 80%, transparent 98%);
+        }
+        #grid-rail::-webkit-scrollbar { display: none; }
+        
+        .rail-item { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; transition: 0.4s ease; cursor: pointer; position: relative; }
+        .rail-item:hover, .rail-item.highlighted { grid-row: span 2; grid-column: span 2; z-index: 10; }
         .rail-item.highlighted::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--pepper-pink); pointer-events: none; opacity: 0.4; }
         .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-        /* --- PROJECT OVERLAY (v164 HORIZONTAL DESIGN) --- */
+        /* --- RIGHT SIDE: SIDEBAR --- */
+        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .sidebar-header { padding: 80px 40px 60px 40px; flex-grow: 1; }
+        .about-text { 
+            font-size: 50px; /* 38pt */
+            line-height: 1.1; font-weight: 500; letter-spacing: -0.03em;
+            text-align: left; max-width: 650px;
+        }
+
+        /* Bottom Nav */
+        .sidebar-nav-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); 
+            width: 100%; border-top: 1px solid var(--line);
+        }
+        .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
+        .nav-col:last-child { border-right: none; }
+
+        .label { font-size: 10px; font-weight: 500; opacity: 0.3; margin-bottom: 25px; }
+        .project-link { font-size: 10px; font-weight: 400; line-height: 2.1; cursor: pointer; opacity: 0.5; transition: 0.2s; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: inherit; text-decoration: none; }
+        .project-link:hover, .project-link.active { opacity: 1; color: var(--pepper-pink) !important; }
+        .contact-link { font-size: 10px; font-weight: 400; opacity: 0.5; text-decoration: none; color: inherit; transition: 0.3s; line-height: 2.1; display: block; }
+        .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
+
+        /* --- OVERLAY --- */
         .overlay { 
-            position: fixed; inset: 0; z-index: 10000; 
-            background: var(--bg); 
-            transform: translateY(-100%);
+            position: fixed; inset: 0; z-index: 10000; background: var(--bg); transform: translateY(-100%);
             transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
-            color: var(--text); 
-            visibility: hidden;
-            display: grid;
-            grid-template-columns: 1fr 350px; /* imagery owns the left, data on right */
+            visibility: hidden; display: grid; grid-template-columns: 1fr 400px;
         }
         .overlay.active { transform: translateY(0); visibility: visible; }
-        
-        #detail-gallery-col {
-            height: 100vh;
-            padding: 100px 80px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            display: flex; flex-direction: column; gap: 100px;
-            align-items: center;
-            border-right: 1px solid var(--line);
-        }
-        #detail-gallery-col::-webkit-scrollbar { display: none; }
-        .detail-asset { width: 100%; max-width: 1000px; height: auto; display: block; border-radius: 4px; }
+        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; }
 
-        /* HORIZONTAL DATA STACK */
-        #detail-info-col {
-            padding: 100px 0; /* Removing side padding for grid line alignment */
-            height: 100vh;
-            overflow-y: auto;
-            scrollbar-width: none;
-        }
-        .info-block {
-            padding: 25px 30px;
-            border-bottom: 1px solid var(--line);
-        }
-        .info-block:first-child { border-top: 1px solid var(--line); }
-        .info-block .label { margin-bottom: 8px; opacity: 0.3; }
-        .info-value { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        .info-caption { font-size: 16px; line-height: 1.6; font-weight: 500; opacity: 0.9; }
+        #detail-gallery-col { height: 100vh; padding: 100px 60px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 80px; align-items: center; border-right: 1px solid var(--line); }
+        .detail-asset { width: 100%; max-width: 1000px; height: auto; border-radius: 4px; }
+        #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; scrollbar-width: none; }
+        .info-block { padding: 25px 40px; border-bottom: 1px solid var(--line); }
+        .info-value { font-size: 14px; font-weight: 500; }
+        .info-caption { font-size: 16px; line-height: 1.6; font-weight: 300; opacity: 0.9; }
 
-        @media (max-width: 1024px) {
-            .blueprint-grid { grid-template-columns: 100px 100px 100px 1fr 280px; }
-            .overlay { grid-template-columns: 1fr 280px; }
-        }
-        @media (max-width: 768px) {
-            .overlay { display: block; overflow-y: auto; }
-            #detail-gallery-col { height: auto; width: 100%; border-right: none; padding: 60px 20px; }
-            #detail-info-col { height: auto; width: 100%; padding: 0; }
+        @media (max-width: 1200px) {
+            #main-container { grid-template-columns: 1fr; display: flex; flex-direction: column; height: auto; }
+            #grid-rail { height: 60vh; -webkit-mask-image: none; }
+            #sidebar { height: auto; }
+            #zoom-container { display: none; }
+            #theme-toggle { bottom: 20px; right: 20px; }
         }
     </style>
 </head>
 <body>
 
-<div id="theme-toggle" onclick="toggleTheme()">Light Mode</div>
-<div class="close-trigger" id="close-btn" onclick="closeAll()">✕</div>
-
-<section id="top-container" class="blueprint-grid">
-    <div class="index-col"><div class="label">Commercial</div><div id="list-commercial"></div></div>
-    <div class="index-col"><div class="label">Editorial</div><div id="list-editorial"></div></div>
-    <div class="index-col"><div class="label">Personal</div><div id="list-personal"></div></div>
-    <div id="hero-panel"></div>
-    <div class="index-col" style="border-right: none; overflow: visible;">
-        <div class="about-text">
-            <span class="name-highlight">Alex Tait</span> is an illustrator and motion designer crafting surreal worlds bursting with color.
-            <a href="mailto:alexjohntait@gmail.com" class="about-email">alexjohntait@gmail.com</a>
-        </div>
+<div id="zoom-container">
+    <div id="zoom-label">2.0×</div>
+    <div class="slider-wrapper">
+        <input type="range" id="zoom-slider" min="2" max="5" step="1" value="4">
     </div>
-</section>
-
-<div id="rail-header">
-    <div class="filter-group">
-        <div class="filter-toggle active" id="f-all" onclick="setFilter('all')">All</div>
-        <div class="filter-toggle" id="f-commercial" onclick="setFilter('commercial')">Commercial</div>
-        <div class="filter-toggle" id="f-editorial" onclick="setFilter('editorial')">Editorial</div>
-        <div class="filter-toggle" id="f-personal" onclick="setFilter('personal')">Personal</div>
-    </div>
-    <span id="active-project-label" style="opacity: 0.2; text-transform: uppercase;">Archive</span>
 </div>
 
-<div id="grid-rail"></div>
+<div id="theme-toggle" onclick="toggleTheme()"><div class="mode-icon"></div></div>
+<div class="close-trigger" id="close-btn" onclick="closeAll()">✕</div>
+
+<main id="main-container">
+    <div id="grid-rail"></div>
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <div class="about-text">
+                Alex Tait is an illustrator and motion designer crafting surreal worlds bursting with color.
+            </div>
+        </div>
+        <div class="sidebar-nav-row">
+            <div class="nav-col">
+                <div class="label">Contact</div>
+                <div class="contact-stack">
+                    <a href="mailto:alexjohntait@gmail.com" class="contact-link">Alexjohntait@gmail.com</a>
+                    <div class="contact-link">+44(0) 7875127072</div>
+                    <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
+                </div>
+            </div>
+            <div class="nav-col"><div class="label">Commercial</div><div id="list-commercial"></div></div>
+            <div class="nav-col"><div class="label">Editorial</div><div id="list-editorial"></div></div>
+            <div class="nav-col"><div class="label">Personal</div><div id="list-personal"></div></div>
+        </div>
+    </aside>
+</main>
 
 <div id="project-overlay" class="overlay">
-    <div id="detail-gallery-col">
-        </div>
-    
+    <div id="detail-gallery-col"></div>
     <div id="detail-info-col">
-        <div class="info-block">
-            <div class="label">Client</div>
-            <div id="det-client" class="info-value"></div>
-        </div>
-        <div class="info-block">
-            <div class="label">Project</div>
-            <div id="det-title" class="info-value"></div>
-        </div>
-        <div class="info-block">
-            <div class="label">Year</div>
-            <div id="det-year" class="info-value"></div>
-        </div>
-        <div class="info-block">
-            <div class="label">Category</div>
-            <div id="det-cat" class="info-value" style="text-transform: capitalize;"></div>
-        </div>
-        <div class="info-block" style="border-bottom: none;">
-            <div class="label">Info</div>
-            <div id="det-caption" class="info-caption"></div>
-        </div>
+        <div class="info-block"><div class="label">Client</div><div id="det-client" class="info-value"></div></div>
+        <div class="info-block"><div class="label">Project</div><div id="det-title" class="info-value"></div></div>
+        <div class="info-block"><div class="label">Year</div><div id="det-year" class="info-value"></div></div>
+        <div class="info-block"><div class="label">Category</div><div id="det-cat" class="info-value"></div></div>
+        <div class="info-block" style="border-bottom:none;"><div class="label">Info</div><div id="det-caption" class="info-caption"></div></div>
     </div>
 </div>
 
@@ -173,28 +182,29 @@
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all';
 
+const slider = document.getElementById('zoom-slider');
+const label = document.getElementById('zoom-label');
+const root = document.documentElement;
+
+slider.addEventListener('input', (e) => {
+    const val = e.target.value;
+    const multiplier = (6 - val).toFixed(1); 
+    label.innerText = multiplier + '×';
+    root.style.setProperty('--grid-rows', val);
+});
+
 async function run() {
     try {
         const res = await fetch(`https://api.airtable.com/v0/${DB.base}/${encodeURIComponent(DB.table)}?sort%5B0%5D%5Bfield%5D=Order`, { headers: { Authorization: `Bearer ${DB.key}` } });
         const data = await res.json();
         all = data.records.map(r => ({
-            id: r.id, title: r.fields['Title'] || 'Untitled', 
-            client: r.fields['Client'] || 'N/A', year: r.fields['Year'] || '2024',
+            id: r.id, title: r.fields['Title'] || 'Untitled', client: r.fields['Client'] || 'N/A', year: r.fields['Year'] || '2024',
             caption: r.fields['Caption'] || '', cat: String(r.fields.Category || '').toLowerCase(),
-            mosaic: r.fields['Mosaic Images'] || [], 
-            heroUrl: r.fields['Hero Image']?.[0]?.url || '',
-            isVid: r.fields['Hero Image']?.[0]?.type?.includes('video'),
-            assets: r.fields['Hero Image'] || []
+            mosaic: r.fields['Mosaic Images'] || [], heroUrl: r.fields['Hero Image']?.[0]?.url || '',
+            isVid: r.fields['Hero Image']?.[0]?.type?.includes('video'), assets: r.fields['Hero Image'] || []
         })).filter(p => p.heroUrl);
-        renderUI(); initNaturalScroll();
-        const pepper = all.find(p => p.title.toLowerCase().includes('pepper'));
-        if (pepper) {
-            const panel = document.getElementById('hero-panel');
-            panel.innerHTML = pepper.isVid 
-                ? `<video id="hero-media" src="${pepper.heroUrl}" autoplay loop muted playsinline></video>`
-                : `<img id="hero-media" src="${pepper.heroUrl}">`;
-        }
-    } catch(e) { console.error('Data Error:', e); }
+        renderUI();
+    } catch(e) { console.error(e); }
 }
 
 function renderUI() {
@@ -202,15 +212,13 @@ function renderUI() {
     const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
     rail.innerHTML = ''; Object.values(lists).forEach(l => l.innerHTML = '');
     all.forEach(p => {
-        if (currentFilter === 'all' || p.cat === currentFilter) {
-            const item = document.createElement('div');
-            item.className = 'rail-item'; item.setAttribute('data-id', p.id); 
-            item.onmouseenter = () => highlight(p.id, p.title);
-            item.onmouseleave = unhighlight;
-            item.onclick = () => openProject(p.id);
-            item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
-            rail.appendChild(item);
-        }
+        const item = document.createElement('div');
+        item.className = 'rail-item'; item.setAttribute('data-id', p.id); 
+        item.onmouseenter = () => highlight(p.id, p.title);
+        item.onmouseleave = unhighlight;
+        item.onclick = () => openProject(p.id);
+        item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
+        rail.appendChild(item);
         if (lists[p.cat]) {
             const link = document.createElement('div');
             link.className = 'project-link'; link.id = `link-${p.id}`;
@@ -230,9 +238,7 @@ function openProject(id) {
     document.getElementById('det-year').innerText = p.year;
     document.getElementById('det-cat').innerText = p.cat;
     document.getElementById('det-caption').innerText = p.caption;
-    
-    const gallery = document.getElementById('detail-gallery-col');
-    gallery.innerHTML = '';
+    const gallery = document.getElementById('detail-gallery-col'); gallery.innerHTML = '';
     const displayAssets = p.mosaic.length > 0 ? p.mosaic : p.assets;
     displayAssets.forEach(asset => {
         const isV = asset.type.includes('video');
@@ -241,42 +247,21 @@ function openProject(id) {
         if(isV) { el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; }
         gallery.appendChild(el);
     });
-
     document.getElementById('project-overlay').classList.add('active');
     document.getElementById('close-btn').style.display = 'block';
-    gallery.scrollTop = 0;
 }
 
-function closeAll() { 
-    document.getElementById('project-overlay').classList.remove('active'); 
-    document.getElementById('close-btn').style.display = 'none';
-}
-
-function setFilter(cat) {
-    currentFilter = cat; renderUI();
-    document.querySelectorAll('.filter-toggle').forEach(t => t.classList.toggle('active', t.id === `f-${cat}`));
-}
-
-function initNaturalScroll() {
-    const rail = document.getElementById('grid-rail');
-    rail.addEventListener('wheel', (e) => {
-        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-            e.preventDefault(); rail.scrollLeft += e.deltaY;
-        }
-    }, { passive: false });
-}
+function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('close-btn').style.display = 'none'; }
+const rail = document.getElementById('grid-rail'); 
+rail.addEventListener('wheel', (e) => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); rail.scrollLeft += e.deltaY; } }, { passive: false });
 
 function highlight(id, title) {
-    document.getElementById('active-project-label').innerText = title;
-    document.getElementById('active-project-label').style.opacity = "1";
     document.getElementById(`link-${id}`)?.classList.add('active');
     const railTarget = document.querySelector(`.rail-item[data-id="${id}"]`);
     if (railTarget) railTarget.classList.add('highlighted');
 }
 
 function unhighlight() {
-    document.getElementById('active-project-label').innerText = "Archive";
-    document.getElementById('active-project-label').style.opacity = "0.2";
     document.querySelectorAll('.project-link').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('highlighted'));
 }
@@ -285,9 +270,7 @@ function toggleTheme() {
     const html = document.documentElement;
     const isDark = html.getAttribute('data-theme') === 'dark';
     html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    document.getElementById('theme-toggle').innerText = isDark ? "Light Mode" : "Dark Mode";
 }
-
 run();
 </script>
 </body>
