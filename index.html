@@ -60,7 +60,7 @@
         #zoom-slider { -webkit-appearance: none; width: 200px; height: 100%; background: transparent; transform: rotate(-90deg); position: absolute; outline: none; cursor: pointer; z-index: 2; }
         #zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 40px; width: 2px; background: var(--pepper-pink); box-shadow: 0 0 10px var(--pepper-pink); }
 
-        /* --- MAIN SPLIT (DESKTOP) --- */
+        /* --- MAIN SPLIT --- */
         #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; }
 
         /* --- GRID --- */
@@ -77,30 +77,31 @@
         .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
         .rail-item:hover { grid-row: span 2; grid-column: span 2; z-index: 10; }
 
-        /* --- SIDEBAR (DESKTOP) --- */
-        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow: hidden; justify-content: space-between; }
+        /* --- SIDEBAR --- */
+        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow-y: auto; scrollbar-width: none; justify-content: space-between; }
         .sidebar-header { padding: 80px 40px 60px 40px; }
         .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; max-width: 650px; }
 
-        /* Navigation Bottom Bar */
+        /* Desktop Bottom Navigation */
         .sidebar-nav-row { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-top: 1px solid var(--line); }
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
         
         .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; cursor: pointer; transition: 0.3s; }
         .label:hover, .label.active-filter { opacity: 1; color: var(--pepper-pink); }
-        
-        .project-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; cursor: pointer; }
-        .project-link:hover { opacity: 1; color: var(--pepper-pink); }
-        
-        .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; }
-        .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
+        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; cursor: pointer; }
+        .project-link:hover, .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
 
-        /* --- MOBILE RE-ARCHITECTURE --- */
+        /* --- MOBILE RE-ARCHITECTURE (v190) --- */
         @media (max-width: 768px) {
             #mobile-info-btn { display: flex; }
             #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
             #zoom-container { display: none; }
+            
+            /* Move Sidebar (Bio/Cats) above Grid */
+            #sidebar { height: auto; order: 1; }
+            #grid-rail { order: 2; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-flow: row; width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none; border-top: 1px solid var(--line); }
+            
             .sidebar-header { padding: 60px 25px 30px 25px; }
             .about-text { font-size: 32px; }
 
@@ -108,13 +109,7 @@
             .nav-col { padding: 8px 0; border: none; }
             .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
             .project-link, .desktop-only-nav { display: none; }
-
-            #grid-rail { 
-                display: grid; grid-template-columns: repeat(2, 1fr); 
-                grid-template-rows: none; grid-auto-flow: row;
-                width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none;
-                border-top: 1px solid var(--line);
-            }
+            
             .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); }
         }
 
@@ -123,11 +118,10 @@
         .overlay.active { transform: translateY(0); visibility: visible; }
         .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; }
         
-        /* Info Overlay specific */
+        /* Info Overlay (v190 Smaller/Clean) */
         #info-overlay { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 60px; }
-        .info-title { font-size: 14px; opacity: 0.3; margin-bottom: 20px; text-transform: uppercase; }
-        .info-big-link { font-size: 32px; font-weight: 500; text-decoration: none; color: inherit; line-height: 1.4; margin-bottom: 10px; display: block; }
-        .info-big-link:hover { color: var(--pepper-pink); }
+        .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
+        .info-big-link:hover { color: var(--pepper-pink); opacity: 1; }
 
         #detail-gallery-col { height: 100vh; padding: 100px 60px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 80px; align-items: center; border-right: 1px solid var(--line); }
         .detail-asset { width: 100%; max-width: 100%; height: auto; border-radius: 2px; object-fit: contain; }
@@ -158,6 +152,7 @@
 
 <main id="main-container">
     <div id="grid-rail"></div>
+
     <aside id="sidebar">
         <div class="sidebar-header">
             <div class="about-text">Alex Tait is an illustrator and motion designer crafting surreal worlds bursting with color.</div>
@@ -190,7 +185,6 @@
 </div>
 
 <div id="info-overlay" class="overlay" style="display: flex;">
-    <div class="info-title">Contact</div>
     <a href="mailto:alexjohntait@gmail.com" class="info-big-link">alexjohntait@gmail.com</a>
     <div class="info-big-link">+44(0) 7875127072</div>
     <a href="https://instagram.com/alexjohntait" target="_blank" class="info-big-link">Instagram</a>
@@ -204,10 +198,8 @@ let all = [], currentFilter = 'all';
 function setFilter(cat) {
     if (currentFilter === cat) currentFilter = 'all';
     else currentFilter = cat;
-    
     document.querySelectorAll('.label').forEach(el => el.classList.remove('active-filter'));
     if (currentFilter !== 'all') document.getElementById(`filter-${currentFilter}`)?.classList.add('active-filter');
-    
     renderUI();
 }
 
@@ -251,7 +243,6 @@ function renderUI() {
     Object.values(lists).forEach(l => l.innerHTML = '');
 
     all.forEach(p => {
-        // Only show in grid if it matches filter
         if (currentFilter === 'all' || p.cat === currentFilter) {
             const item = document.createElement('div');
             item.className = 'rail-item';
@@ -259,7 +250,6 @@ function renderUI() {
             item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
             rail.appendChild(item);
         }
-        // Always show in lists for desktop
         if (lists[p.cat]) {
             const link = document.createElement('div');
             link.className = 'project-link'; link.innerText = p.title;
