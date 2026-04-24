@@ -21,7 +21,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
 
-        /* --- UI: THEME TOGGLE --- */
+        /* --- UI: THEME TOGGLE (Bottom Right) --- */
         #theme-toggle { 
             position: fixed; bottom: 30px; right: 30px; z-index: 20000; 
             cursor: pointer; width: 44px; height: 44px; opacity: 0.5;
@@ -31,7 +31,7 @@
         .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
-        /* --- UI: DESKTOP ZOOM --- */
+        /* --- UI: DESKTOP ZOOM (Stealth) --- */
         #zoom-container {
             position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
             z-index: 1000; display: flex; flex-direction: column; align-items: center; pointer-events: none;
@@ -73,41 +73,43 @@
         .sidebar-header { padding: 80px 40px 60px 40px; }
         .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; max-width: 650px; }
 
-        /* Navigation Row (Pinned to bottom) */
         .sidebar-nav-row { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-top: 1px solid var(--line); }
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
         .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; }
         .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; }
 
-        /* Desktop Contact (Always open) */
-        #desktop-contact-list { display: block; }
-        #mobile-accordion { display: none; }
+        /* Mobile Zoom UI - Hidden on Desktop */
+        #mobile-zoom-toggle { display: none; }
 
         /* --- MOBILE RE-ARCHITECTURE --- */
         @media (max-width: 768px) {
             #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
             #zoom-container { display: none; }
             
-            /* Bio at Top */
+            #mobile-zoom-toggle { 
+                display: flex; position: fixed; bottom: 30px; left: 30px; z-index: 20000;
+                width: 44px; height: 44px; background: rgba(128,128,128,0.1); 
+                backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line);
+                align-items: center; justify-content: center; font-size: 10px; opacity: 0.6;
+            }
+
             .sidebar-header { padding: 60px 25px 30px 25px; order: 1; }
             .about-text { font-size: 32px; }
 
-            /* Categories Stacking above Grid */
             .sidebar-nav-row { display: flex; flex-direction: column; border: none; padding: 0 25px 20px 25px; order: 2; }
             .nav-col { padding: 10px 0; border: none; }
             .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
             .project-link, .desktop-only-nav { display: none; }
 
-            /* Mobile Grid under Categories */
             #grid-rail { 
                 order: 3; display: grid; grid-template-columns: repeat(var(--mobile-cols), 1fr); 
                 grid-template-rows: none; grid-auto-flow: row;
                 width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none;
+                border-top: 1px solid var(--line);
             }
             .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); }
 
-            /* Mobile Accordion at Absolute Bottom */
             #mobile-accordion { 
                 display: block; order: 4; margin-top: 40px; margin-bottom: 120px;
                 border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
@@ -118,19 +120,13 @@
             .accordion-content.active { height: auto; padding-bottom: 30px; }
             .contact-link { font-size: 20px; line-height: 1.6; padding: 5px 0; opacity: 0.7; }
             .accordion-arrow { font-size: 14px; opacity: 0.3; transition: 0.4s; }
-
-            #mobile-zoom-toggle {
-                position: fixed; bottom: 30px; left: 30px; z-index: 20000;
-                width: 44px; height: 44px; background: rgba(128,128,128,0.1); 
-                backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line);
-                display: flex; align-items: center; justify-content: center; font-size: 10px; opacity: 0.6;
-            }
         }
 
         /* --- PROJECT OVERLAY --- */
         .overlay { position: fixed; inset: 0; z-index: 10000; background: var(--bg); transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); visibility: hidden; display: grid; grid-template-columns: 1fr 400px; }
         .overlay.active { transform: translateY(0); visibility: visible; }
-        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; }
+        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; }
+        
         #detail-gallery-col { height: 100vh; padding: 100px 60px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 80px; align-items: center; border-right: 1px solid var(--line); }
         .detail-asset { width: 100%; max-width: 100%; height: auto; border-radius: 2px; object-fit: contain; }
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; }
