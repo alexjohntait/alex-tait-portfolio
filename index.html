@@ -1,146 +1,293 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Alex Tait</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <title>Alex Tait — Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;800&display=swap" rel="stylesheet">
     <style>
-        :root { --default-bg: #E8E7E2; --text: #000000; }
+        :root { 
+            --bg: #000000; --text: #ffffff; --line: rgba(255,255,255,0.15); --accent: #3b59ff;
+            --pepper-pink: #ff00ff;
+        }
+        [data-theme="light"] { 
+            --bg: #ffffff; --text: #000000; --line: rgba(0,0,0,0.1);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--default-bg); font-family: 'Manrope', sans-serif; color: var(--text); overflow: hidden; }
+        body, html { width: 100%; height: 100%; background: var(--bg); font-family: 'Manrope', sans-serif; color: var(--text); overflow: hidden; transition: background-color 0.4s ease; }
 
-        /* --- v115 LOADER --- */
-        #load-screen { position: fixed; inset: 0; background: var(--default-bg); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 1s ease; cursor: pointer; }
-        #load-screen.hide { opacity: 0; pointer-events: none; }
-        #lottie-loader { width: 100vw; height: 100vh; }
+        /* --- UI --- */
+        #theme-toggle { position: fixed; top: 35px; left: 20px; z-index: 20000; cursor: pointer; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.3; transition: 0.3s; }
+        #theme-toggle:hover { opacity: 1; color: var(--pepper-pink); }
+        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 300; cursor: pointer; opacity: 0.4; z-index: 20001; transition: 0.3s; display: none; }
+        .close-trigger:hover { opacity: 1; color: var(--pepper-pink); }
 
-        /* --- DESKTOP UI --- */
-        #site-logo { position: fixed; z-index: 9005; top: 30px; left: 30px; width: 140px; cursor: pointer; }
-        #site-logo img { width: 100%; height: auto; }
-        #info-trigger { position: fixed; z-index: 9005; top: 30px; right: 30px; font-size: 48px; font-weight: 800; cursor: pointer; text-transform: none !important; }
-        #filter-bar { position: fixed; z-index: 8000; top: 30px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
-        .filter-btn { font-size: 48px; font-weight: 800; opacity: 0.15; cursor: pointer; transition: 0.4s; line-height: 1.2; text-transform: capitalize; }
-        .filter-btn.active { opacity: 1; }
+        /* --- GLOBAL GRID SYSTEM --- */
+        .blueprint-grid {
+            display: grid; 
+            grid-template-columns: 140px 140px 140px 1fr 350px; 
+            width: 100%;
+        }
 
-        /* --- CAROUSEL --- */
-        #viewport { position: absolute; inset: 0; display: flex; align-items: center; z-index: 10; }
-        #mover { display: flex; align-items: center; will-change: transform; }
-        .item { flex-shrink: 0; padding: 0 60px; cursor: pointer; }
-        .item img, .item video { height: 60vh !important; width: auto !important; border-radius: 20px; box-shadow: 0 40px 100px rgba(0,0,0,0.1); display: block; }
+        /* --- HOME SECTION --- */
+        #top-container { height: 55vh; border-bottom: 1px solid var(--line); }
+        .index-col { padding: 100px 20px 40px 20px; border-right: 1px solid var(--line); overflow-y: auto; scrollbar-width: none; }
+        .index-col::-webkit-scrollbar { display: none; }
+        .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.3; margin-bottom: 15px; }
+        .project-link { font-size: 11px; font-weight: 500; line-height: 2.2; cursor: pointer; opacity: 0.5; transition: 0.2s; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; color: inherit; }
+        .project-link:hover, .project-link.active { opacity: 1; color: var(--pepper-pink) !important; }
 
-        /* --- INFO OVERLAY --- */
-        .overlay { position: fixed; inset: 0; z-index: 10000; display: none; overflow-y: auto; opacity: 0; transition: 0.5s; background: var(--default-bg); padding: 120px 60px; }
-        .overlay.active { display: flex; opacity: 1; }
-        .close-btn { position: fixed; top: 30px; right: 30px; font-size: 48px; font-weight: 800; cursor: pointer; z-index: 11000; }
-        .info-magazine-grid { display: grid; grid-template-columns: 32% 43% 25%; gap: 60px; max-width: 1600px; margin: 0 auto; width: 100%; }
-        .info-img-col img { width: 100%; border-radius: 20px; }
-        .bio-text { font-size: 28px; font-weight: 500; line-height: 1.35; }
+        #hero-panel { display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--line); background: #000 !important; padding: 60px; overflow: hidden; }
+        #hero-media { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* --- MOBILE REDESIGN (v115) --- */
+        .about-text { font-family: 'Manrope', sans-serif; font-size: 38px; line-height: 1.05; font-weight: 800; letter-spacing: -0.04em; text-align: left; margin-top: -6px; }
+        .name-highlight { color: var(--pepper-pink); }
+        .about-email { font-size: 14px; font-weight: 800; margin-top: 35px; display: block; opacity: 0.3; text-decoration: none; color: inherit; letter-spacing: 0.05em; }
+
+        /* --- RAIL --- */
+        #rail-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; background: var(--bg); }
+        .filter-group { display: flex; gap: 30px; }
+        .filter-toggle { cursor: pointer; opacity: 0.3; }
+        .filter-toggle.active { opacity: 1; color: var(--pepper-pink); }
+
+        #grid-rail { display: grid; grid-template-rows: repeat(2, 1fr); grid-auto-flow: column; grid-auto-columns: calc(22vh); width: 100%; height: 44vh; overflow-x: auto; overflow-y: hidden; background: var(--bg); scrollbar-width: none; }
+        .rail-item { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; position: relative; }
+        .rail-item:hover, .rail-item.highlighted { grid-row: 1 / 3; grid-column: span 2; z-index: 10; }
+        .rail-item.highlighted::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--pepper-pink); pointer-events: none; opacity: 0.4; }
+        .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* --- PROJECT OVERLAY (v164 HORIZONTAL DESIGN) --- */
+        .overlay { 
+            position: fixed; inset: 0; z-index: 10000; 
+            background: var(--bg); 
+            transform: translateY(-100%);
+            transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+            color: var(--text); 
+            visibility: hidden;
+            display: grid;
+            grid-template-columns: 1fr 350px; /* imagery owns the left, data on right */
+        }
+        .overlay.active { transform: translateY(0); visibility: visible; }
+        
+        #detail-gallery-col {
+            height: 100vh;
+            padding: 100px 80px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            display: flex; flex-direction: column; gap: 100px;
+            align-items: center;
+            border-right: 1px solid var(--line);
+        }
+        #detail-gallery-col::-webkit-scrollbar { display: none; }
+        .detail-asset { width: 100%; max-width: 1000px; height: auto; display: block; border-radius: 4px; }
+
+        /* HORIZONTAL DATA STACK */
+        #detail-info-col {
+            padding: 100px 0; /* Removing side padding for grid line alignment */
+            height: 100vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+        .info-block {
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--line);
+        }
+        .info-block:first-child { border-top: 1px solid var(--line); }
+        .info-block .label { margin-bottom: 8px; opacity: 0.3; }
+        .info-value { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .info-caption { font-size: 16px; line-height: 1.6; font-weight: 500; opacity: 0.9; }
+
+        @media (max-width: 1024px) {
+            .blueprint-grid { grid-template-columns: 100px 100px 100px 1fr 280px; }
+            .overlay { grid-template-columns: 1fr 280px; }
+        }
         @media (max-width: 768px) {
-            #viewport { display: block; padding-top: 250px; overflow-y: auto; position: relative; }
-            #mover { flex-direction: column; gap: 40px; padding: 20px; }
-            .item { width: 100%; padding: 0; }
-            .item img, .item video { width: 100% !important; height: auto !important; border-radius: 12px; }
-            #site-logo { width: 55px; top: 20px; left: 20px; }
-            #info-trigger { font-size: 16px; top: 22px; right: 20px; text-transform: none !important; }
-            
-            /* FORCE STACKED BLACK NAV */
-            #filter-bar { top: 80px; gap: 6px; flex-direction: column !important; width: 100%; }
-            .filter-btn { font-size: 30px !important; color: #000000 !important; font-weight: 800; }
-            
-            /* v115 INFO PAGE FIX: Clear the "X" button */
-            .overlay { padding: 140px 24px 60px 24px; }
-            .close-btn { top: 15px; right: 20px; font-size: 28px; background: var(--default-bg); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-            .info-magazine-grid { display: flex; flex-direction: column; align-items: flex-start; gap: 30px; text-align: left; }
-            #bio-image-container { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; }
-            #mobile-header-shield { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 235px; background: var(--default-bg); z-index: 9000; border-bottom: 1px solid rgba(0,0,0,0.05); }
+            .overlay { display: block; overflow-y: auto; }
+            #detail-gallery-col { height: auto; width: 100%; border-right: none; padding: 60px 20px; }
+            #detail-info-col { height: auto; width: 100%; padding: 0; }
         }
     </style>
 </head>
 <body>
-<div id="load-screen" onclick="this.classList.add('hide')"><div id="lottie-loader"></div></div>
-<div id="site-logo" onclick="location.reload()"></div>
-<div id="info-trigger" onclick="openOverlay('info')">Info</div>
-<div id="mobile-header-shield"></div>
-<div id="filter-bar">
-    <div class="filter-btn active" onclick="setFilter('commercial')">Commercial</div>
-    <div class="filter-btn" onclick="setFilter('editorial')">Editorial</div>
-    <div class="filter-btn" onclick="setFilter('personal')">Personal</div>
+
+<div id="theme-toggle" onclick="toggleTheme()">Light Mode</div>
+<div class="close-trigger" id="close-btn" onclick="closeAll()">✕</div>
+
+<section id="top-container" class="blueprint-grid">
+    <div class="index-col"><div class="label">Commercial</div><div id="list-commercial"></div></div>
+    <div class="index-col"><div class="label">Editorial</div><div id="list-editorial"></div></div>
+    <div class="index-col"><div class="label">Personal</div><div id="list-personal"></div></div>
+    <div id="hero-panel"></div>
+    <div class="index-col" style="border-right: none; overflow: visible;">
+        <div class="about-text">
+            <span class="name-highlight">Alex Tait</span> is an illustrator and motion designer crafting surreal worlds bursting with color.
+            <a href="mailto:alexjohntait@gmail.com" class="about-email">alexjohntait@gmail.com</a>
+        </div>
+    </div>
+</section>
+
+<div id="rail-header">
+    <div class="filter-group">
+        <div class="filter-toggle active" id="f-all" onclick="setFilter('all')">All</div>
+        <div class="filter-toggle" id="f-commercial" onclick="setFilter('commercial')">Commercial</div>
+        <div class="filter-toggle" id="f-editorial" onclick="setFilter('editorial')">Editorial</div>
+        <div class="filter-toggle" id="f-personal" onclick="setFilter('personal')">Personal</div>
+    </div>
+    <span id="active-project-label" style="opacity: 0.2; text-transform: uppercase;">Archive</span>
 </div>
-<div id="viewport"><main id="mover"></main></div>
-<div id="info-overlay" class="overlay">
-    <div class="close-btn" onclick="closeAll()">✕</div>
-    <div class="info-magazine-grid">
-        <div class="info-img-col" id="bio-image-container"></div>
-        <div class="bio-text">Alex Tait is an illustrator and motion designer crafting surreal, spirited worlds bursting with color...</div>
-        <div style="font-size: 16px; line-height: 2;">
-            <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 5px;">Contact</h3>
-            <a href="mailto:alexjohntait@gmail.com" style="color:inherit; text-decoration:none;">alexjohntait@gmail.com</a><br>
-            Represented by Jelly
+
+<div id="grid-rail"></div>
+
+<div id="project-overlay" class="overlay">
+    <div id="detail-gallery-col">
+        </div>
+    
+    <div id="detail-info-col">
+        <div class="info-block">
+            <div class="label">Client</div>
+            <div id="det-client" class="info-value"></div>
+        </div>
+        <div class="info-block">
+            <div class="label">Project</div>
+            <div id="det-title" class="info-value"></div>
+        </div>
+        <div class="info-block">
+            <div class="label">Year</div>
+            <div id="det-year" class="info-value"></div>
+        </div>
+        <div class="info-block">
+            <div class="label">Category</div>
+            <div id="det-cat" class="info-value" style="text-transform: capitalize;"></div>
+        </div>
+        <div class="info-block" style="border-bottom: none;">
+            <div class="label">Info</div>
+            <div id="det-caption" class="info-caption"></div>
         </div>
     </div>
 </div>
+
 <script>
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
-let all = [], list = [], targetX = 0, currentX = 0, velocity = 0, isOverlay = false, moverSetWidth = 0, itemCenters = [];
-lottie.loadAnimation({ container: document.getElementById('lottie-loader'), renderer: 'svg', loop: true, autoplay: true, path: './loader.json', rendererSettings: { preserveAspectRatio: 'xMidYMid slice' } });
+let all = [], currentFilter = 'all';
+
 async function run() {
     try {
         const res = await fetch(`https://api.airtable.com/v0/${DB.base}/${encodeURIComponent(DB.table)}?sort%5B0%5D%5Bfield%5D=Order`, { headers: { Authorization: `Bearer ${DB.key}` } });
         const data = await res.json();
-        const logoRec = data.records.find(r => r.fields['Site Logo']);
-        if(logoRec) document.getElementById('site-logo').innerHTML = `<img src="${logoRec.fields['Site Logo'][0].url}">`;
-        const bioRec = data.records.find(r => r.fields['Bio Image']);
-        if(bioRec) document.getElementById('bio-image-container').innerHTML = `<img src="${bioRec.fields['Bio Image'][0].url}" style="width:100%; height:100%; object-fit:cover;">`;
-        all = data.records.map(r => {
-            const hero = r.fields['Hero Image']?.[0];
-            return { title: r.fields.Title || '', cat: String(r.fields.Category || '').toLowerCase(), url: hero?.url || '', isVid: hero?.type?.includes('video') || hero?.url?.match(/\.(mp4|mov|webm|quicktime)/i), bg: r.fields['Background'] || '#E8E7E2' };
-        }).filter(p => p.url);
-        setFilter('commercial');
-        setTimeout(() => document.getElementById('load-screen').classList.add('hide'), 5000);
-        requestAnimationFrame(loop);
-    } catch(e) { console.error(e); }
+        all = data.records.map(r => ({
+            id: r.id, title: r.fields['Title'] || 'Untitled', 
+            client: r.fields['Client'] || 'N/A', year: r.fields['Year'] || '2024',
+            caption: r.fields['Caption'] || '', cat: String(r.fields.Category || '').toLowerCase(),
+            mosaic: r.fields['Mosaic Images'] || [], 
+            heroUrl: r.fields['Hero Image']?.[0]?.url || '',
+            isVid: r.fields['Hero Image']?.[0]?.type?.includes('video'),
+            assets: r.fields['Hero Image'] || []
+        })).filter(p => p.heroUrl);
+        renderUI(); initNaturalScroll();
+        const pepper = all.find(p => p.title.toLowerCase().includes('pepper'));
+        if (pepper) {
+            const panel = document.getElementById('hero-panel');
+            panel.innerHTML = pepper.isVid 
+                ? `<video id="hero-media" src="${pepper.heroUrl}" autoplay loop muted playsinline></video>`
+                : `<img id="hero-media" src="${pepper.heroUrl}">`;
+        }
+    } catch(e) { console.error('Data Error:', e); }
 }
-function setFilter(cat) {
-    list = all.filter(r => r.cat === cat);
-    const mover = document.getElementById('mover'); mover.innerHTML = '';
-    const isMobile = window.innerWidth < 769;
-    const items = isMobile ? list : [...list, ...list, ...list];
-    items.forEach((p) => {
-        const div = document.createElement('div'); div.className = 'item';
-        if(p.isVid) { div.innerHTML = `<video src="${p.url}" autoplay loop muted playsinline onloadedmetadata="calculateCenters()"></video>`; }
-        else { div.innerHTML = `<img src="${p.url}" onload="calculateCenters()">`; }
-        mover.appendChild(div);
+
+function renderUI() {
+    const rail = document.getElementById('grid-rail');
+    const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
+    rail.innerHTML = ''; Object.values(lists).forEach(l => l.innerHTML = '');
+    all.forEach(p => {
+        if (currentFilter === 'all' || p.cat === currentFilter) {
+            const item = document.createElement('div');
+            item.className = 'rail-item'; item.setAttribute('data-id', p.id); 
+            item.onmouseenter = () => highlight(p.id, p.title);
+            item.onmouseleave = unhighlight;
+            item.onclick = () => openProject(p.id);
+            item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
+            rail.appendChild(item);
+        }
+        if (lists[p.cat]) {
+            const link = document.createElement('div');
+            link.className = 'project-link'; link.id = `link-${p.id}`;
+            link.innerText = p.title;
+            link.onmouseenter = () => highlight(p.id, p.title);
+            link.onmouseleave = unhighlight;
+            link.onclick = () => openProject(p.id);
+            lists[p.cat].appendChild(link);
+        }
     });
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.innerText.toLowerCase() === cat));
 }
-function calculateCenters() {
-    if(window.innerWidth < 769) return;
-    const items = document.querySelectorAll('.item');
-    itemCenters = []; let acc = 0;
-    items.forEach(item => { const w = item.offsetWidth || 500; itemCenters.push(acc + (w / 2)); acc += w; });
-    moverSetWidth = acc / 3;
-    if(currentX === 0) { currentX = itemCenters[list.length] || 0; targetX = currentX; }
+
+function openProject(id) {
+    const p = all.find(proj => proj.id === id);
+    document.getElementById('det-client').innerText = p.client;
+    document.getElementById('det-title').innerText = p.title;
+    document.getElementById('det-year').innerText = p.year;
+    document.getElementById('det-cat').innerText = p.cat;
+    document.getElementById('det-caption').innerText = p.caption;
+    
+    const gallery = document.getElementById('detail-gallery-col');
+    gallery.innerHTML = '';
+    const displayAssets = p.mosaic.length > 0 ? p.mosaic : p.assets;
+    displayAssets.forEach(asset => {
+        const isV = asset.type.includes('video');
+        const el = document.createElement(isV ? 'video' : 'img');
+        el.className = 'detail-asset'; el.src = asset.url;
+        if(isV) { el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; }
+        gallery.appendChild(el);
+    });
+
+    document.getElementById('project-overlay').classList.add('active');
+    document.getElementById('close-btn').style.display = 'block';
+    gallery.scrollTop = 0;
 }
-function openOverlay(id) { isOverlay = true; document.getElementById(`${id}-overlay`).classList.add('active'); }
-function closeAll() { isOverlay = false; document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active')); }
-function loop() {
-    if(!isOverlay && moverSetWidth > 0 && window.innerWidth > 768) {
-        velocity = (velocity + (targetX - currentX) * 0.02) * 0.85;
-        currentX += velocity;
-        if(currentX > moverSetWidth * 2) { currentX -= moverSetWidth; targetX -= moverSetWidth; }
-        if(currentX < moverSetWidth) { currentX += moverSetWidth; targetX += moverSetWidth; }
-        document.getElementById('mover').style.transform = `translateX(${-currentX + (window.innerWidth / 2)}px)`;
-        document.body.style.backgroundColor = list[0]?.bg || '#E8E7E2';
-    }
-    requestAnimationFrame(loop);
+
+function closeAll() { 
+    document.getElementById('project-overlay').classList.remove('active'); 
+    document.getElementById('close-btn').style.display = 'none';
 }
-window.addEventListener('wheel', e => { if(!isOverlay && window.innerWidth > 768) targetX += e.deltaY * 1.1; }, { passive: true });
+
+function setFilter(cat) {
+    currentFilter = cat; renderUI();
+    document.querySelectorAll('.filter-toggle').forEach(t => t.classList.toggle('active', t.id === `f-${cat}`));
+}
+
+function initNaturalScroll() {
+    const rail = document.getElementById('grid-rail');
+    rail.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            e.preventDefault(); rail.scrollLeft += e.deltaY;
+        }
+    }, { passive: false });
+}
+
+function highlight(id, title) {
+    document.getElementById('active-project-label').innerText = title;
+    document.getElementById('active-project-label').style.opacity = "1";
+    document.getElementById(`link-${id}`)?.classList.add('active');
+    const railTarget = document.querySelector(`.rail-item[data-id="${id}"]`);
+    if (railTarget) railTarget.classList.add('highlighted');
+}
+
+function unhighlight() {
+    document.getElementById('active-project-label').innerText = "Archive";
+    document.getElementById('active-project-label').style.opacity = "0.2";
+    document.querySelectorAll('.project-link').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('highlighted'));
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.getElementById('theme-toggle').innerText = isDark ? "Light Mode" : "Dark Mode";
+}
+
 run();
 </script>
 </body>
