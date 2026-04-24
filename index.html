@@ -12,7 +12,6 @@
             --bg: #000000; --text: #ffffff; --line: rgba(255,255,255,0.15); 
             --pepper-pink: #ff00ff;
             --grid-rows: 4; 
-            --mobile-cols: 2;
         }
         [data-theme="light"] { 
             --bg: #ffffff; --text: #000000; --line: rgba(0,0,0,0.1);
@@ -31,7 +30,17 @@
         .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
-        /* --- UI: DESKTOP ZOOM (Stealth) --- */
+        /* --- UI: INFO ICON (Bottom Left - Mobile Only) --- */
+        #mobile-info-btn { 
+            display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; 
+            cursor: pointer; width: 44px; height: 44px; opacity: 0.6;
+            align-items: center; justify-content: center;
+            background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); 
+            border-radius: 50%; border: 1px solid var(--line);
+            font-size: 18px; font-weight: 300; font-family: serif; font-style: italic;
+        }
+
+        /* --- UI: DESKTOP ZOOM --- */
         #zoom-container {
             position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
             z-index: 1000; display: flex; flex-direction: column; align-items: center; pointer-events: none;
@@ -73,60 +82,53 @@
         .sidebar-header { padding: 80px 40px 60px 40px; }
         .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; max-width: 650px; }
 
+        /* Navigation Bottom Bar */
         .sidebar-nav-row { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-top: 1px solid var(--line); }
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
-        .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; }
-        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; }
-
-        /* Mobile Zoom UI - Hidden on Desktop */
-        #mobile-zoom-toggle { display: none; }
+        
+        .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; cursor: pointer; transition: 0.3s; }
+        .label:hover, .label.active-filter { opacity: 1; color: var(--pepper-pink); }
+        
+        .project-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; cursor: pointer; }
+        .project-link:hover { opacity: 1; color: var(--pepper-pink); }
+        
+        .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; }
+        .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
 
         /* --- MOBILE RE-ARCHITECTURE --- */
         @media (max-width: 768px) {
+            #mobile-info-btn { display: flex; }
             #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
             #zoom-container { display: none; }
-            
-            #mobile-zoom-toggle { 
-                display: flex; position: fixed; bottom: 30px; left: 30px; z-index: 20000;
-                width: 44px; height: 44px; background: rgba(128,128,128,0.1); 
-                backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line);
-                align-items: center; justify-content: center; font-size: 10px; opacity: 0.6;
-            }
-
-            .sidebar-header { padding: 60px 25px 30px 25px; order: 1; }
+            .sidebar-header { padding: 60px 25px 30px 25px; }
             .about-text { font-size: 32px; }
 
-            .sidebar-nav-row { display: flex; flex-direction: column; border: none; padding: 0 25px 20px 25px; order: 2; }
-            .nav-col { padding: 10px 0; border: none; }
+            .sidebar-nav-row { display: flex; flex-direction: column; border: none; padding: 0 25px 40px 25px; }
+            .nav-col { padding: 8px 0; border: none; }
             .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
             .project-link, .desktop-only-nav { display: none; }
 
             #grid-rail { 
-                order: 3; display: grid; grid-template-columns: repeat(var(--mobile-cols), 1fr); 
+                display: grid; grid-template-columns: repeat(2, 1fr); 
                 grid-template-rows: none; grid-auto-flow: row;
                 width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none;
                 border-top: 1px solid var(--line);
             }
             .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); }
-
-            #mobile-accordion { 
-                display: block; order: 4; margin-top: 40px; margin-bottom: 120px;
-                border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-            }
-            .accordion-trigger { display: flex; justify-content: space-between; align-items: center; padding: 25px; cursor: pointer; }
-            .accordion-trigger .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
-            .accordion-content { height: 0; overflow: hidden; padding: 0 25px; transition: 0.4s; }
-            .accordion-content.active { height: auto; padding-bottom: 30px; }
-            .contact-link { font-size: 20px; line-height: 1.6; padding: 5px 0; opacity: 0.7; }
-            .accordion-arrow { font-size: 14px; opacity: 0.3; transition: 0.4s; }
         }
 
-        /* --- PROJECT OVERLAY --- */
+        /* --- OVERLAYS --- */
         .overlay { position: fixed; inset: 0; z-index: 10000; background: var(--bg); transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); visibility: hidden; display: grid; grid-template-columns: 1fr 400px; }
         .overlay.active { transform: translateY(0); visibility: visible; }
-        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; }
+        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; }
         
+        /* Info Overlay specific */
+        #info-overlay { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 60px; }
+        .info-title { font-size: 14px; opacity: 0.3; margin-bottom: 20px; text-transform: uppercase; }
+        .info-big-link { font-size: 32px; font-weight: 500; text-decoration: none; color: inherit; line-height: 1.4; margin-bottom: 10px; display: block; }
+        .info-big-link:hover { color: var(--pepper-pink); }
+
         #detail-gallery-col { height: 100vh; padding: 100px 60px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 80px; align-items: center; border-right: 1px solid var(--line); }
         .detail-asset { width: 100%; max-width: 100%; height: auto; border-radius: 2px; object-fit: contain; }
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; }
@@ -138,19 +140,21 @@
             .overlay { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
             #detail-gallery-col { padding: 60px 15px; height: 70vh; border-right: none; }
             #detail-info-col { height: auto; padding: 20px; border-top: 1px solid var(--line); }
+            #info-overlay { padding: 40px 25px; }
         }
     </style>
 </head>
 <body>
 
-<div id="mobile-zoom-toggle" onclick="toggleMobileGrid()">2×</div>
+<div id="mobile-info-btn" onclick="openInfo()">i</div>
 
 <div id="zoom-container">
     <div class="slider-wrapper"><input type="range" id="zoom-slider" min="2" max="5" step="1" value="4"></div>
 </div>
 
 <div id="theme-toggle" onclick="toggleTheme()"><div class="mode-icon"></div></div>
-<div class="close-trigger" id="close-btn" onclick="closeAll()">✕</div>
+
+<div class="close-trigger" id="close-btn" style="display: none;" onclick="closeAll()">✕</div>
 
 <main id="main-container">
     <div id="grid-rail"></div>
@@ -160,29 +164,16 @@
         </div>
         
         <div class="sidebar-nav-row">
-            <div class="nav-col"><div class="label">Commercial</div><div id="list-commercial"></div></div>
-            <div class="nav-col"><div class="label">Editorial</div><div id="list-editorial"></div></div>
-            <div class="nav-col"><div class="label">Personal</div><div id="list-personal"></div></div>
-            
+            <div class="nav-col"><div class="label" id="filter-commercial" onclick="setFilter('commercial')">Commercial</div><div id="list-commercial"></div></div>
+            <div class="nav-col"><div class="label" id="filter-editorial" onclick="setFilter('editorial')">Editorial</div><div id="list-editorial"></div></div>
+            <div class="nav-col"><div class="label" id="filter-personal" onclick="setFilter('personal')">Personal</div><div id="list-personal"></div></div>
             <div class="nav-col desktop-only-nav">
-                <div class="label">Contact</div>
+                <div class="label" onclick="setFilter('all')">Archive</div>
                 <div id="desktop-contact-list">
                     <a href="mailto:alexjohntait@gmail.com" class="contact-link">alexjohntait@gmail.com</a>
                     <div class="contact-link">+44(0) 7875127072</div>
                     <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
                 </div>
-            </div>
-        </div>
-
-        <div id="mobile-accordion" onclick="toggleAccordion()">
-            <div class="accordion-trigger">
-                <div class="label">Contact</div>
-                <div class="accordion-arrow" id="arr-icon">↓</div>
-            </div>
-            <div class="accordion-content" id="acc-content">
-                <a href="mailto:alexjohntait@gmail.com" class="contact-link">alexjohntait@gmail.com</a>
-                <div class="contact-link">+44(0) 7875127072</div>
-                <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
             </div>
         </div>
     </aside>
@@ -198,25 +189,41 @@
     </div>
 </div>
 
+<div id="info-overlay" class="overlay" style="display: flex;">
+    <div class="info-title">Contact</div>
+    <a href="mailto:alexjohntait@gmail.com" class="info-big-link">alexjohntait@gmail.com</a>
+    <div class="info-big-link">+44(0) 7875127072</div>
+    <a href="https://instagram.com/alexjohntait" target="_blank" class="info-big-link">Instagram</a>
+</div>
+
 <script>
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all';
 
-function toggleAccordion() {
-    const content = document.getElementById('acc-content');
-    const arrow = document.getElementById('arr-icon');
-    content.classList.toggle('active');
-    arrow.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+// FILTER ENGINE
+function setFilter(cat) {
+    if (currentFilter === cat) currentFilter = 'all';
+    else currentFilter = cat;
+    
+    document.querySelectorAll('.label').forEach(el => el.classList.remove('active-filter'));
+    if (currentFilter !== 'all') document.getElementById(`filter-${currentFilter}`)?.classList.add('active-filter');
+    
+    renderUI();
 }
 
-function toggleMobileGrid() {
-    const root = document.documentElement;
-    const current = getComputedStyle(root).getPropertyValue('--mobile-cols').trim();
-    const next = current == "2" ? "1" : "2";
-    root.style.setProperty('--mobile-cols', next);
-    document.getElementById('mobile-zoom-toggle').innerText = next + '×';
+// OVERLAY LOGIC
+function openInfo() {
+    document.getElementById('info-overlay').classList.add('active');
+    document.getElementById('close-btn').style.display = 'block';
 }
 
+function closeAll() { 
+    document.getElementById('project-overlay').classList.remove('active'); 
+    document.getElementById('info-overlay').classList.remove('active'); 
+    document.getElementById('close-btn').style.display = 'none'; 
+}
+
+// ZOOM (DESKTOP)
 const slider = document.getElementById('zoom-slider');
 const root = document.documentElement;
 slider.addEventListener('input', (e) => {
@@ -241,15 +248,22 @@ function renderUI() {
     const rail = document.getElementById('grid-rail');
     const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
     rail.innerHTML = '';
+    Object.values(lists).forEach(l => l.innerHTML = '');
+
     all.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'rail-item';
-        item.onclick = () => openProject(p.id);
-        item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
-        rail.appendChild(item);
+        // Only show in grid if it matches filter
+        if (currentFilter === 'all' || p.cat === currentFilter) {
+            const item = document.createElement('div');
+            item.className = 'rail-item';
+            item.onclick = () => openProject(p.id);
+            item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
+            rail.appendChild(item);
+        }
+        // Always show in lists for desktop
         if (lists[p.cat]) {
             const link = document.createElement('div');
             link.className = 'project-link'; link.innerText = p.title;
+            link.onclick = () => openProject(p.id);
             lists[p.cat].appendChild(link);
         }
     });
@@ -273,8 +287,6 @@ function openProject(id) {
     document.getElementById('close-btn').style.display = 'block';
     gallery.scrollTop = 0;
 }
-
-function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('close-btn').style.display = 'none'; }
 
 function toggleTheme() {
     const html = document.documentElement;
