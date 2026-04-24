@@ -18,9 +18,9 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
 
-        /* --- UI: THEME TOGGLE (Bottom Right) --- */
+        /* --- UI: THEME TOGGLE --- */
         #theme-toggle { 
             position: fixed; bottom: 30px; right: 30px; z-index: 20000; 
             cursor: pointer; width: 44px; height: 44px; opacity: 0.5;
@@ -30,7 +30,7 @@
         .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
-        /* --- UI: INFO ICON (Bottom Left - Mobile Only) --- */
+        /* --- UI: INFO ICON (Mobile Only) --- */
         #mobile-info-btn { 
             display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; 
             cursor: pointer; width: 44px; height: 44px; opacity: 0.6;
@@ -73,43 +73,41 @@
             -webkit-mask-image: linear-gradient(to right, black 80%, transparent 98%);
             mask-image: linear-gradient(to right, black 80%, transparent 98%);
         }
+        #grid-rail::-webkit-scrollbar { display: none; }
+        
         .rail-item { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; transition: 0.4s ease; cursor: pointer; position: relative; }
         .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .rail-item:hover { grid-row: span 2; grid-column: span 2; z-index: 10; }
+        .rail-item:hover, .rail-item.highlighted { grid-row: span 2; grid-column: span 2; z-index: 10; }
+        .rail-item.highlighted::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--pepper-pink); pointer-events: none; opacity: 0.4; }
 
         /* --- SIDEBAR --- */
-        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow-y: auto; scrollbar-width: none; justify-content: space-between; }
+        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow: hidden; justify-content: space-between; }
         .sidebar-header { padding: 80px 40px 60px 40px; }
         .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; max-width: 650px; }
 
-        /* Desktop Bottom Navigation */
         .sidebar-nav-row { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-top: 1px solid var(--line); }
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
         
         .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; cursor: pointer; transition: 0.3s; }
         .label:hover, .label.active-filter { opacity: 1; color: var(--pepper-pink); }
-        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; cursor: pointer; }
-        .project-link:hover, .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
+        
+        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; cursor: pointer; transition: 0.2s; }
+        .project-link:hover, .project-link.active, .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
 
-        /* --- MOBILE RE-ARCHITECTURE (v190) --- */
+        /* --- MOBILE RE-ARCHITECTURE --- */
         @media (max-width: 768px) {
             #mobile-info-btn { display: flex; }
             #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
             #zoom-container { display: none; }
-            
-            /* Move Sidebar (Bio/Cats) above Grid */
             #sidebar { height: auto; order: 1; }
             #grid-rail { order: 2; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-flow: row; width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none; border-top: 1px solid var(--line); }
-            
             .sidebar-header { padding: 60px 25px 30px 25px; }
             .about-text { font-size: 32px; }
-
             .sidebar-nav-row { display: flex; flex-direction: column; border: none; padding: 0 25px 40px 25px; }
             .nav-col { padding: 8px 0; border: none; }
             .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
             .project-link, .desktop-only-nav { display: none; }
-            
             .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); }
         }
 
@@ -118,13 +116,22 @@
         .overlay.active { transform: translateY(0); visibility: visible; }
         .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; }
         
-        /* Info Overlay (v190 Smaller/Clean) */
         #info-overlay { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 60px; }
         .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
         .info-big-link:hover { color: var(--pepper-pink); opacity: 1; }
 
         #detail-gallery-col { height: 100vh; padding: 100px 60px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 80px; align-items: center; border-right: 1px solid var(--line); }
-        .detail-asset { width: 100%; max-width: 100%; height: auto; border-radius: 2px; object-fit: contain; }
+        
+        /* v191: Limit Image Height on Project Pages */
+        .detail-asset { 
+            width: auto; 
+            max-width: 100%; 
+            max-height: 80vh; /* Ensures it fits vertically */
+            height: auto; 
+            border-radius: 2px; 
+            object-fit: contain; 
+        }
+
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; }
         .info-block { padding: 25px 40px; border-bottom: 1px solid var(--line); }
         .info-value { font-size: 14px; font-weight: 500; }
@@ -147,12 +154,10 @@
 </div>
 
 <div id="theme-toggle" onclick="toggleTheme()"><div class="mode-icon"></div></div>
-
 <div class="close-trigger" id="close-btn" style="display: none;" onclick="closeAll()">✕</div>
 
 <main id="main-container">
     <div id="grid-rail"></div>
-
     <aside id="sidebar">
         <div class="sidebar-header">
             <div class="about-text">Alex Tait is an illustrator and motion designer crafting surreal worlds bursting with color.</div>
@@ -194,7 +199,15 @@
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all';
 
-// FILTER ENGINE
+// v191: SCROLL ENGINE
+const rail = document.getElementById('grid-rail');
+rail.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        rail.scrollLeft += e.deltaY;
+    }
+}, { passive: false });
+
 function setFilter(cat) {
     if (currentFilter === cat) currentFilter = 'all';
     else currentFilter = cat;
@@ -203,24 +216,23 @@ function setFilter(cat) {
     renderUI();
 }
 
-// OVERLAY LOGIC
-function openInfo() {
-    document.getElementById('info-overlay').classList.add('active');
-    document.getElementById('close-btn').style.display = 'block';
+function openInfo() { document.getElementById('info-overlay').classList.add('active'); document.getElementById('close-btn').style.display = 'block'; }
+function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('info-overlay').classList.remove('active'); document.getElementById('close-btn').style.display = 'none'; }
+
+// v191: HOVER LOGIC
+function highlight(id) {
+    document.getElementById(`link-${id}`)?.classList.add('active');
+    const railTarget = document.querySelector(`.rail-item[data-id="${id}"]`);
+    if (railTarget) railTarget.classList.add('highlighted');
+}
+function unhighlight() {
+    document.querySelectorAll('.project-link').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('highlighted'));
 }
 
-function closeAll() { 
-    document.getElementById('project-overlay').classList.remove('active'); 
-    document.getElementById('info-overlay').classList.remove('active'); 
-    document.getElementById('close-btn').style.display = 'none'; 
-}
-
-// ZOOM (DESKTOP)
 const slider = document.getElementById('zoom-slider');
 const root = document.documentElement;
-slider.addEventListener('input', (e) => {
-    root.style.setProperty('--grid-rows', e.target.value);
-});
+slider.addEventListener('input', (e) => { root.style.setProperty('--grid-rows', e.target.value); });
 
 async function run() {
     try {
@@ -239,20 +251,26 @@ async function run() {
 function renderUI() {
     const rail = document.getElementById('grid-rail');
     const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
-    rail.innerHTML = '';
-    Object.values(lists).forEach(l => l.innerHTML = '');
+    rail.innerHTML = ''; Object.values(lists).forEach(l => l.innerHTML = '');
 
     all.forEach(p => {
         if (currentFilter === 'all' || p.cat === currentFilter) {
             const item = document.createElement('div');
             item.className = 'rail-item';
+            item.setAttribute('data-id', p.id);
+            item.onmouseenter = () => highlight(p.id);
+            item.onmouseleave = unhighlight;
             item.onclick = () => openProject(p.id);
             item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
             rail.appendChild(item);
         }
         if (lists[p.cat]) {
             const link = document.createElement('div');
-            link.className = 'project-link'; link.innerText = p.title;
+            link.className = 'project-link'; 
+            link.id = `link-${p.id}`;
+            link.innerText = p.title;
+            link.onmouseenter = () => highlight(p.id);
+            link.onmouseleave = unhighlight;
             link.onclick = () => openProject(p.id);
             lists[p.cat].appendChild(link);
         }
