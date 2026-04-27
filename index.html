@@ -27,7 +27,7 @@
             display: flex; align-items: center; justify-content: center;
             background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%;
         }
-        .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
+        .mode-icon { width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
         #mobile-info-btn { 
@@ -111,34 +111,21 @@
         /* --- OVERLAYS --- */
         .overlay { position: fixed; inset: 0; z-index: 10000; background: var(--bg); transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); visibility: hidden; display: grid; grid-template-columns: 1fr 400px; }
         .overlay.active { transform: translateY(0); visibility: visible; }
+        
+        /* v198: Rogue X Fix */
         .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; }
         
         #info-overlay { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 60px; }
         .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
         .info-big-link:hover { color: var(--pepper-pink); opacity: 1; }
 
-        /* v197: TIGHT 2-COLUMN MASONRY GALLERY */
+        /* v198: Refined Masonry Gallery */
         #detail-gallery-col { 
-            height: 100vh; 
-            padding: 0; 
-            overflow-y: auto; 
-            scrollbar-width: none; 
-            border-right: 1px solid var(--line);
-            column-count: 2; /* Two Columns */
-            column-gap: 1px; /* Vertical divider */
-            background-color: var(--line); /* Divider color shows through */
-            display: block; /* Required for column-count to work */
+            height: 100vh; padding: 0; overflow-y: auto; scrollbar-width: none; 
+            border-right: 1px solid var(--line); background-color: var(--line);
+            column-count: 2; column-gap: 1px; display: block;
         }
-        
-        .detail-asset { 
-            width: 100%; 
-            height: auto; 
-            display: block;
-            margin-bottom: 1px; /* Horizontal divider */
-            background: var(--bg);
-            object-fit: contain; 
-            break-inside: avoid; /* Prevents splitting images between columns */
-        }
+        .detail-asset { width: 100%; height: auto; display: block; margin-bottom: 1px; background: var(--bg); object-fit: contain; break-inside: avoid; }
 
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
         .info-meta { flex-grow: 1; }
@@ -146,12 +133,7 @@
         .info-value { font-size: 14px; font-weight: 500; }
         .info-caption { font-size: 16px; line-height: 1.6; font-weight: 300; opacity: 0.9; }
 
-        #next-project-bar {
-            padding: 40px;
-            cursor: pointer;
-            transition: 0.3s;
-            opacity: 0.6;
-        }
+        #next-project-bar { padding: 40px; cursor: pointer; transition: 0.3s; opacity: 0.6; }
         #next-project-bar:hover { opacity: 1; color: var(--pepper-pink); }
         .next-label { font-size: 14px; font-weight: 500; }
 
@@ -173,7 +155,8 @@
 </div>
 
 <div id="theme-toggle" onclick="toggleTheme()"><div class="mode-icon"></div></div>
-<div class="close-trigger" id="close-btn" style="display: none;" onclick="closeAll()">✕</div>
+
+<div class="close-trigger" id="close-btn" onclick="closeAll()">✕</div>
 
 <main id="main-container">
     <div id="grid-rail"></div>
@@ -231,15 +214,19 @@ function nextProject() {
     openProject(all[currentIdx].id);
 }
 
+// v198: Bulletproof Filter logic
 function setFilter(cat) {
-    if (currentFilter === cat) currentFilter = 'all';
-    else currentFilter = cat;
+    currentFilter = cat;
     document.querySelectorAll('.label').forEach(el => el.classList.remove('active-filter'));
     if (currentFilter !== 'all') document.getElementById(`filter-${currentFilter}`)?.classList.add('active-filter');
     renderUI();
 }
 
-function openInfo() { document.getElementById('info-overlay').classList.add('active'); document.getElementById('close-btn').style.display = 'block'; }
+function openInfo() { 
+    document.getElementById('info-overlay').classList.add('active'); 
+    document.getElementById('close-btn').style.display = 'block'; 
+}
+
 function closeAll() { 
     document.getElementById('project-overlay').classList.remove('active'); 
     document.getElementById('info-overlay').classList.remove('active'); 
@@ -275,10 +262,12 @@ async function run() {
 }
 
 function renderUI() {
-    const rail = document.getElementById('grid-rail');
     const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
-    rail.innerHTML = ''; Object.values(lists).forEach(l => l.innerHTML = '');
+    rail.innerHTML = ''; 
+    Object.values(lists).forEach(l => l.innerHTML = '');
+
     all.forEach(p => {
+        // v198: Ensure ALL items show if filter is 'all'
         if (currentFilter === 'all' || p.cat === currentFilter) {
             const item = document.createElement('div');
             item.className = 'rail-item'; item.setAttribute('data-id', p.id);
@@ -287,6 +276,7 @@ function renderUI() {
             item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}">`;
             rail.appendChild(item);
         }
+        // Sub-lists always populate
         if (lists[p.cat]) {
             const link = document.createElement('div');
             link.className = 'project-link'; link.id = `link-${p.id}`;
