@@ -20,7 +20,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
 
-        /* --- UI: THEME TOGGLE --- */
+        /* --- UI: HUD --- */
         #theme-toggle { 
             position: fixed; bottom: 30px; right: 30px; z-index: 20000; 
             cursor: pointer; width: 44px; height: 44px; opacity: 0.5;
@@ -30,7 +30,6 @@
         .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
-        /* --- UI: INFO ICON (Mobile) --- */
         #mobile-info-btn { 
             display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; 
             cursor: pointer; width: 44px; height: 44px; opacity: 0.6;
@@ -40,7 +39,6 @@
             font-size: 18px; font-weight: 300; font-family: serif; font-style: italic;
         }
 
-        /* --- UI: DESKTOP ZOOM --- */
         #zoom-container {
             position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
             z-index: 1000; display: flex; flex-direction: column; align-items: center; pointer-events: none;
@@ -63,7 +61,7 @@
         /* --- MAIN SPLIT --- */
         #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; }
 
-        /* --- GRID --- */
+        /* --- HOMEPAGE GRID --- */
         #grid-rail { 
             display: grid; grid-template-rows: repeat(var(--grid-rows), 1fr); grid-auto-flow: column; 
             grid-auto-columns: calc(100vh / var(--grid-rows)); 
@@ -119,18 +117,17 @@
         .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
         .info-big-link:hover { color: var(--pepper-pink); opacity: 1; }
 
-        /* v195: TIGHT PARALLAX GRID */
+        /* v196: CLEAN VERTICAL STACKED GALLERY */
         #detail-gallery-col { 
             height: 100vh; 
             padding: 0; 
             overflow-y: auto; 
             scrollbar-width: none; 
             border-right: 1px solid var(--line);
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1px; /* Matching homepage spacing */
-            background: var(--line); /* Divider color */
-            grid-auto-flow: dense;
+            display: flex;
+            flex-direction: column;
+            gap: 1px; /* The technical line gap */
+            background-color: var(--line);
         }
         
         .detail-asset { 
@@ -138,17 +135,15 @@
             height: auto; 
             display: block;
             background: var(--bg);
-            object-fit: cover; 
-            transition: transform 0.1s linear;
-            will-change: transform;
+            object-fit: contain; 
         }
 
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
+        .info-meta { flex-grow: 1; }
         .info-block { padding: 25px 40px; border-bottom: 1px solid var(--line); }
         .info-value { font-size: 14px; font-weight: 500; }
         .info-caption { font-size: 16px; line-height: 1.6; font-weight: 300; opacity: 0.9; }
 
-        /* v195: NEXT PROJECT LINK (Bottom-Left) */
         #next-project-bar {
             padding: 40px;
             cursor: pointer;
@@ -160,7 +155,7 @@
 
         @media (max-width: 768px) {
             .overlay { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-            #detail-gallery-col { grid-template-columns: 1fr; height: 70vh; border-right: none; }
+            #detail-gallery-col { height: 70vh; border-right: none; }
             #detail-info-col { height: auto; padding: 20px; border-top: 1px solid var(--line); }
             #next-project-bar { padding: 20px; }
             #info-overlay { padding: 40px 25px; }
@@ -210,7 +205,6 @@
             <div class="info-block"><div class="label">Year</div><div id="det-year" class="info-value"></div></div>
             <div class="info-block" style="border-bottom:none;"><div id="det-caption" class="info-caption"></div></div>
         </div>
-        
         <div id="next-project-bar" onclick="nextProject()">
             <div class="next-label">Next project →</div>
         </div>
@@ -227,23 +221,8 @@
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all', currentIdx = 0;
 
-// SCROLL ENGINE
 const rail = document.getElementById('grid-rail');
 rail.addEventListener('wheel', (e) => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); rail.scrollLeft += e.deltaY; } }, { passive: false });
-
-// PARALLAX ENGINE
-const galleryCol = document.getElementById('detail-gallery-col');
-let parallaxAssets = [];
-galleryCol.addEventListener('scroll', () => { if (window.innerWidth > 768) requestAnimationFrame(applyParallax); });
-
-function applyParallax() {
-    const scrollTop = galleryCol.scrollTop;
-    parallaxAssets.forEach((asset, index) => {
-        if (index % 2 === 1) {
-            asset.style.transform = `translateY(${scrollTop * 0.15}px)`;
-        }
-    });
-}
 
 function nextProject() {
     currentIdx = (currentIdx + 1) % all.length;
@@ -263,7 +242,6 @@ function closeAll() {
     document.getElementById('project-overlay').classList.remove('active'); 
     document.getElementById('info-overlay').classList.remove('active'); 
     document.getElementById('close-btn').style.display = 'none'; 
-    parallaxAssets.forEach(asset => asset.style.transform = '');
 }
 
 function highlight(id) {
@@ -326,7 +304,6 @@ function openProject(id) {
     document.getElementById('det-year').innerText = p.year;
     document.getElementById('det-caption').innerText = p.caption;
     const gallery = document.getElementById('detail-gallery-col'); gallery.innerHTML = '';
-    parallaxAssets = [];
     const displayAssets = p.mosaic.length > 0 ? p.mosaic : p.assets;
     displayAssets.forEach((asset) => {
         const isV = asset.type.includes('video');
@@ -334,7 +311,6 @@ function openProject(id) {
         el.className = 'detail-asset'; el.src = asset.url;
         if(isV) { el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; }
         gallery.appendChild(el);
-        parallaxAssets.push(el);
     });
     document.getElementById('project-overlay').classList.add('active');
     document.getElementById('close-btn').style.display = 'block';
