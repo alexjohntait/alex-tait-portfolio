@@ -119,26 +119,28 @@
         .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
         .info-big-link:hover { color: var(--pepper-pink); opacity: 1; }
 
-        /* v193: FULL-WIDTH VERTICAL GALLERY */
+        /* v194: TWO COLUMN PARALLAX GRID (DESKTOP) */
         #detail-gallery-col { 
             height: 100vh; 
-            padding: 0; 
+            padding: 80px 40px; /* Containment: not full bleed */
             overflow-y: auto; 
             scrollbar-width: none; 
             border-right: 1px solid var(--line);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px; /* Spacing between assets */
             background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            gap: 1px; /* The technical 1px line */
-            background-color: var(--line); /* This creates the divider line color */
+            grid-auto-flow: dense; /* Masonry-lite packing */
         }
         
         .detail-asset { 
             width: 100%; 
             height: auto; 
             display: block;
-            background: var(--bg);
-            object-fit: contain; 
+            border-radius: 2px; 
+            object-fit: cover; /* Fill the grid cell */
+            transition: transform 0.1s linear; /* Smooth parallax */
+            will-change: transform;
         }
 
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; }
@@ -148,7 +150,7 @@
 
         @media (max-width: 768px) {
             .overlay { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-            #detail-gallery-col { height: 70vh; border-right: none; }
+            #detail-gallery-col { grid-template-columns: 1fr; height: 70vh; padding: 40px 15px; border-right: none; }
             #detail-info-col { height: auto; padding: 20px; border-top: 1px solid var(--line); }
             #info-overlay { padding: 40px 25px; }
         }
@@ -208,8 +210,34 @@
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all';
 
+// SCROLL ENGINE (HOME GRID)
 const rail = document.getElementById('grid-rail');
-rail.addEventListener('wheel', (e) => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); rail.scrollLeft += e.deltaY; } }, { passive: false });
+rail.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        rail.scrollLeft += e.deltaY;
+    }
+}, { passive: false });
+
+// v194: PARALLAX ENGINE (PROJECT GALLERY)
+const galleryCol = document.getElementById('detail-gallery-col');
+let parallaxAssets = [];
+
+galleryCol.addEventListener('scroll', () => {
+    if (window.innerWidth <= 768) return; // Disable on mobile
+    requestAnimationFrame(applyParallax);
+});
+
+function applyParallax() {
+    const scrollTop = galleryCol.scrollTop;
+    parallaxAssets.forEach((asset, index) => {
+        // Slow down even-indexed items (right column)
+        if (index % 2 === 1) {
+            const yOffset = scrollTop * 0.15; // Adjustment factor
+            asset.style.transform = `translateY(${yOffset}px)`;
+        }
+    });
+}
 
 function setFilter(cat) {
     if (currentFilter === cat) currentFilter = 'all';
@@ -220,7 +248,13 @@ function setFilter(cat) {
 }
 
 function openInfo() { document.getElementById('info-overlay').classList.add('active'); document.getElementById('close-btn').style.display = 'block'; }
-function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('info-overlay').classList.remove('active'); document.getElementById('close-btn').style.display = 'none'; }
+function closeAll() { 
+    document.getElementById('project-overlay').classList.remove('active'); 
+    document.getElementById('info-overlay').classList.remove('active'); 
+    document.getElementById('close-btn').style.display = 'none'; 
+    // Reset parallax transforms
+    parallaxAssets.forEach(asset => asset.style.transform = '');
+}
 
 function highlight(id) {
     document.getElementById(`link-${id}`)?.classList.add('active');
@@ -254,6 +288,7 @@ function renderUI() {
     const rail = document.getElementById('grid-rail');
     const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
     rail.innerHTML = ''; Object.values(lists).forEach(l => l.innerHTML = '');
+
     all.forEach(p => {
         if (currentFilter === 'all' || p.cat === currentFilter) {
             const item = document.createElement('div');
@@ -281,13 +316,23 @@ function openProject(id) {
     document.getElementById('det-year').innerText = p.year;
     document.getElementById('det-caption').innerText = p.caption;
     const gallery = document.getElementById('detail-gallery-col'); gallery.innerHTML = '';
+    parallaxAssets = []; // Reset array
+    
+    // v194: Load tight grid assets
     const displayAssets = p.mosaic.length > 0 ? p.mosaic : p.assets;
-    displayAssets.forEach(asset => {
+    displayAssets.forEach((asset, index) => {
         const isV = asset.type.includes('video');
         const el = document.createElement(isV ? 'video' : 'img');
         el.className = 'detail-asset'; el.src = asset.url;
         if(isV) { el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; }
+        
+        // Add special grid classes for potential spans based on aspect ratio
+        if (asset.width > asset.height * 1.5) { // Very wide image
+            // el.style.gridColumn = 'span 2'; // Option to span across both columns
+        }
+        
         gallery.appendChild(el);
+        parallaxAssets.push(el); // Store for parallax effect
     });
     document.getElementById('project-overlay').classList.add('active');
     document.getElementById('close-btn').style.display = 'block';
