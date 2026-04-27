@@ -117,25 +117,27 @@
         .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
         .info-big-link:hover { color: var(--pepper-pink); opacity: 1; }
 
-        /* v196: CLEAN VERTICAL STACKED GALLERY */
+        /* v197: TIGHT 2-COLUMN MASONRY GALLERY */
         #detail-gallery-col { 
             height: 100vh; 
             padding: 0; 
             overflow-y: auto; 
             scrollbar-width: none; 
             border-right: 1px solid var(--line);
-            display: flex;
-            flex-direction: column;
-            gap: 1px; /* The technical line gap */
-            background-color: var(--line);
+            column-count: 2; /* Two Columns */
+            column-gap: 1px; /* Vertical divider */
+            background-color: var(--line); /* Divider color shows through */
+            display: block; /* Required for column-count to work */
         }
         
         .detail-asset { 
             width: 100%; 
             height: auto; 
             display: block;
+            margin-bottom: 1px; /* Horizontal divider */
             background: var(--bg);
             object-fit: contain; 
+            break-inside: avoid; /* Prevents splitting images between columns */
         }
 
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
@@ -155,7 +157,7 @@
 
         @media (max-width: 768px) {
             .overlay { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-            #detail-gallery-col { height: 70vh; border-right: none; }
+            #detail-gallery-col { column-count: 1; height: 70vh; border-right: none; }
             #detail-info-col { height: auto; padding: 20px; border-top: 1px solid var(--line); }
             #next-project-bar { padding: 20px; }
             #info-overlay { padding: 40px 25px; }
