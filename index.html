@@ -16,19 +16,26 @@
             --bg: #000000; --text: #ffffff; --line: rgba(255,255,255,0.15); 
             --pepper-pink: #ff00ff;
             --grid-rows: 4; 
+            --glitch-offset: 0px;
         }
         [data-theme="light"] { 
             --bg: #ffffff; --text: #000000; --line: rgba(0,0,0,0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.6s ease, color 0.6s ease; cursor: none; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.6s ease; cursor: none; }
 
-        /* --- EXP 1: ANALOG GRAIN --- */
+        /* --- EXP: CHROMATIC THEME GLITCH --- */
+        #glitch-overlay { 
+            position: fixed; inset: 0; pointer-events: none; z-index: 99999; 
+            mix-blend-mode: screen; opacity: 0; transition: opacity 0.2s;
+            box-shadow: inset var(--glitch-offset) 0 0 #ff0000, inset calc(var(--glitch-offset) * -1) 0 0 #00ffff;
+        }
+
         body::after {
             content: ""; position: fixed; top: -150%; left: -150%; width: 300%; height: 300%;
             background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.08; pointer-events: none; z-index: 999999;
+            opacity: 0.08; pointer-events: none; z-index: 999998;
             animation: grain 8s steps(10) infinite;
         }
         @keyframes grain {
@@ -40,17 +47,21 @@
             90% { transform: translate(10%, 10%); }
         }
 
-        /* --- UI: CUSTOM CURSOR --- */
-        #cursor { width: 8px; height: 8px; background: var(--text); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, opacity 0.3s; mix-blend-mode: difference; }
-        .cursor-hover #cursor { width: 40px; height: 40px; background: transparent; border: 1px solid var(--text); }
+        /* --- UI: MAGNETIC CURSOR --- */
+        #cursor { 
+            width: 8px; height: 8px; background: var(--text); border-radius: 50%; 
+            position: fixed; pointer-events: none; z-index: 999999; 
+            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background 0.3s, border 0.3s; 
+            mix-blend-mode: difference;
+        }
+        .cursor-active #cursor { width: 50px; height: 50px; background: transparent; border: 1px solid var(--text); }
 
-        /* --- UI: HUD --- */
+        /* --- HUD --- */
         #theme-toggle { position: fixed; bottom: 30px; right: 30px; z-index: 20000; cursor: pointer; width: 44px; height: 44px; opacity: 0.5; display: flex; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%; transition: 0.3s; }
-        #theme-toggle:hover { opacity: 1; transform: scale(1.1); }
-        .mode-icon { width: 16px; height: 16px; border: 1px solid currentColor; border-radius: 50%; }
+        .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
-        #mobile-info-btn { display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; cursor: pointer; width: 44px; height: 44px; opacity: 0.6; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line); font-size: 18px; font-weight: 300; font-family: serif; font-style: italic; transition: 0.2s; }
+        #mobile-info-btn { display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; cursor: pointer; width: 44px; height: 44px; opacity: 0.6; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line); font-size: 18px; font-weight: 300; font-family: serif; font-style: italic; }
 
         #zoom-container { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); z-index: 1000; pointer-events: none; }
         .slider-wrapper { height: 240px; width: 44px; background: rgba(128,128,128,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 22px; border: 1px solid var(--line); position: relative; pointer-events: auto; display: flex; justify-content: center; overflow: hidden; }
@@ -62,9 +73,9 @@
 
         /* --- LAYOUT --- */
         #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease; }
-        #main-container.dimmed { transform: scale(0.98); filter: blur(4px) grayscale(0.5); opacity: 0.3; pointer-events: none; }
+        #main-container.dimmed { transform: scale(0.98); filter: blur(10px) grayscale(0.5); opacity: 0.2; pointer-events: none; }
 
-        /* --- GRID (EXP 2: 3D Perspective) --- */
+        /* --- GRID RAIL (EXP: Drag to scroll) --- */
         #grid-rail { 
             display: grid; grid-template-rows: repeat(var(--grid-rows), 1fr); grid-auto-flow: column; 
             grid-auto-columns: calc(100vh / var(--grid-rows)); width: 100%; height: 100vh; 
@@ -72,20 +83,18 @@
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-mask-image: linear-gradient(to right, black 80%, transparent 98%);
             mask-image: linear-gradient(to right, black 80%, transparent 98%);
-            perspective: 1200px; /* Essential for 3D Tilt */
+            perspective: 1200px;
+            user-select: none;
         }
+        #grid-rail::-webkit-scrollbar { display: none; }
         
-        @keyframes reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .rail-item { 
             border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); 
             overflow: hidden; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); position: relative; 
-            background: rgba(128,128,128,0.05); animation: reveal 0.8s ease forwards;
-            transform-style: preserve-3d;
+            background: rgba(128,128,128,0.05); transform-style: preserve-3d;
         }
         .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: 0.5s opacity; pointer-events: none; }
         .rail-item.loaded img, .rail-item.loaded video { opacity: 1; }
-        
-        /* 3D States */
         .rail-item:hover, .rail-item.highlighted { grid-row: span 2; grid-column: span 2; z-index: 10; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
         .rail-item.highlighted::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--pepper-pink); pointer-events: none; opacity: 0.4; }
 
@@ -93,30 +102,25 @@
         #sidebar { display: flex; flex-direction: column; height: 100vh; overflow: hidden; justify-content: space-between; }
         .sidebar-header { padding: 80px 40px 60px 40px; }
         .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; max-width: 650px; }
-
-        /* EXP 3: INTERACTIVE COLOUR */
         .colour-trigger { color: var(--pepper-pink); cursor: pointer; transition: 0.3s; position: relative; }
         .colour-trigger:hover { animation: colorCycle 2s linear infinite; }
-        @keyframes colorCycle {
-            0% { color: #ff00ff; } 25% { color: #00ffff; } 50% { color: #ffff00; } 75% { color: #ff0000; } 100% { color: #ff00ff; }
-        }
+        @keyframes colorCycle { 0% { color: #ff00ff; } 25% { color: #00ffff; } 50% { color: #ffff00; } 75% { color: #ff0000; } 100% { color: #ff00ff; } }
 
         .sidebar-nav-row { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-top: 1px solid var(--line); }
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
-        
-        .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; transition: 0.3s; cursor: pointer; }
+        .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; transition: 0.3s; cursor: pointer; position: relative; }
         .label:hover, .label.active-filter { opacity: 1; color: var(--pepper-pink); }
         .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; transition: 0.2s; cursor: pointer; }
         .project-link:hover, .project-link.active, .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
 
         /* --- MOBILE --- */
         @media (max-width: 768px) {
-            body { cursor: auto; } #cursor, body::after { display: none; }
+            body { cursor: auto; } #cursor, body::after, #scroll-progress { display: none; }
             #mobile-info-btn { display: flex; }
             #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
             #main-container.dimmed { filter: none; transform: none; opacity: 1; }
-            #zoom-container, #scroll-progress { display: none; }
+            #zoom-container { display: none; }
             #sidebar { height: auto; order: 1; }
             #grid-rail { order: 2; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-flow: row; width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none; border-top: 1px solid var(--line); perspective: none; }
             .sidebar-header { padding: 60px 25px 30px 25px; }
@@ -125,7 +129,7 @@
             .nav-col { padding: 8px 0; border: none; }
             .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
             .project-link, .desktop-only-nav { display: none; }
-            .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); animation: none; perspective: none; }
+            .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); perspective: none; }
         }
 
         /* --- OVERLAYS --- */
@@ -133,9 +137,6 @@
         .overlay.active { transform: translateY(0); visibility: visible; }
         .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; }
         
-        #info-overlay { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 60px; }
-        .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
-
         #detail-gallery-col { height: 100vh; padding: 0; overflow-y: auto; scrollbar-width: none; border-right: 1px solid var(--line); background-color: var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
         .detail-asset { width: 100%; height: auto; display: block; background: var(--bg); object-fit: contain; }
 
@@ -149,6 +150,7 @@
 <body>
 
 <div id="cursor"></div>
+<div id="glitch-overlay"></div>
 <div id="scroll-progress"></div>
 <div id="mobile-info-btn" onclick="openInfo()">i</div>
 
@@ -209,63 +211,98 @@
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all', currentIdx = 0;
 
-// CURSOR
+// CURSOR & MAGNETIC EFFECT
 const cursor = document.getElementById('cursor');
-document.addEventListener('mousemove', e => { 
-    cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; 
-});
-document.addEventListener('mouseover', e => {
-    if (e.target.closest('a, .rail-item, .label, #next-project-bar, .project-link, #theme-toggle, #mobile-info-btn, .close-trigger, .colour-trigger')) document.body.classList.add('cursor-hover');
-    else document.body.classList.remove('cursor-hover');
-});
+let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
 
-// SCROLL MOMENTUM + PROGRESS
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+function updateCursor() {
+    let targetX = mouseX, targetY = mouseY;
+    const magneticEl = document.querySelector('.label:hover, .mode-icon:hover, #mobile-info-btn:hover, .close-trigger:hover, .colour-trigger:hover');
+    
+    if (magneticEl && window.innerWidth > 768) {
+        const rect = magneticEl.getBoundingClientRect();
+        targetX = rect.left + rect.width / 2;
+        targetY = rect.top + rect.height / 2;
+        document.body.classList.add('cursor-active');
+    } else {
+        document.body.classList.remove('cursor-active');
+        if (document.querySelector('a:hover, .rail-item:hover, #next-project-bar:hover, .project-link:hover')) {
+            document.body.classList.add('cursor-active');
+        }
+    }
+
+    cursorX += (targetX - cursorX) * 0.15;
+    cursorY += (targetY - cursorY) * 0.15;
+    cursor.style.left = `${cursorX}px`;
+    cursor.style.top = `${cursorY}px`;
+    requestAnimationFrame(updateCursor);
+}
+updateCursor();
+
+// SCROLL ENGINE + DRAG
 const rail = document.getElementById('grid-rail');
 const progressBar = document.getElementById('scroll-progress');
-let scrollTarget = 0, scrollCurrent = 0;
+let scrollTarget = 0, scrollCurrent = 0, isDragging = false, startX, scrollLeft;
+
 rail.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); scrollTarget += e.deltaY; } }, { passive: false });
+
+rail.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX - rail.offsetLeft; scrollLeft = rail.scrollLeft; rail.style.cursor = 'grabbing'; });
+document.addEventListener('mouseup', () => { isDragging = false; rail.style.cursor = 'none'; });
+document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const x = e.pageX - rail.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollTarget = scrollLeft - walk;
+});
 
 function smoothScroll() {
     scrollCurrent += (scrollTarget - scrollCurrent) * 0.08;
     rail.scrollLeft = scrollCurrent;
-    const progress = (rail.scrollLeft / (rail.scrollWidth - rail.clientWidth)) * 100;
-    progressBar.style.width = `${progress}%`;
+    const max = rail.scrollWidth - rail.clientWidth;
+    if (max > 0) progressBar.style.width = `${(rail.scrollLeft / max) * 100}%`;
     requestAnimationFrame(smoothScroll);
 }
 smoothScroll();
 
-// EXP: 3D TILT ENGINE
+// 3D TILT
 document.addEventListener('mousemove', e => {
     const item = e.target.closest('.rail-item');
     if (item && window.innerWidth > 768) {
         const rect = item.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width - 0.5;
         const y = (e.clientY - rect.top) / rect.height - 0.5;
-        item.style.transform = `perspective(1000px) rotateY(${x * 15}deg) rotateX(${y * -15}deg) scale(1.05)`;
+        item.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${y * -12}deg) scale(1.05)`;
     }
 });
-document.addEventListener('mouseout', e => {
-    const item = e.target.closest('.rail-item');
-    if (item) item.style.transform = '';
-});
+document.addEventListener('mouseout', e => { const item = e.target.closest('.rail-item'); if (item) item.style.transform = ''; });
 
-document.addEventListener('keydown', e => {
-    if (e.key === "Escape") closeAll();
-    if (e.key === "ArrowRight") scrollTarget += 400;
-    if (e.key === "ArrowLeft") scrollTarget -= 400;
-});
+// CHROMATIC GLITCH
+function triggerGlitch() {
+    const glitch = document.getElementById('glitch-overlay');
+    glitch.style.opacity = '1';
+    document.documentElement.style.setProperty('--glitch-offset', '10px');
+    setTimeout(() => {
+        document.documentElement.style.setProperty('--glitch-offset', '0px');
+        glitch.style.opacity = '0';
+    }, 150);
+}
 
+function toggleTheme() {
+    triggerGlitch();
+    const html = document.documentElement;
+    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+
+// REST OF LOGIC
+document.addEventListener('keydown', e => { if (e.key === "Escape") closeAll(); if (e.key === "ArrowRight") scrollTarget += 400; if (e.key === "ArrowLeft") scrollTarget -= 400; });
 function nextProject() { currentIdx = (currentIdx + 1) % all.length; openProject(all[currentIdx].id); }
 function setFilter(cat) { currentFilter = cat; document.querySelectorAll('.label').forEach(el => el.classList.remove('active-filter')); document.getElementById(`filter-${cat}`)?.classList.add('active-filter'); renderUI(); }
 function openInfo() { document.getElementById('info-overlay').classList.add('active'); document.getElementById('close-btn').style.display = 'block'; }
 function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('info-overlay').classList.remove('active'); document.getElementById('main-container').classList.remove('dimmed'); document.getElementById('close-btn').style.display = 'none'; document.title = "Alex Tait — Studio"; }
-
 function highlight(id) { document.getElementById(`link-${id}`)?.classList.add('active'); const railTarget = document.querySelector(`.rail-item[data-id="${id}"]`); if (railTarget) railTarget.classList.add('highlighted'); }
 function unhighlight() { document.querySelectorAll('.project-link').forEach(el => el.classList.remove('active')); document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('highlighted')); }
-
-const slider = document.getElementById('zoom-slider');
-const root = document.documentElement;
-slider.addEventListener('input', e => { root.style.setProperty('--grid-rows', e.target.value); });
 
 async function run() {
     try {
@@ -333,10 +370,8 @@ function openProject(id) {
     gallery.scrollTop = 0;
 }
 
-function toggleTheme() {
-    const html = document.documentElement;
-    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-}
+const slider = document.getElementById('zoom-slider');
+slider.addEventListener('input', e => { document.documentElement.style.setProperty('--grid-rows', e.target.value); });
 run();
 </script>
 </body>
