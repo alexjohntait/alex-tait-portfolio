@@ -6,10 +6,6 @@
     
     <title>Alex Tait — Studio</title>
     <meta name="description" content="Alex Tait is an illustrator and motion designer crafting surreal worlds bursting with colour.">
-    <meta property="og:title" content="Alex Tait — Studio">
-    <meta property="og:description" content="Surreal illustration and motion design.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://v5.airtableusercontent.com/..."> 
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +31,6 @@
             transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, opacity 0.3s;
             mix-blend-mode: difference;
         }
-        body:hover #cursor { opacity: 1; }
         .cursor-hover #cursor { width: 40px; height: 40px; background: transparent; border: 1px solid var(--text); }
 
         /* --- UI: HUD --- */
@@ -56,37 +51,28 @@
             align-items: center; justify-content: center;
             background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); 
             border-radius: 50%; border: 1px solid var(--line);
-            font-size: 18px; font-weight: 300; font-family: serif; font-style: italic;
+            font-size: 18px; font-weight: 300; font-family: serif; font-style: italic; transition: 0.2s;
         }
+        #mobile-info-btn:active { transform: scale(0.9); opacity: 1; }
 
-        #zoom-container {
-            position: fixed; left: 30px; top: 50%; transform: translateY(-50%);
-            z-index: 1000; display: flex; flex-direction: column; align-items: center; pointer-events: none;
-        }
-        .slider-wrapper {
-            height: 240px; width: 44px; background: rgba(128,128,128,0.1);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-radius: 22px; border: 1px solid var(--line);
-            position: relative; pointer-events: auto;
-            display: flex; justify-content: center; overflow: hidden;
-        }
-        .slider-wrapper::before {
-            content: ''; position: absolute; inset: 20px 0;
-            background-image: repeating-linear-gradient(to bottom, var(--line) 0px, var(--line) 1px, transparent 1px, transparent 12px);
-            width: 12px; margin: 0 auto; opacity: 0.5;
-        }
+        #zoom-container { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); z-index: 1000; pointer-events: none; }
+        .slider-wrapper { height: 240px; width: 44px; background: rgba(128,128,128,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 22px; border: 1px solid var(--line); position: relative; pointer-events: auto; display: flex; justify-content: center; overflow: hidden; }
+        .slider-wrapper::before { content: ''; position: absolute; inset: 20px 0; background-image: repeating-linear-gradient(to bottom, var(--line) 0px, var(--line) 1px, transparent 1px, transparent 12px); width: 12px; margin: 0 auto; opacity: 0.5; }
         #zoom-slider { -webkit-appearance: none; width: 200px; height: 100%; background: transparent; transform: rotate(-90deg); position: absolute; outline: none; cursor: pointer; z-index: 2; }
         #zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 40px; width: 2px; background: var(--pepper-pink); box-shadow: 0 0 10px var(--pepper-pink); }
 
-        /* --- LAYOUT --- */
-        #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; }
+        /* v202: PROGRESS BAR INDICATOR */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 1px; width: 0%; background: var(--pepper-pink); z-index: 1500; transition: width 0.1s linear; box-shadow: 0 0 8px var(--pepper-pink); }
 
-        /* --- HOME GRID RAIL --- */
+        /* --- LAYOUT --- */
+        #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease; }
+        #main-container.dimmed { transform: scale(0.98); filter: blur(4px) grayscale(0.5); opacity: 0.3; pointer-events: none; }
+
+        /* --- GRID --- */
         #grid-rail { 
             display: grid; grid-template-rows: repeat(var(--grid-rows), 1fr); grid-auto-flow: column; 
-            grid-auto-columns: calc(100vh / var(--grid-rows)); 
-            width: 100%; height: 100vh; overflow-x: auto; overflow-y: hidden; 
-            background: var(--bg); scrollbar-width: none;
+            grid-auto-columns: calc(100vh / var(--grid-rows)); width: 100%; height: 100vh; 
+            overflow-x: auto; overflow-y: hidden; background: var(--bg); scrollbar-width: none;
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-mask-image: linear-gradient(to right, black 80%, transparent 98%);
             mask-image: linear-gradient(to right, black 80%, transparent 98%);
@@ -94,12 +80,7 @@
         #grid-rail::-webkit-scrollbar { display: none; }
         
         @keyframes reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .rail-item { 
-            border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); 
-            overflow: hidden; transition: 0.4s ease; position: relative; 
-            background: rgba(128,128,128,0.05); 
-            animation: reveal 0.8s ease forwards;
-        }
+        .rail-item { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; transition: 0.4s ease; position: relative; background: rgba(128,128,128,0.05); animation: reveal 0.8s ease forwards; }
         .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: 0.5s opacity; }
         .rail-item.loaded img, .rail-item.loaded video { opacity: 1; }
         .rail-item:hover, .rail-item.highlighted { grid-row: span 2; grid-column: span 2; z-index: 10; }
@@ -114,10 +95,9 @@
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
         
-        .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; transition: 0.3s; }
+        .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; transition: 0.3s; cursor: pointer; }
         .label:hover, .label.active-filter { opacity: 1; color: var(--pepper-pink); }
-        
-        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; transition: 0.2s; }
+        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; transition: 0.2s; cursor: pointer; }
         .project-link:hover, .project-link.active, .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
 
         /* --- MOBILE --- */
@@ -125,7 +105,8 @@
             body { cursor: auto; } #cursor { display: none; }
             #mobile-info-btn { display: flex; }
             #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
-            #zoom-container { display: none; }
+            #main-container.dimmed { filter: none; transform: none; opacity: 1; } /* Disable scale effect on mobile overlays for performance */
+            #zoom-container, #scroll-progress { display: none; }
             #sidebar { height: auto; order: 1; }
             #grid-rail { order: 2; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-flow: row; width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none; border-top: 1px solid var(--line); }
             .sidebar-header { padding: 60px 25px 30px 25px; }
@@ -140,7 +121,8 @@
         /* --- OVERLAYS --- */
         .overlay { position: fixed; inset: 0; z-index: 10000; background: var(--bg); transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); visibility: hidden; display: grid; grid-template-columns: 1fr 400px; }
         .overlay.active { transform: translateY(0); visibility: visible; }
-        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; opacity: 0.4; z-index: 20001; display: none; }
+        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; transition: 0.3s; }
+        .close-trigger:hover { opacity: 1; color: var(--pepper-pink); }
         
         #info-overlay { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 60px; }
         .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
@@ -150,11 +132,9 @@
         .detail-asset { width: 100%; height: auto; display: block; background: var(--bg); object-fit: contain; }
 
         #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
-        .info-meta { flex-grow: 1; }
         .info-block { padding: 25px 40px; border-bottom: 1px solid var(--line); }
         .info-value { font-size: 14px; font-weight: 500; }
         .info-caption { font-size: 16px; line-height: 1.6; font-weight: 300; opacity: 0.9; }
-
         #next-project-bar { padding: 40px; opacity: 0.6; transition: 0.3s; }
         #next-project-bar:hover { opacity: 1; color: var(--pepper-pink); }
 
@@ -169,7 +149,7 @@
 <body>
 
 <div id="cursor"></div>
-
+<div id="scroll-progress"></div>
 <div id="mobile-info-btn" onclick="openInfo()">i</div>
 
 <div id="zoom-container">
@@ -227,36 +207,35 @@
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
 let all = [], currentFilter = 'all', currentIdx = 0;
 
-// CURSOR ENGINE
+// v202: CURSOR
 const cursor = document.getElementById('cursor');
-document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-});
+document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
 document.addEventListener('mouseover', e => {
-    if (e.target.closest('a, .rail-item, .label, #next-project-bar, .project-link, #theme-toggle, #mobile-info-btn, .close-trigger')) {
-        document.body.classList.add('cursor-hover');
-    } else {
-        document.body.classList.remove('cursor-hover');
-    }
+    if (e.target.closest('a, .rail-item, .label, #next-project-bar, .project-link, #theme-toggle, #mobile-info-btn, .close-trigger')) document.body.classList.add('cursor-hover');
+    else document.body.classList.remove('cursor-hover');
 });
 
-// SCROLL MOMENTUM
+// v202: SCROLL ENGINE + PROGRESS
 const rail = document.getElementById('grid-rail');
+const progressBar = document.getElementById('scroll-progress');
 let scrollTarget = 0, scrollCurrent = 0;
-rail.addEventListener('wheel', e => {
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        scrollTarget += e.deltaY;
-    }
-}, { passive: false });
+rail.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); scrollTarget += e.deltaY; } }, { passive: false });
 
 function smoothScroll() {
-    scrollCurrent += (scrollTarget - scrollCurrent) * 0.1;
+    scrollCurrent += (scrollTarget - scrollCurrent) * 0.08;
     rail.scrollLeft = scrollCurrent;
+    const progress = (rail.scrollLeft / (rail.scrollWidth - rail.clientWidth)) * 100;
+    progressBar.style.width = `${progress}%`;
     requestAnimationFrame(smoothScroll);
 }
 smoothScroll();
+
+// v202: KEYBOARD SHORTCUTS
+document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") closeAll();
+    if (e.key === "ArrowRight" && !document.getElementById('project-overlay').classList.contains('active')) scrollTarget += 400;
+    if (e.key === "ArrowLeft" && !document.getElementById('project-overlay').classList.contains('active')) scrollTarget -= 400;
+});
 
 function nextProject() {
     currentIdx = (currentIdx + 1) % all.length;
@@ -270,10 +249,15 @@ function setFilter(cat) {
     renderUI();
 }
 
-function openInfo() { document.getElementById('info-overlay').classList.add('active'); document.getElementById('close-btn').style.display = 'block'; }
+function openInfo() { 
+    document.getElementById('info-overlay').classList.add('active'); 
+    document.getElementById('close-btn').style.display = 'block'; 
+}
+
 function closeAll() { 
     document.getElementById('project-overlay').classList.remove('active'); 
     document.getElementById('info-overlay').classList.remove('active'); 
+    document.getElementById('main-container').classList.remove('dimmed');
     document.getElementById('close-btn').style.display = 'none'; 
     document.title = "Alex Tait — Studio";
 }
@@ -356,6 +340,7 @@ function openProject(id) {
         gallery.appendChild(el);
     });
     document.getElementById('project-overlay').classList.add('active');
+    document.getElementById('main-container').classList.add('dimmed');
     document.getElementById('close-btn').style.display = 'block';
     gallery.scrollTop = 0;
 }
