@@ -30,7 +30,7 @@
         .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
 
-        /* --- UI: INFO ICON (Mobile Only) --- */
+        /* --- UI: INFO ICON (Mobile) --- */
         #mobile-info-btn { 
             display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; 
             cursor: pointer; width: 44px; height: 44px; opacity: 0.6;
@@ -63,7 +63,7 @@
         /* --- MAIN SPLIT --- */
         #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; }
 
-        /* --- HOMEPAGE GRID --- */
+        /* --- GRID --- */
         #grid-rail { 
             display: grid; grid-template-rows: repeat(var(--grid-rows), 1fr); grid-auto-flow: column; 
             grid-auto-columns: calc(100vh / var(--grid-rows)); 
@@ -119,39 +119,50 @@
         .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: inherit; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
         .info-big-link:hover { color: var(--pepper-pink); opacity: 1; }
 
-        /* v194: TWO COLUMN PARALLAX GRID (DESKTOP) */
+        /* v195: TIGHT PARALLAX GRID */
         #detail-gallery-col { 
             height: 100vh; 
-            padding: 80px 40px; /* Containment: not full bleed */
+            padding: 0; 
             overflow-y: auto; 
             scrollbar-width: none; 
             border-right: 1px solid var(--line);
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 40px; /* Spacing between assets */
-            background: var(--bg);
-            grid-auto-flow: dense; /* Masonry-lite packing */
+            gap: 1px; /* Matching homepage spacing */
+            background: var(--line); /* Divider color */
+            grid-auto-flow: dense;
         }
         
         .detail-asset { 
             width: 100%; 
             height: auto; 
             display: block;
-            border-radius: 2px; 
-            object-fit: cover; /* Fill the grid cell */
-            transition: transform 0.1s linear; /* Smooth parallax */
+            background: var(--bg);
+            object-fit: cover; 
+            transition: transform 0.1s linear;
             will-change: transform;
         }
 
-        #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; }
+        #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; }
         .info-block { padding: 25px 40px; border-bottom: 1px solid var(--line); }
         .info-value { font-size: 14px; font-weight: 500; }
         .info-caption { font-size: 16px; line-height: 1.6; font-weight: 300; opacity: 0.9; }
 
+        /* v195: NEXT PROJECT LINK (Bottom-Left) */
+        #next-project-bar {
+            padding: 40px;
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0.6;
+        }
+        #next-project-bar:hover { opacity: 1; color: var(--pepper-pink); }
+        .next-label { font-size: 14px; font-weight: 500; }
+
         @media (max-width: 768px) {
             .overlay { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-            #detail-gallery-col { grid-template-columns: 1fr; height: 70vh; padding: 40px 15px; border-right: none; }
+            #detail-gallery-col { grid-template-columns: 1fr; height: 70vh; border-right: none; }
             #detail-info-col { height: auto; padding: 20px; border-top: 1px solid var(--line); }
+            #next-project-bar { padding: 20px; }
             #info-overlay { padding: 40px 25px; }
         }
     </style>
@@ -193,10 +204,16 @@
 <div id="project-overlay" class="overlay">
     <div id="detail-gallery-col"></div>
     <div id="detail-info-col">
-        <div class="info-block"><div class="label">Client</div><div id="det-client" class="info-value"></div></div>
-        <div class="info-block"><div class="label">Project</div><div id="det-title" class="info-value"></div></div>
-        <div class="info-block"><div class="label">Year</div><div id="det-year" class="info-value"></div></div>
-        <div class="info-block" style="border-bottom:none;"><div id="det-caption" class="info-caption"></div></div>
+        <div class="info-meta">
+            <div class="info-block"><div class="label">Client</div><div id="det-client" class="info-value"></div></div>
+            <div class="info-block"><div class="label">Project</div><div id="det-title" class="info-value"></div></div>
+            <div class="info-block"><div class="label">Year</div><div id="det-year" class="info-value"></div></div>
+            <div class="info-block" style="border-bottom:none;"><div id="det-caption" class="info-caption"></div></div>
+        </div>
+        
+        <div id="next-project-bar" onclick="nextProject()">
+            <div class="next-label">Next project →</div>
+        </div>
     </div>
 </div>
 
@@ -208,35 +225,29 @@
 
 <script>
 const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
-let all = [], currentFilter = 'all';
+let all = [], currentFilter = 'all', currentIdx = 0;
 
-// SCROLL ENGINE (HOME GRID)
+// SCROLL ENGINE
 const rail = document.getElementById('grid-rail');
-rail.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        rail.scrollLeft += e.deltaY;
-    }
-}, { passive: false });
+rail.addEventListener('wheel', (e) => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); rail.scrollLeft += e.deltaY; } }, { passive: false });
 
-// v194: PARALLAX ENGINE (PROJECT GALLERY)
+// PARALLAX ENGINE
 const galleryCol = document.getElementById('detail-gallery-col');
 let parallaxAssets = [];
-
-galleryCol.addEventListener('scroll', () => {
-    if (window.innerWidth <= 768) return; // Disable on mobile
-    requestAnimationFrame(applyParallax);
-});
+galleryCol.addEventListener('scroll', () => { if (window.innerWidth > 768) requestAnimationFrame(applyParallax); });
 
 function applyParallax() {
     const scrollTop = galleryCol.scrollTop;
     parallaxAssets.forEach((asset, index) => {
-        // Slow down even-indexed items (right column)
         if (index % 2 === 1) {
-            const yOffset = scrollTop * 0.15; // Adjustment factor
-            asset.style.transform = `translateY(${yOffset}px)`;
+            asset.style.transform = `translateY(${scrollTop * 0.15}px)`;
         }
     });
+}
+
+function nextProject() {
+    currentIdx = (currentIdx + 1) % all.length;
+    openProject(all[currentIdx].id);
 }
 
 function setFilter(cat) {
@@ -252,7 +263,6 @@ function closeAll() {
     document.getElementById('project-overlay').classList.remove('active'); 
     document.getElementById('info-overlay').classList.remove('active'); 
     document.getElementById('close-btn').style.display = 'none'; 
-    // Reset parallax transforms
     parallaxAssets.forEach(asset => asset.style.transform = '');
 }
 
@@ -288,7 +298,6 @@ function renderUI() {
     const rail = document.getElementById('grid-rail');
     const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
     rail.innerHTML = ''; Object.values(lists).forEach(l => l.innerHTML = '');
-
     all.forEach(p => {
         if (currentFilter === 'all' || p.cat === currentFilter) {
             const item = document.createElement('div');
@@ -310,29 +319,22 @@ function renderUI() {
 }
 
 function openProject(id) {
-    const p = all.find(proj => proj.id === id);
+    currentIdx = all.findIndex(p => p.id === id);
+    const p = all[currentIdx];
     document.getElementById('det-client').innerText = p.client;
     document.getElementById('det-title').innerText = p.title;
     document.getElementById('det-year').innerText = p.year;
     document.getElementById('det-caption').innerText = p.caption;
     const gallery = document.getElementById('detail-gallery-col'); gallery.innerHTML = '';
-    parallaxAssets = []; // Reset array
-    
-    // v194: Load tight grid assets
+    parallaxAssets = [];
     const displayAssets = p.mosaic.length > 0 ? p.mosaic : p.assets;
-    displayAssets.forEach((asset, index) => {
+    displayAssets.forEach((asset) => {
         const isV = asset.type.includes('video');
         const el = document.createElement(isV ? 'video' : 'img');
         el.className = 'detail-asset'; el.src = asset.url;
         if(isV) { el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; }
-        
-        // Add special grid classes for potential spans based on aspect ratio
-        if (asset.width > asset.height * 1.5) { // Very wide image
-            // el.style.gridColumn = 'span 2'; // Option to span across both columns
-        }
-        
         gallery.appendChild(el);
-        parallaxAssets.push(el); // Store for parallax effect
+        parallaxAssets.push(el);
     });
     document.getElementById('project-overlay').classList.add('active');
     document.getElementById('close-btn').style.display = 'block';
@@ -341,8 +343,7 @@ function openProject(id) {
 
 function toggleTheme() {
     const html = document.documentElement;
-    const currentTheme = html.getAttribute('data-theme');
-    html.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
 run();
 </script>
