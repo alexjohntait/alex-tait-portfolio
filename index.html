@@ -15,12 +15,15 @@
         :root { 
             --bg: #000000; --text: #ffffff; --line: rgba(255,255,255,0.15); 
             --pepper-pink: #ff00ff;
+            --accent: var(--pepper-pink);
             --grid-rows: 4; 
             --glitch-offset: 0px;
         }
         [data-theme="light"] { 
             --bg: #ffffff; --text: #000000; --line: rgba(0,0,0,0.1);
         }
+        /* v210: Workspace Mode Colors */
+        [data-mode="workspace"] { --accent: #0088ff; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.6s ease; cursor: none; }
@@ -32,44 +35,28 @@
             opacity: 0.08; pointer-events: none; z-index: 999998;
             animation: grain 8s steps(10) infinite;
         }
-        @keyframes grain {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-5%, -10%); }
-            30% { transform: translate(-15%, 5%); }
-            50% { transform: translate(-5%, -25%); }
-            70% { transform: translate(-25%, 15%); }
-            90% { transform: translate(10%, 10%); }
-        }
+        @keyframes grain { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-5%, -10%); } 30% { transform: translate(-15%, 5%); } 50% { transform: translate(-5%, -25%); } 70% { transform: translate(-25%, 15%); } 90% { transform: translate(10%, 10%); } }
 
-        /* --- THEME GLITCH --- */
-        #glitch-overlay { 
-            position: fixed; inset: 0; pointer-events: none; z-index: 99999; 
-            mix-blend-mode: screen; opacity: 0; transition: opacity 0.2s;
-            box-shadow: inset var(--glitch-offset) 0 0 #ff0000, inset calc(var(--glitch-offset) * -1) 0 0 #00ffff;
-        }
-
-        /* --- RESPONSIVE CURSOR --- */
-        #cursor { 
-            width: 8px; height: 8px; background: var(--text); border-radius: 50%; 
-            position: fixed; pointer-events: none; z-index: 999999; 
-            transform: translate(-50%, -50%); 
-            transition: width 0.2s cubic-bezier(0.2, 0, 0, 1), height 0.2s cubic-bezier(0.2, 0, 0, 1), opacity 0.3s;
-            mix-blend-mode: difference;
-        }
+        /* --- UI: HUD --- */
+        #cursor { width: 8px; height: 8px; background: var(--text); border-radius: 50%; position: fixed; pointer-events: none; z-index: 999999; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s, background-color 0.4s; mix-blend-mode: difference; }
         .cursor-active #cursor { width: 50px; height: 50px; background: transparent; border: 1px solid var(--text); }
+        
+        /* v210: Doodle Canvas */
+        #doodle-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999997; opacity: 0; transition: opacity 0.5s; }
+        [data-mode="workspace"] #doodle-canvas { opacity: 0.4; }
 
-        /* --- HUD --- */
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 1px; width: 0%; background: var(--accent); z-index: 1500; transition: background 0.4s; box-shadow: 0 0 8px var(--accent); }
         #theme-toggle { position: fixed; bottom: 30px; right: 30px; z-index: 20000; cursor: pointer; width: 44px; height: 44px; opacity: 0.5; display: flex; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%; transition: 0.3s; }
         .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
         [data-theme="light"] .mode-icon { background: currentColor; }
+
         #mobile-info-btn { display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; cursor: pointer; width: 44px; height: 44px; opacity: 0.6; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line); font-size: 18px; font-weight: 300; font-family: serif; font-style: italic; }
 
         #zoom-container { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); z-index: 1000; pointer-events: none; }
         .slider-wrapper { height: 240px; width: 44px; background: rgba(128,128,128,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 22px; border: 1px solid var(--line); position: relative; pointer-events: auto; display: flex; justify-content: center; overflow: hidden; }
         .slider-wrapper::before { content: ''; position: absolute; inset: 20px 0; background-image: repeating-linear-gradient(to bottom, var(--line) 0px, var(--line) 1px, transparent 1px, transparent 12px); width: 12px; margin: 0 auto; opacity: 0.5; }
         #zoom-slider { -webkit-appearance: none; width: 200px; height: 100%; background: transparent; transform: rotate(-90deg); position: absolute; outline: none; cursor: pointer; z-index: 2; }
-        #zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 40px; width: 2px; background: var(--pepper-pink); box-shadow: 0 0 10px var(--pepper-pink); }
-        #scroll-progress { position: fixed; top: 0; left: 0; height: 1px; width: 0%; background: var(--pepper-pink); z-index: 1500; box-shadow: 0 0 8px var(--pepper-pink); }
+        #zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 40px; width: 2px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 
         /* --- LAYOUT --- */
         #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease; }
@@ -86,29 +73,22 @@
             user-select: none;
         }
         
-        .rail-item { 
-            border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); 
-            overflow: hidden; transition: 0.4s ease; position: relative; 
-            background: rgba(128,128,128,0.05);
-        }
-        
-        .rail-item img, .rail-item video { 
-            width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; 
-            transition: 0.8s opacity, 0.6s transform cubic-bezier(0.16, 1, 0.3, 1); 
-            pointer-events: none; 
-        }
+        .rail-item { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; transition: 0.4s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: relative; background: rgba(128,128,128,0.05); }
+        /* v210: Scattered Paper Logic */
+        [data-mode="workspace"] .rail-item { border: 1px solid var(--line); margin: 5px; }
+        [data-mode="workspace"] .rail-item:nth-child(odd) { transform: rotate(1.2deg); }
+        [data-mode="workspace"] .rail-item:nth-child(even) { transform: rotate(-1.2deg); }
+
+        .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: 0.8s opacity, 0.6s transform cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; }
         .rail-item.loaded img, .rail-item.loaded video { opacity: 1; }
-        
-        /* v208: STABLE HOVER (No Spanning) */
         .rail-item:hover img, .rail-item:hover video { transform: scale(1.03); }
-        .rail-item:hover, .rail-item.highlighted { z-index: 10; }
-        .rail-item:hover::after, .rail-item.highlighted::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--pepper-pink); pointer-events: none; opacity: 1; }
+        .rail-item:hover::after, .rail-item.highlighted::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--accent); pointer-events: none; opacity: 1; z-index: 5; }
 
         /* --- SIDEBAR --- */
         #sidebar { display: flex; flex-direction: column; height: 100vh; overflow: hidden; justify-content: space-between; }
         .sidebar-header { padding: 80px 40px 60px 40px; }
         .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; max-width: 650px; }
-        .colour-trigger { color: var(--pepper-pink); cursor: pointer; transition: 0.3s; position: relative; }
+        .colour-trigger { color: var(--accent); cursor: pointer; transition: 0.3s; position: relative; }
         .colour-trigger:hover { animation: colorCycle 2s linear infinite; }
         @keyframes colorCycle { 0% { color: #ff00ff; } 25% { color: #00ffff; } 50% { color: #ffff00; } 75% { color: #ff0000; } 100% { color: #ff00ff; } }
 
@@ -116,17 +96,17 @@
         .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
         .nav-col:last-child { border-right: none; }
         .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; transition: 0.3s; cursor: pointer; position: relative; }
-        .label:hover, .label.active-filter { opacity: 1; color: var(--pepper-pink); }
+        .label:hover, .label.active-filter { opacity: 1; color: var(--accent); }
+        
         .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; transition: 0.2s; cursor: pointer; }
-        .project-link:hover, .project-link.active, .contact-link:hover { opacity: 1; color: var(--pepper-pink); }
+        .project-link:hover, .project-link.active, .contact-link:hover { opacity: 1; color: var(--accent); }
 
         /* --- MOBILE --- */
         @media (max-width: 768px) {
-            body { cursor: auto; } #cursor, body::after, #scroll-progress { display: none; }
+            body { cursor: auto; } #cursor, body::after, #scroll-progress, #doodle-canvas { display: none; }
             #mobile-info-btn { display: flex; }
             #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
             #main-container.dimmed { filter: none; transform: none; opacity: 1; }
-            #zoom-container { display: none; }
             #sidebar { height: auto; order: 1; }
             #grid-rail { order: 2; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-flow: row; width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none; border-top: 1px solid var(--line); }
             .sidebar-header { padding: 60px 25px 30px 25px; }
@@ -136,213 +116,10 @@
             .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
             .project-link, .desktop-only-nav { display: none; }
             .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); }
-            .rail-item:hover::after { display: none; }
+            [data-mode="workspace"] .rail-item { transform: none; margin: 0; border: none; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
         }
 
         /* --- OVERLAYS --- */
         .overlay { position: fixed; inset: 0; z-index: 10000; background: #000000; transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); visibility: hidden; display: grid; grid-template-columns: 1fr 400px; }
         .overlay.active { transform: translateY(0); visibility: visible; }
-        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; transition: 0.3s; }
-        .close-trigger:hover { opacity: 1; color: var(--pepper-pink); }
-        
-        #info-overlay { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 60px; background: #000000; }
-        .info-big-link { font-size: 20px; font-weight: 400; text-decoration: none; color: #ffffff; line-height: 1.8; margin-bottom: 5px; display: block; opacity: 0.8; }
-
-        #detail-gallery-col { height: 100vh; padding: 0; overflow-y: auto; scrollbar-width: none; border-right: 1px solid rgba(255,255,255,0.1); background-color: #000000; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
-        .detail-asset { width: 100%; height: auto; display: block; background: #000000; object-fit: contain; }
-
-        #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; background: #000000; color: #ffffff; }
-        .info-block { padding: 25px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .info-value { font-size: 14px; font-weight: 500; }
-        .info-caption { font-size: 16px; line-height: 1.6; font-weight: 300; opacity: 0.9; }
-        #next-project-bar { padding: 40px; opacity: 0.6; transition: 0.3s; cursor: pointer; color: #ffffff; }
-    </style>
-</head>
-<body>
-
-<div id="cursor"></div>
-<div id="glitch-overlay"></div>
-<div id="scroll-progress"></div>
-<div id="mobile-info-btn" onclick="openInfo()">i</div>
-
-<div id="zoom-container">
-    <div class="slider-wrapper"><input type="range" id="zoom-slider" min="2" max="5" step="1" value="4"></div>
-</div>
-
-<div id="theme-toggle" onclick="toggleTheme()"><div class="mode-icon"></div></div>
-<div class="close-trigger" id="close-btn" onclick="closeAll()">✕</div>
-
-<main id="main-container">
-    <div id="grid-rail"></div>
-    <aside id="sidebar">
-        <div class="sidebar-header">
-            <div class="about-text">
-                Alex Tait is an illustrator and motion designer crafting surreal worlds bursting with <span class="colour-trigger">colour</span>.
-            </div>
-        </div>
-        
-        <div class="sidebar-nav-row">
-            <div class="nav-col"><div class="label" id="filter-commercial" onclick="setFilter('commercial')">Commercial</div><div id="list-commercial"></div></div>
-            <div class="nav-col"><div class="label" id="filter-editorial" onclick="setFilter('editorial')">Editorial</div><div id="list-editorial"></div></div>
-            <div class="nav-col"><div class="label" id="filter-personal" onclick="setFilter('personal')">Personal</div><div id="list-personal"></div></div>
-            <div class="nav-col desktop-only-nav">
-                <div class="label active-filter" id="filter-all" onclick="setFilter('all')">Archive</div>
-                <div id="desktop-contact-list">
-                    <a href="mailto:alexjohntait@gmail.com" class="contact-link">alexjohntait@gmail.com</a>
-                    <div class="contact-link">+44(0) 7875127072</div>
-                    <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
-                </div>
-            </div>
-        </div>
-    </aside>
-</main>
-
-<div id="project-overlay" class="overlay">
-    <div id="detail-gallery-col"></div>
-    <div id="detail-info-col">
-        <div class="info-meta">
-            <div class="info-block"><div class="label">Client</div><div id="det-client" class="info-value"></div></div>
-            <div class="info-block"><div class="label">Project</div><div id="det-title" class="info-value"></div></div>
-            <div class="info-block"><div class="label">Year</div><div id="det-year" class="info-value"></div></div>
-            <div class="info-block" style="border-bottom:none;"><div id="det-caption" class="info-caption"></div></div>
-        </div>
-        <div id="next-project-bar" onclick="nextProject()">
-            <div class="next-label">Next project →</div>
-        </div>
-    </div>
-</div>
-
-<div id="info-overlay" class="overlay" style="display: flex;">
-    <a href="mailto:alexjohntait@gmail.com" class="info-big-link">alexjohntait@gmail.com</a>
-    <div class="info-big-link">+44(0) 7875127072</div>
-    <a href="https://instagram.com/alexjohntait" target="_blank" class="info-big-link">Instagram</a>
-</div>
-
-<script>
-const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
-let all = [], currentFilter = 'all', currentIdx = 0;
-
-// CURSOR
-const cursor = document.getElementById('cursor');
-let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
-document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-function updateCursor() {
-    let targetX = mouseX, targetY = mouseY;
-    const magneticEl = document.querySelector('.label:hover, .mode-icon:hover, #mobile-info-btn:hover, .close-trigger:hover, .colour-trigger:hover');
-    if (magneticEl && window.innerWidth > 768) {
-        const rect = magneticEl.getBoundingClientRect();
-        targetX = rect.left + rect.width / 2; targetY = rect.top + rect.height / 2;
-        document.body.classList.add('cursor-active');
-    } else {
-        document.body.classList.remove('cursor-active');
-        if (document.querySelector('a:hover, .rail-item:hover, #next-project-bar:hover, .project-link:hover')) document.body.classList.add('cursor-active');
-    }
-    cursorX += (targetX - cursorX) * 0.6; cursorY += (targetY - cursorY) * 0.6;
-    cursor.style.left = `${cursorX}px`; cursor.style.top = `${cursorY}px`;
-    requestAnimationFrame(updateCursor);
-}
-updateCursor();
-
-// SCROLL + DRAG
-const rail = document.getElementById('grid-rail');
-const progressBar = document.getElementById('scroll-progress');
-let scrollTarget = 0, scrollCurrent = 0, isDragging = false, startX, scrollLeft;
-rail.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); scrollTarget += e.deltaY; } }, { passive: false });
-rail.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX - rail.offsetLeft; scrollLeft = rail.scrollLeft; rail.style.cursor = 'grabbing'; });
-document.addEventListener('mouseup', () => { isDragging = false; if(rail) rail.style.cursor = 'none'; });
-document.addEventListener('mousemove', e => { if (!isDragging) return; const x = e.pageX - rail.offsetLeft; scrollTarget = scrollLeft - (x - startX) * 2; });
-function smoothScroll() {
-    scrollCurrent += (scrollTarget - scrollCurrent) * 0.08;
-    rail.scrollLeft = scrollCurrent;
-    const max = rail.scrollWidth - rail.clientWidth;
-    if (max > 0) progressBar.style.width = `${(rail.scrollLeft / max) * 100}%`;
-    requestAnimationFrame(smoothScroll);
-}
-smoothScroll();
-
-function triggerGlitch() {
-    const glitch = document.getElementById('glitch-overlay'); glitch.style.opacity = '1';
-    document.documentElement.style.setProperty('--glitch-offset', '10px');
-    setTimeout(() => { document.documentElement.style.setProperty('--glitch-offset', '0px'); glitch.style.opacity = '0'; }, 150);
-}
-function toggleTheme() { triggerGlitch(); const html = document.documentElement; html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
-document.addEventListener('keydown', e => { if (e.key === "Escape") closeAll(); if (e.key === "ArrowRight") scrollTarget += 400; if (e.key === "ArrowLeft") scrollTarget -= 400; });
-function nextProject() { currentIdx = (currentIdx + 1) % all.length; openProject(all[currentIdx].id); }
-function setFilter(cat) { currentFilter = cat; document.querySelectorAll('.label').forEach(el => el.classList.remove('active-filter')); document.getElementById(`filter-${cat}`)?.classList.add('active-filter'); renderUI(); }
-function openInfo() { document.getElementById('info-overlay').classList.add('active'); document.getElementById('close-btn').style.display = 'block'; }
-function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('info-overlay').classList.remove('active'); document.getElementById('main-container').classList.remove('dimmed'); document.getElementById('close-btn').style.display = 'none'; document.title = "Alex Tait — Studio"; }
-function highlight(id) { document.getElementById(`link-${id}`)?.classList.add('active'); const railTarget = document.querySelector(`.rail-item[data-id="${id}"]`); if (railTarget) railTarget.classList.add('highlighted'); }
-function unhighlight() { document.querySelectorAll('.project-link').forEach(el => el.classList.remove('active')); document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('highlighted')); }
-
-async function run() {
-    try {
-        const res = await fetch(`https://api.airtable.com/v0/${DB.base}/${encodeURIComponent(DB.table)}?sort%5B0%5D%5Bfield%5D=Order`, { headers: { Authorization: `Bearer ${DB.key}` } });
-        const data = await res.json();
-        all = data.records.map(r => {
-            const f = r.fields; const heroField = f['Hero Image'] || f['Hero image'] || f['Image'];
-            return {
-                id: r.id, title: f['Title'] || 'Untitled', client: f['Client'] || 'N/A', year: f['Year'] || '2024',
-                caption: f['Caption'] || '', cat: String(f.Category || '').toLowerCase().trim(),
-                mosaic: f['Mosaic Images'] || f['Gallery'] || [], heroUrl: heroField?.[0]?.url || '',
-                isVid: heroField?.[0]?.type?.includes('video'), assets: heroField || []
-            };
-        }).filter(p => p.heroUrl);
-        renderUI();
-    } catch(e) { console.error(e); }
-}
-
-function renderUI() {
-    rail.innerHTML = '';
-    const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
-    Object.values(lists).forEach(l => l.innerHTML = '');
-    all.forEach((p, index) => {
-        if (currentFilter === 'all' || p.cat === currentFilter) {
-            const item = document.createElement('div');
-            item.className = 'rail-item'; item.setAttribute('data-id', p.id);
-            item.style.animationDelay = `${index * 0.05}s`;
-            item.onmouseenter = () => highlight(p.id); item.onmouseleave = unhighlight;
-            item.onclick = () => openProject(p.id);
-            item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}" loading="lazy">`;
-            rail.appendChild(item);
-            const media = item.querySelector('img, video');
-            if (p.isVid) item.classList.add('loaded'); else media.onload = () => item.classList.add('loaded');
-        }
-        if (lists[p.cat]) {
-            const link = document.createElement('div');
-            link.className = 'project-link'; link.id = `link-${p.id}`; link.innerText = p.title;
-            link.onmouseenter = () => highlight(p.id); link.onmouseleave = unhighlight;
-            link.onclick = () => openProject(p.id);
-            lists[p.cat].appendChild(link);
-        }
-    });
-}
-
-function openProject(id) {
-    currentIdx = all.findIndex(p => p.id === id);
-    const p = all[currentIdx];
-    document.title = `${p.title} — Alex Tait`;
-    document.getElementById('det-client').innerText = p.client;
-    document.getElementById('det-title').innerText = p.title;
-    document.getElementById('det-year').innerText = p.year;
-    document.getElementById('det-caption').innerText = p.caption;
-    const gallery = document.getElementById('detail-gallery-col'); gallery.innerHTML = '';
-    (p.mosaic.length > 0 ? p.mosaic : p.assets).forEach(asset => {
-        const isV = asset.type.includes('video');
-        const el = document.createElement(isV ? 'video' : 'img');
-        el.className = 'detail-asset'; el.src = asset.url;
-        el.setAttribute('loading', 'lazy');
-        if(isV) { el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; }
-        gallery.appendChild(el);
-    });
-    document.getElementById('project-overlay').classList.add('active');
-    document.getElementById('main-container').classList.add('dimmed');
-    document.getElementById('close-btn').style.display = 'block';
-    gallery.scrollTop = 0;
-}
-
-const slider = document.getElementById('zoom-slider');
-slider.addEventListener('input', e => { document.documentElement.style.setProperty('--grid-rows', e.target.value); });
-run();
-</script>
-</body>
-</html>
+        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200
