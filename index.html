@@ -16,7 +16,7 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; width: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; }
-    img, video { display: block; max-width: none; } /* Prevents shrinking in flex */
+    img, video { display: block; max-width: none; }
     a { color: inherit; text-decoration: none; }
     button { cursor: pointer; border: none; background: none; font: inherit; }
 
@@ -67,14 +67,13 @@
       flex-shrink: 0; height: 100%; display: flex; flex-direction: column; 
       cursor: pointer; position: relative; padding: 0 10px; z-index: 1;
     }
-    .strip-item-wrap.active { z-index: 10; } 
+    .strip-item-wrap.active { z-index: 10; } /* Overlap Fix */
 
     .strip-meta { position: absolute; top: -52px; left: 10px; font-size: 0.75rem; opacity: 0.35; transition: opacity 0.4s; pointer-events: none; white-space: nowrap; }
     .strip-item-wrap.active .strip-meta { opacity: 1; }
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-img { height: 100%; width: auto; object-fit: contain; transition: transform 0.9s var(--silk); transform-origin: top center; }
     
-    /* Active Zoom (Desktop Only) */
     @media (min-width: 769px) {
       .strip-item-wrap.active .strip-img { transform: scale(1.6); }
     }
@@ -89,7 +88,7 @@
     .bottom-logo { width: 120px; height: 120px; flex-shrink: 0; }
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* ══ CLEAN WHITE PROJECT PAGE ═══════ */
+    /* ══ WHITE PROJECT PAGE ═══════ */
     .proj-page { 
       position: fixed; inset: 0; z-index: 200; overflow-y: auto; 
       background: #FFFFFF !important; color: #000000 !important; 
@@ -99,10 +98,12 @@
     .proj-page::-webkit-scrollbar { display: none; }
     .proj-page.open { transform: translateY(0); }
     .proj-close-wrap { position: fixed; top: 32px; right: 32px; z-index: 210; }
-    .proj-close { width: 44px; height: 44px; border-radius: 50%; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; }
+    .proj-close { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; }
     
     .proj-container { padding: 120px 32px 0; max-width: 1400px; margin: 0 auto; }
     .proj-meta-row { display: flex; gap: 40px; margin-bottom: 20px; font-family: var(--ff-feature); font-size: 0.5rem; opacity: 0.4; }
+    
+    /* Small Header (3.6vw approx) */
     .proj-big-title { font-size: 2.5rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 80px; }
     
     .proj-asset-wrap { position: relative; margin-bottom: 80px; }
@@ -112,25 +113,26 @@
     .layout-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
     .layout-stagger-left { width: 65%; margin-right: auto; }
     .layout-stagger-right { width: 65%; margin-left: auto; }
+    
     .proj-caption-editorial { font-size: 1.8rem; line-height: 1.2; max-width: 25ch; margin: 120px 0; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
-    .proj-footer-nav { height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 120px; }
+    .proj-footer-nav { height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 120px; cursor: pointer; }
     .next-sub { font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; margin-bottom: 8px; }
     .next-title { font-size: 1.8rem; font-weight: 600; }
 
-    /* ══ MOBILE FIXES ═══════════════════ */
+    /* ══ MOBILE ═════════════════════════ */
     @media (max-width: 768px) {
       .top-cats { display: none; }
       .top-bar { grid-template-columns: 1fr 1fr; padding: 0 20px; height: 80px; }
-      .bottom-area { flex-direction: column; align-items: flex-start; gap: 40px; padding: 40px 20px 100px; height: auto; overflow: visible; }
+      .bottom-area { flex-direction: column; align-items: flex-start; gap: 40px; padding: 40px 20px 100px; height: auto; }
       .about-cols { flex-direction: column; gap: 30px; }
       .about-text { font-size: 20pt; }
       .middle-area { padding-top: 40px; }
-      .strip-outer { height: 50vh; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+      .strip-outer { height: 50vh; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; scrollbar-width: none; }
       .strip { transition: none !important; transform: none !important; width: max-content; padding: 0 20px; }
       .strip-meta { position: static; opacity: 1; margin-bottom: 10px; font-size: 0.65rem; }
-      .strip-item-wrap { width: 80vw !important; padding: 0 10px; height: 100%; }
+      .strip-item-wrap { width: 85vw !important; padding: 0 10px; height: 100%; scroll-snap-align: center; }
       .strip-img { width: 100% !important; height: auto !important; object-fit: cover; }
       .cursor, .cursor-ring { display: none !important; }
       * { cursor: auto !important; }
@@ -146,7 +148,7 @@
     .cursor span { font-family: var(--ff-feature); font-size: 10px; opacity: 0; color: var(--bg); transition: opacity 0.2s; }
     .cursor.big { width: 50px; height: 50px; background: var(--ink); }
     .cursor.big span { opacity: 1; }
-    .cursor-ring { position: fixed; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(128,128,128,0.2); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: border-color 1.2s; }
+    .cursor-ring { position: fixed; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(128,128,128,0.2); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); }
     .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 300; font-size: .6rem; color: rgba(0,0,0,.4); font-family: var(--ff-feature); }
   </style>
 </head>
@@ -157,7 +159,7 @@
 <div class="cursor-ring" id="cursor-ring"></div>
 
 <div class="main">
-  <div class="loading-screen" id="loading-screen">Portfolio establishing...</div>
+  <div class="loading-screen" id="loading-screen">Starting session...</div>
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
     <div class="top-cats" id="top-cats"></div>
@@ -258,10 +260,7 @@ function build(){
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     if(!isMobile) el.style.width = w + 'px';
     el.innerHTML = `<div class="strip-meta">${p.title}</div><div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div>`;
-    el.onclick = () => {
-        if(isMobile) openProject(i);
-        else (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
-    }
+    el.onclick = () => isMobile ? openProject(i) : (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
     strip.appendChild(el);
   });
   if(!isMobile) { activeIdx = filtered.length; goTo(activeIdx, true); }
@@ -313,7 +312,7 @@ function openProject(i){
   });
   document.getElementById('proj-page').classList.add('open');
   document.getElementById('proj-page').scrollTop = 0;
-  document.getElementById('proj-next-trigger').onclick = () => { goTo(i+1+filtered.length); openProject((i+1)%filtered.length); };
+  document.getElementById('proj-next-trigger').onclick = () => { if(window.innerWidth > 768) goTo(i+1+filtered.length); openProject((i+1)%filtered.length); };
 }
 
 function media(att, cls){
@@ -343,7 +342,7 @@ document.onmouseover = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .
 document.onmouseout = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .top-contact, .proj-close, .proj-footer-nav, .about-link')) cur.classList.remove('big'); };
 
 async function init(){ 
-  const loaderTimeout = setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 2000);
+  const loaderTimeout = setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1500);
   allProjects=await fetchAll(); 
   if (allProjects.length > 0) { filtered=[...allProjects]; buildTopCats(); build(); }
   clearTimeout(loaderTimeout);
