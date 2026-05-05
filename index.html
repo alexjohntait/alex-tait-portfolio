@@ -53,9 +53,7 @@
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
     .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; }
-    .top-cats { display: flex; gap: 12px; font-size: 0.8rem; color: #aaa; }
-    .top-cat { cursor: pointer; transition: color .2s; }
-    .top-cat.active { color: var(--ink); }
+    .top-right { display: flex; align-items: center; gap: 32px; }
     .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
 
     /* ══ CAROUSEL ═════════════════════════ */
@@ -69,7 +67,7 @@
     }
     .strip-item-wrap.active { z-index: 10 !important; }
 
-    /* MOVED META BELOW IMAGES TO PREVENT HEADER CONFLICT */
+    /* Project names moved below images */
     .strip-meta { 
       position: absolute; bottom: -40px; left: 15px; font-size: 0.75rem; 
       opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; 
@@ -126,13 +124,12 @@
     /* ══ MOBILE FIXES ═══════════════════ */
     @media (max-width: 768px) {
       :root { --header-h: 60px; --strip-h: 40vh; }
-      .top-cats { display: none; }
       .top-bar { height: var(--header-h); padding: 0 20px; }
       .middle-area { padding-top: 0; }
       .strip-item-wrap { padding: 0 10px; }
       .strip-meta { bottom: -30px; left: 10px; font-size: 0.65rem; }
       
-      /* STACK MOBILE FOOTER LINKS */
+      /* Vertical Link Stack */
       .bottom-area { flex-direction: column; align-items: flex-start; gap: 40px; padding: 20px 20px 80px; height: auto; }
       .about-cols { flex-direction: column; align-items: flex-start; gap: 35px; }
       .about-text { font-size: 18pt; max-width: 100%; }
@@ -148,26 +145,17 @@
       * { cursor: auto !important; }
     }
 
-    .cursor { position: fixed; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .3s, height .3s, background 0.8s; mix-blend-mode: multiply; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    body.is-dark .cursor { mix-blend-mode: screen; }
-    .cursor span { font-family: var(--ff-feature); font-size: 10px; opacity: 0; color: var(--bg); transition: opacity 0.2s; }
-    .cursor.big { width: 50px; height: 50px; background: var(--ink); }
-    .cursor.big span { opacity: 1; }
-    .cursor-ring { position: fixed; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(128,128,128,0.2); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); }
-    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 300; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
+    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 300; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); text-transform: lowercase; }
   </style>
 </head>
 <body>
 
 <div class="grain"></div>
-<div class="cursor" id="cursor"><span>View</span></div>
-<div class="cursor-ring" id="cursor-ring"></div>
 
 <div class="main">
   <div class="loading-screen" id="loading-screen">Establishing session...</div>
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
-    <div class="top-cats" id="top-cats"></div>
     <div class="top-right"><div class="top-contact" id="top-contact">Say hello</div></div>
   </div>
   <div class="middle-area"><div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div></div>
@@ -204,6 +192,10 @@ const F={title:'Title',caption:'Detailed Description',category:'Category',heroIm
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
+// Hard-coded reveal safety
+const hideLoader = () => { document.getElementById('loading-screen').style.display='none'; };
+setTimeout(hideLoader, 1000);
+
 function toSentenceCase(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : ''; }
 function isDark(color) {
   if(!color) return false;
@@ -235,12 +227,6 @@ async function fetchAll(){
       atts:[...(rec.fields[F.heroImg]||[]), ...(rec.fields[F.mosaicImg]||[])]
     }));
   } catch(e) { return []; }
-}
-
-function buildTopCats(){
-  const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
-  document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" data-filter="${c}">${c}</span>`).join(', ');
-  document.querySelectorAll('.top-cat').forEach(el => el.onclick = () => setFilter(el.dataset.filter));
 }
 
 function build(){
@@ -281,12 +267,6 @@ function goTo(i, inst = false){
   }
 }
 
-function setFilter(f){
-  document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.dataset.filter === f));
-  filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.cat === f);
-  build();
-}
-
 const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1});
 
 function openProject(i){
@@ -322,12 +302,9 @@ function media(att, cls){
 document.getElementById('proj-close').onclick = () => document.getElementById('proj-page').classList.remove('open');
 document.getElementById('top-contact').onclick = () => window.location.href = 'mailto:alex@alexjohntait.com';
 
-// QUICKER WHEEL SCROLL
 window.onwheel = e => { 
   if(!document.getElementById('proj-page').classList.contains('open') && Math.abs(e.deltaY)>15 && !isScrolling){ 
-    isScrolling=true; 
-    goTo(activeIdx+(e.deltaY>0?1:-1)); 
-    setTimeout(()=>isScrolling=false,400); // Shorter cooldown
+    isScrolling=true; goTo(activeIdx+(e.deltaY>0?1:-1)); setTimeout(()=>isScrolling=false,400); 
   } 
 };
 
@@ -339,18 +316,10 @@ window.addEventListener('touchend', e => {
     if(Math.abs(delta) > 40) { isScrolling=true; goTo(activeIdx+(delta > 0 ? 1 : -1)); setTimeout(()=>isScrolling=false,400); }
 }, false);
 
-const cur=document.getElementById('cursor'), rng=document.getElementById('cursor-ring');
-let mx=0, my=0, rx=0, ry=0;
-document.onmousemove = e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; };
-(function anim(){ rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; rng.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(anim); })();
-document.onmouseover = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .top-contact, .proj-close, .proj-footer-nav, .about-link')) cur.classList.add('big'); };
-document.onmouseout = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .top-contact, .proj-close, .proj-footer-nav, .about-link')) cur.classList.remove('big'); };
-
 async function init(){ 
-  const loaderTimeout = setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1000);
   allProjects=await fetchAll(); 
-  if (allProjects.length > 0) { filtered=[...allProjects]; buildTopCats(); build(); }
-  clearTimeout(loaderTimeout); document.getElementById('loading-screen').style.display='none'; 
+  if (allProjects.length > 0) { filtered=[...allProjects]; build(); }
+  hideLoader(); 
 }
 init();
 </script>
