@@ -67,7 +67,7 @@
       flex-shrink: 0; height: 100%; display: flex; flex-direction: column; 
       cursor: pointer; position: relative; padding: 0 10px; z-index: 1;
     }
-    .strip-item-wrap.active { z-index: 100 !important; } /* Overlap Fix */
+    .strip-item-wrap.active { z-index: 100 !important; } /* FIX: Sitting on top of neighbors */
 
     .strip-meta { position: absolute; top: -52px; left: 10px; font-size: 0.75rem; opacity: 0.35; transition: opacity 0.4s; pointer-events: none; white-space: nowrap; }
     .strip-item-wrap.active .strip-meta { opacity: 1; }
@@ -103,7 +103,7 @@
     .proj-container { padding: 120px 32px 0; max-width: 1400px; margin: 0 auto; }
     .proj-meta-row { display: flex; gap: 40px; margin-bottom: 20px; font-family: var(--ff-feature); font-size: 0.5rem; opacity: 0.4; }
     
-    /* Small Header (Half size) */
+    /* Reduced Header size */
     .proj-big-title { font-size: 1.8rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 80px; }
     
     .proj-asset-wrap { position: relative; margin-bottom: 80px; }
@@ -160,7 +160,7 @@
 <div class="cursor-ring" id="cursor-ring"></div>
 
 <div class="main">
-  <div class="loading-screen" id="loading-screen">Establishing portfolio session...</div>
+  <div class="loading-screen" id="loading-screen">Establishing session...</div>
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
     <div class="top-cats" id="top-cats"></div>
@@ -181,7 +181,7 @@
 </div>
 
 <div class="proj-page" id="proj-page">
-  <div class="proj-close-wrap"><button class="proj-close magnetic" id="proj-close">×</button></div>
+  <div class="proj-close-wrap"><button class="proj-close" id="proj-close">×</button></div>
   <div class="proj-container">
     <div class="proj-meta-row" id="proj-meta-header"></div>
     <div class="proj-big-title" id="proj-big-title"></div>
@@ -343,13 +343,12 @@ document.onmouseover = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .
 document.onmouseout = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .top-contact, .proj-close, .proj-footer-nav, .about-link')) cur.classList.remove('big'); };
 
 async function init(){ 
-  // NUCLEAR FAIL-SAFE: loader dies in 1.5s regardless of data
+  // FAIL-SAFE: Hide loader in 1.5s regardless of fetch status
   const loaderTimeout = setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1500);
   
   allProjects=await fetchAll(); 
   if (allProjects.length > 0) { filtered=[...allProjects]; buildTopCats(); build(); }
   
-  // If data arrived early, clear the timeout and hide loader
   clearTimeout(loaderTimeout);
   document.getElementById('loading-screen').style.display='none'; 
 }
