@@ -1,335 +1,348 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Alex Tait — Studio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { 
-            --bg: #000000; --text: #ffffff; --line: rgba(255,255,255,0.15); 
-            --pepper-pink: #ff00ff; --accent: var(--pepper-pink);
-            --grid-rows: 4; --glitch-offset: 0px;
-        }
-        [data-theme="light"] { --bg: #ffffff; --text: #000000; --line: rgba(0,0,0,0.1); }
-        [data-mode="workspace"] { --accent: #0088ff; }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alex Tait — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    @font-face {
+      font-family: 'Avenue Mono';
+      src: url('path-to-your-font/AvenueMono.woff2') format('woff2');
+      font-weight: normal; font-style: normal;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Lexend', sans-serif; overflow-x: hidden; transition: background-color 0.6s ease; cursor: none; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; }
+    img, video { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; font: inherit; }
 
-        /* --- ANALOG GRAIN --- */
-        body::after {
-            content: ""; position: fixed; top: -150%; left: -150%; width: 300%; height: 300%;
-            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.08; pointer-events: none; z-index: 999998;
-            animation: grain 8s steps(10) infinite;
-        }
-        @keyframes grain { 0%, 100% { transform: translate(0, 0); } 10% { transform: translate(-5%, -10%); } 30% { transform: translate(-15%, 5%); } 50% { transform: translate(-5%, -25%); } 70% { transform: translate(-25%, 15%); } 90% { transform: translate(10%, 10%); } }
+    :root {
+      --ff: 'Geist', system-ui, sans-serif;
+      --ff-feature: 'Avenue Mono', 'Geist Mono', monospace; 
+      --silk: cubic-bezier(.22, 1, .36, 1);
+      --bg: #FFFFFF;
+      --ink: #000000;
+      --strip-h: 37vh; 
+    }
 
-        /* --- UI: HUD --- */
-        #cursor { width: 8px; height: 8px; background: var(--text); border-radius: 50%; position: fixed; pointer-events: none; z-index: 999999; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s, background-color 0.4s; mix-blend-mode: difference; }
-        .cursor-active #cursor { width: 50px; height: 50px; background: transparent; border: 1px solid var(--text); }
-        
-        #doodle-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999997; opacity: 0; transition: opacity 0.5s; }
-        [data-mode="workspace"] #doodle-canvas { opacity: 0.4; }
+    body {
+      display: flex; flex-direction: column; height: 100vh;
+      font-family: var(--ff); background: var(--bg); color: var(--ink);
+      transition: background-color 1.2s var(--silk), color 1.2s var(--silk);
+    }
 
-        #scroll-progress { position: fixed; top: 0; left: 0; height: 1px; width: 0%; background: var(--accent); z-index: 1500; transition: background 0.4s; box-shadow: 0 0 8px var(--accent); }
-        #theme-toggle { position: fixed; bottom: 30px; right: 30px; z-index: 20000; cursor: pointer; width: 44px; height: 44px; opacity: 0.5; display: flex; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%; transition: 0.3s; }
-        .mode-icon { width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 50%; }
-        [data-theme="light"] .mode-icon { background: currentColor; }
+    body.is-dark { --ink: #FFFFFF; }
 
-        #mobile-info-btn { display: none; position: fixed; bottom: 30px; left: 30px; z-index: 20000; cursor: pointer; width: 44px; height: 44px; opacity: 0.6; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); backdrop-filter: blur(10px); border-radius: 50%; border: 1px solid var(--line); font-size: 18px; font-weight: 300; font-family: serif; font-style: italic; }
+    .grain {
+      position: fixed; inset: -50%; width: 200%; height: 200%;
+      background-image: url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Grain_Noise.png");
+      opacity: 0.04; pointer-events: none; z-index: 999; animation: grain 8s steps(10) infinite;
+    }
+    @keyframes grain { 0%, 100% { transform:translate(0, 0) } 50% { transform:translate(-5%, -10%) } }
 
-        #zoom-container { position: fixed; left: 30px; top: 50%; transform: translateY(-50%); z-index: 1000; pointer-events: none; }
-        .slider-wrapper { height: 240px; width: 44px; background: rgba(128,128,128,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 22px; border: 1px solid var(--line); position: relative; pointer-events: auto; display: flex; justify-content: center; overflow: hidden; }
-        .slider-wrapper::before { content: ''; position: absolute; inset: 20px 0; background-image: repeating-linear-gradient(to bottom, var(--line) 0px, var(--line) 1px, transparent 1px, transparent 12px); width: 12px; margin: 0 auto; opacity: 0.5; }
-        #zoom-slider { -webkit-appearance: none; width: 200px; height: 100%; background: transparent; transform: rotate(-90deg); position: absolute; outline: none; cursor: pointer; z-index: 2; }
-        #zoom-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 40px; width: 2px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .main { display: flex; flex-direction: column; height: 100vh; overflow: hidden; position: relative; }
 
-        #main-container { display: grid; grid-template-columns: 2fr 1fr; width: 100vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease; }
-        #main-container.dimmed { transform: scale(0.98); filter: blur(10px) grayscale(0.5); opacity: 0.2; pointer-events: none; }
+    /* ══ TOP BAR ══════════════════════════ */
+    .top-bar {
+      flex-shrink: 0; height: 100px; display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; padding: 0 32px; z-index: 50;
+    }
+    .top-name { font-family: var(--ff-feature); font-size: 1.1rem; letter-spacing: -0.01em; white-space: nowrap; }
+    .top-cats { display: flex; gap: 8px; font-size: 0.85rem; color: #aaa; transition: color 1.2s; }
+    .top-cat { cursor: pointer; transition: color .2s; }
+    .top-cat.active { color: var(--ink); }
+    .top-right { display: flex; justify-content: flex-end; }
+    .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
 
-        #grid-rail { 
-            display: grid; grid-template-rows: repeat(var(--grid-rows), 1fr); grid-auto-flow: column; 
-            grid-auto-columns: calc(100vh / var(--grid-rows)); width: 100%; height: 100vh; 
-            overflow-x: auto; overflow-y: hidden; background: var(--bg); scrollbar-width: none;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            -webkit-mask-image: linear-gradient(to right, black 80%, transparent 98%);
-            mask-image: linear-gradient(to right, black 80%, transparent 98%);
-            user-select: none;
-        }
-        
-        .rail-item { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; transition: 0.4s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); position: relative; background: rgba(128,128,128,0.05); }
-        [data-mode="workspace"] .rail-item { border: 1px solid var(--line); margin: 5px; }
-        [data-mode="workspace"] .rail-item:nth-child(odd) { transform: rotate(1.2deg); }
-        [data-mode="workspace"] .rail-item:nth-child(even) { transform: rotate(-1.2deg); }
+    /* ══ CAROUSEL ═════════════════════════ */
+    .middle-area { flex: 1; display: flex; align-items: flex-start; padding-top: 80px; overflow: visible; }
+    .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
+    .strip { display: flex; height: 100%; transition: transform 0.9s var(--silk); will-change: transform; overflow: visible; }
+    
+    .strip-item-wrap { 
+      flex-shrink: 0; height: 100%; display: flex; flex-direction: column; 
+      cursor: pointer; position: relative; padding: 0 10px; 
+      z-index: 1; /* Default low z-index */
+    }
+    .strip-item-wrap.active { z-index: 10; } /* FIX: Active sits on top of neighbors */
 
-        .rail-item img, .rail-item video { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: 0.8s opacity, 0.6s transform cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; }
-        .rail-item.loaded img, .rail-item.loaded video { opacity: 1; }
-        .rail-item:hover img, .rail-item:hover video { transform: scale(1.03); }
-        .rail-item:hover::after, .rail-item.highlighted::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--accent); pointer-events: none; opacity: 1; z-index: 5; }
+    .strip-meta { position: absolute; top: -52px; left: 10px; font-size: 0.75rem; opacity: 0.35; transition: opacity 0.4s; pointer-events: none; white-space: nowrap; }
+    .strip-item-wrap.active .strip-meta { opacity: 1; }
+    .strip-img-wrap { height: var(--strip-h); width: 100%; position: relative; overflow: visible; }
+    .strip-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.9s var(--silk); transform-origin: top center; }
+    .strip-item-wrap.active .strip-img { transform: scale(1.6); }
 
-        #sidebar { display: flex; flex-direction: column; height: 100vh; overflow: hidden; justify-content: space-between; }
-        .sidebar-header { padding: 80px 40px 60px 40px; }
-        .about-text { font-size: 50px; line-height: 1.1; font-weight: 500; letter-spacing: -0.03em; max-width: 650px; }
-        .colour-trigger { color: var(--accent); cursor: pointer; transition: 0.3s; position: relative; }
-        .colour-trigger:hover { animation: colorCycle 2s linear infinite; }
-        @keyframes colorCycle { 0% { color: #ff00ff; } 25% { color: #00ffff; } 50% { color: #ffff00; } 75% { color: #ff0000; } 100% { color: #ff00ff; } }
+    /* ══ BOTTOM AREA ══════════════════════ */
+    .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 25vh; z-index: 10; }
+    .about-cols { display: flex; align-items: flex-end; gap: 80px; }
+    .about-text { font-size: 28pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 30ch; transition: color 1.2s; }
+    .about-info-col { display: flex; flex-direction: column; gap: 12px; font-family: var(--ff-feature); font-size: 0.8rem; line-height: 1.4; }
+    .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
+    .label { opacity: 0.4; font-size: 0.6rem; text-transform: lowercase; margin-bottom: 2px; }
+    .bottom-logo { width: 120px; height: 120px; flex-shrink: 0; }
+    .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-        .sidebar-nav-row { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-top: 1px solid var(--line); }
-        .nav-col { padding: 40px 20px; border-right: 1px solid var(--line); }
-        .nav-col:last-child { border-right: none; }
-        .label { font-size: 12px; font-weight: 500; opacity: 0.3; margin-bottom: 30px; transition: 0.3s; cursor: pointer; position: relative; }
-        .label:hover, .label.active-filter { opacity: 1; color: var(--accent); }
-        .project-link, .contact-link { font-size: 12px; font-weight: 400; line-height: 2.3; opacity: 0.5; text-decoration: none; color: inherit; display: block; transition: 0.2s; cursor: pointer; }
-        .project-link:hover, .project-link.active, .contact-link:hover { opacity: 1; color: var(--accent); }
+    /* ══ CLEAN WHITE PROJECT PAGE ═══════ */
+    .proj-page { 
+      position: fixed; inset: 0; z-index: 200; overflow-y: auto; 
+      background: #FFFFFF !important; color: #000000 !important; 
+      transform: translateY(100%); transition: transform .8s var(--silk); 
+      scrollbar-width: none;
+    }
+    .proj-page::-webkit-scrollbar { display: none; }
+    .proj-page.open { transform: translateY(0); }
+    
+    .proj-close-wrap { position: fixed; top: 32px; right: 32px; z-index: 210; }
+    .proj-close { width: 44px; height: 44px; border-radius: 50%; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; }
+    
+    .proj-container { padding: 120px 32px 0; max-width: 1400px; margin: 0 auto; }
+    .proj-meta-row { display: flex; gap: 40px; margin-bottom: 20px; font-family: var(--ff-feature); font-size: 0.5rem; opacity: 0.4; text-transform: lowercase; }
+    
+    /* Reduced Header (3.6vw) */
+    .proj-big-title { font-size: 3.6vw; font-weight: 800; line-height: 1; letter-spacing: -0.04em; margin-bottom: 80px; }
+    
+    .proj-asset-wrap { position: relative; margin-bottom: 80px; }
+    .proj-media { width: 100%; height: auto; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: all 1s var(--silk); }
+    .proj-asset-wrap::before { content: "fig " attr(data-index); position: absolute; top: -18px; left: 0; font-family: var(--ff-feature); font-size: 8px; opacity: 0.3; }
 
-        @media (max-width: 768px) {
-            body { cursor: auto; } #cursor, body::after, #scroll-progress, #doodle-canvas { display: none; }
-            #mobile-info-btn { display: flex; }
-            #main-container { display: flex; flex-direction: column; height: auto; overflow-y: auto; }
-            #sidebar { height: auto; order: 1; }
-            #grid-rail { order: 2; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: none; grid-auto-flow: row; width: 100vw; height: auto; overflow: visible; -webkit-mask-image: none; border-top: 1px solid var(--line); }
-            .sidebar-header { padding: 60px 25px 30px 25px; } .about-text { font-size: 32px; }
-            .sidebar-nav-row { display: flex; flex-direction: column; border: none; padding: 0 25px 40px 25px; }
-            .nav-col { padding: 8px 0; border: none; } .nav-col .label { font-size: 24px; opacity: 0.9; margin-bottom: 0; }
-            .project-link, .desktop-only-nav { display: none; } .rail-item { aspect-ratio: 1/1; border-right: 1px solid var(--line); }
-        }
+    .layout-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .layout-stagger-left { width: 65%; margin-right: auto; }
+    .layout-stagger-right { width: 65%; margin-left: auto; }
+    
+    .proj-caption-editorial { font-size: 1.8rem; line-height: 1.2; font-weight: 400; max-width: 25ch; margin: 120px 0; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
+    .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
-        .overlay { position: fixed; inset: 0; z-index: 10000; background: #000000; transform: translateY(-100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); visibility: hidden; display: grid; grid-template-columns: 1fr 400px; }
-        .overlay.active { transform: translateY(0); visibility: visible; }
-        .close-trigger { position: fixed; top: 30px; right: 30px; font-size: 32px; font-weight: 200; cursor: pointer; opacity: 0.4; z-index: 20001; display: none; }
-        
-        #detail-gallery-col { height: 100vh; padding: 0; overflow-y: auto; scrollbar-width: none; border-right: 1px solid rgba(255,255,255,0.1); background-color: #000000; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
-        .detail-asset { width: 100%; height: auto; display: block; background: #000000; object-fit: contain; }
+    .proj-footer-nav { height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 120px; cursor: pointer; }
+    .next-sub { font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; margin-bottom: 8px; }
+    .next-title { font-size: 3vw; font-weight: 700; letter-spacing: -0.01em; }
 
-        #detail-info-col { padding: 100px 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; background: #000000; color: #ffffff; }
-        .info-block { padding: 25px 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .info-value { font-size: 14px; font-weight: 500; } .info-caption { font-size: 16px; line-height: 1.6; font-weight: 300; opacity: 0.9; }
-        #next-project-bar { padding: 40px; opacity: 0.6; transition: 0.3s; cursor: pointer; }
-    </style>
+    /* ══ MOBILE ═════════════════════════ */
+    @media (max-width: 768px) {
+      .top-cats { display: none; }
+      .top-bar { grid-template-columns: 1fr 1fr; padding: 0 20px; height: 80px; }
+      .bottom-area { flex-direction: column; align-items: flex-start; gap: 40px; padding: 40px 20px 100px; }
+      .about-cols { flex-direction: column; gap: 30px; }
+      .about-text { font-size: 20pt; }
+      .proj-big-title { font-size: 10vw; margin-bottom: 40px; }
+      .layout-grid-2 { grid-template-columns: 1fr; gap: 20px; }
+      .layout-stagger-left, .layout-stagger-right { width: 100%; }
+      .proj-caption-editorial { font-size: 1.4rem; margin: 60px 0; }
+      .proj-container { padding: 100px 20px 0; }
+      .cursor, .cursor-ring { display: none !important; }
+      * { cursor: auto !important; }
+      .strip-outer { height: 45vh; }
+      .strip { overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+      .strip-item-wrap { scroll-snap-align: center; }
+    }
+
+    /* Cursor */
+    .cursor { position: fixed; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .3s, height .3s, background 1.2s; mix-blend-mode: multiply; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    body.is-dark .cursor { mix-blend-mode: screen; }
+    .cursor span { font-family: var(--ff-feature); font-size: 10px; opacity: 0; color: var(--bg); transition: opacity 0.2s; }
+    .cursor.big { width: 50px; height: 50px; background: var(--ink); }
+    .cursor.big span { opacity: 1; }
+    .cursor-ring { position: fixed; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(128,128,128,0.2); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: border-color 1.2s; }
+    
+    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 300; font-size: .6rem; color: rgba(0,0,0,.4); font-family: var(--ff-feature); }
+  </style>
 </head>
 <body>
 
-<canvas id="doodle-canvas"></canvas>
-<div id="cursor"></div>
-<div id="scroll-progress"></div>
-<div id="mobile-info-btn" onclick="openInfo()">i</div>
+<div class="grain"></div>
+<div class="cursor" id="cursor"><span>View</span></div>
+<div class="cursor-ring" id="cursor-ring"></div>
 
-<div id="zoom-container">
-    <div class="slider-wrapper"><input type="range" id="zoom-slider" min="2" max="5" step="1" value="4"></div>
-</div>
-
-<div id="theme-toggle" onclick="toggleTheme()"><div class="mode-icon"></div></div>
-<div class="close-trigger" id="close-btn" onclick="closeAll()">✕</div>
-
-<main id="main-container">
-    <div id="grid-rail"></div>
-    <aside id="sidebar">
-        <div class="sidebar-header">
-            <div class="about-text">Alex Tait is an illustrator and motion designer crafting surreal worlds bursting with <span class="colour-trigger">colour</span>.</div>
-        </div>
-        
-        <div class="sidebar-nav-row">
-            <div class="nav-col"><div class="label" id="filter-commercial" onclick="setFilter('commercial')">Commercial</div><div id="list-commercial"></div></div>
-            <div class="nav-col"><div class="label" id="filter-editorial" onclick="setFilter('editorial')">Editorial</div><div id="list-editorial"></div></div>
-            <div class="nav-col">
-                <div class="label" id="filter-personal" onclick="setFilter('personal')">Personal</div>
-                <div class="label" id="filter-sketchbook" style="margin-top:20px; font-style:italic;" onclick="setFilter('sketchbook')">Process</div>
-                <div id="list-personal"></div>
-            </div>
-            <div class="nav-col desktop-only-nav">
-                <div class="label active-filter" id="filter-all" onclick="setFilter('all')">Archive</div>
-                <div id="desktop-contact-list">
-                    <a href="mailto:alexjohntait@gmail.com" class="contact-link">alexjohntait@gmail.com</a>
-                    <div class="contact-link">+44(0) 7875127072</div>
-                    <a href="https://instagram.com/alexjohntait" target="_blank" class="contact-link">Instagram</a>
-                </div>
-            </div>
-        </div>
-    </aside>
-</main>
-
-<div id="project-overlay" class="overlay">
-    <div id="detail-gallery-col"></div>
-    <div id="detail-info-col">
-        <div class="info-meta">
-            <div class="info-block"><div class="label">Client</div><div id="det-client" class="info-value"></div></div>
-            <div class="info-block"><div class="label">Project</div><div id="det-title" class="info-value"></div></div>
-            <div class="info-block"><div class="label">Year</div><div id="det-year" class="info-value"></div></div>
-            <div class="info-block" style="border-bottom:none;"><div id="det-caption" class="info-caption"></div></div>
-        </div>
-        <div id="next-project-bar" onclick="nextProject()">
-            <div class="next-label">Next project →</div>
-        </div>
+<div class="main">
+  <div class="loading-screen" id="loading-screen">Establishing portfolio...</div>
+  <div class="top-bar">
+    <div class="top-name">Alex Tait</div>
+    <div class="top-cats" id="top-cats"></div>
+    <div class="top-right"><div class="top-contact" id="top-contact">Say hello</div></div>
+  </div>
+  <div class="middle-area"><div class="strip-outer"><div class="strip" id="strip"></div></div></div>
+  <div class="bottom-area">
+    <div class="about-cols">
+      <div class="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+      <div class="about-info-col">
+        <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
+        <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
+        <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank" class="about-link">Jelly</a></div>
+      </div>
     </div>
+    <div class="bottom-logo"><img src="https://via.placeholder.com/150" alt="logo" id="site-logo"></div>
+  </div>
 </div>
 
-<div id="info-overlay" class="overlay" style="display: flex;">
-    <a href="mailto:alexjohntait@gmail.com" class="info-big-link">alexjohntait@gmail.com</a>
-    <div class="info-big-link">+44(0) 7875127072</div>
-    <a href="https://instagram.com/alexjohntait" target="_blank" class="info-big-link">Instagram</a>
+<div class="proj-page" id="proj-page">
+  <div class="proj-close-wrap"><button class="proj-close magnetic" id="proj-close">×</button></div>
+  <div class="proj-container">
+    <div class="proj-meta-row" id="proj-meta-header"></div>
+    <div class="proj-big-title" id="proj-big-title"></div>
+    <div id="proj-dynamic-content"></div>
+    <div class="proj-footer-nav" id="proj-next-trigger">
+        <span class="next-sub">Next project</span>
+        <span class="next-title" id="next-proj-title"></span>
+    </div>
+  </div>
 </div>
 
 <script>
-const DB = { base: 'appjYUthm8ib2ctuH', table: 'Projects', key: 'pat1U3rYUa5yFPgfe.fcd6014565ed789ef453fad674f8f24815a5112bfcb046ca1cfea32ea77dcf70' };
-let all = [], currentFilter = 'all', currentIdx = 0;
+const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
+const AT_BASE='appjYUthm8ib2ctuH';
+const F={title:'Title',caption:'Caption',category:'Category',year:'Year',heroImg:'Hero Image',mosaicImg:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
-// DOODLE ENGINE
-const canvas = document.getElementById('doodle-canvas');
-const ctx = canvas.getContext('2d');
-let points = [];
-window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-window.onresize();
+let allProjects=[], filtered=[], activeIdx=0, isScrolling=false;
 
-function animateDoodle() {
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-    if(document.body.getAttribute('data-mode') === 'workspace') {
-        points.push({x: mouseX, y: mouseY, age: 100});
-        ctx.strokeStyle = document.documentElement.getAttribute('data-theme') === 'light' ? '#000' : '#fff';
-        ctx.lineWidth = 1; ctx.beginPath();
-        for(let i=0; i<points.length; i++) {
-            const p = points[i]; p.age -= 1;
-            if(p.age <= 0) { points.splice(i,1); continue; }
-            ctx.lineTo(p.x, p.y);
-        }
-        ctx.stroke();
+function toSentenceCase(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : ''; }
+function isDark(color) {
+  if(!color) return false;
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+  return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
+}
+
+async function fetchAll(){
+  try {
+    const TABLES=['Portfolio','Projects','Work'];
+    let table = null;
+    for (const name of TABLES) {
+      const r = await fetch(`https://api.airtable.com/v0/${AT_BASE}/${encodeURIComponent(name)}?maxRecords=1`, {headers:{Authorization:`Bearer ${AT_TOKEN}`}});
+      if (r.ok) { table = name; break; }
     }
-    requestAnimationFrame(animateDoodle);
-}
-animateDoodle();
-
-// CURSOR
-const cursor = document.getElementById('cursor');
-let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
-document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-
-function updateCursor() {
-    let targetX = mouseX, targetY = mouseY;
-    const mag = document.querySelector('.label:hover, .mode-icon:hover, #mobile-info-btn:hover, .close-trigger:hover, .colour-trigger:hover');
-    if (mag && window.innerWidth > 768) {
-        const r = mag.getBoundingClientRect();
-        targetX = r.left + r.width/2; targetY = r.top + r.height/2;
-        document.body.classList.add('cursor-active');
-    } else {
-        document.body.classList.remove('cursor-active');
-        if (document.querySelector('a:hover, .rail-item:hover, #next-project-bar:hover, .project-link:hover')) document.body.classList.add('cursor-active');
+    if (!table) return [];
+    let recs=[], off='';
+    do {
+      let url = `https://api.airtable.com/v0/${AT_BASE}/${encodeURIComponent(table)}?pageSize=100`;
+      if (off) url += `&offset=${off}`;
+      let r = await fetch(url, {headers:{Authorization:`Bearer ${AT_TOKEN}`}});
+      const d = await r.json(); 
+      if (d.records) recs = recs.concat(d.records); 
+      off = d.offset || '';
+    } while(off);
+    recs.sort((a,b) => (a.fields[F.order] || 999) - (b.fields[F.order] || 999));
+    for(const rec of recs){
+      if(rec.fields[F.logo]?.[0]?.url) { document.getElementById('site-logo').src = rec.fields[F.logo][0].url; break; }
     }
-    cursorX += (targetX - cursorX) * 0.6; cursorY += (targetY - cursorY) * 0.6;
-    cursor.style.left = `${cursorX}px`; cursor.style.top = `${cursorY}px`;
-    requestAnimationFrame(updateCursor);
-}
-updateCursor();
-
-// SCROLL
-const rail = document.getElementById('grid-rail');
-const progress = document.getElementById('scroll-progress');
-let scrollTarget = 0, scrollCurrent = 0;
-rail.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); scrollTarget += e.deltaY; } }, { passive: false });
-function smoothScroll() {
-    scrollCurrent += (scrollTarget - scrollCurrent) * 0.08;
-    rail.scrollLeft = scrollCurrent;
-    const max = rail.scrollWidth - rail.clientWidth;
-    if (max > 0) progress.style.width = `${(rail.scrollLeft / max) * 100}%`;
-    requestAnimationFrame(smoothScroll);
-}
-smoothScroll();
-
-// FILTERS
-function setFilter(cat) {
-    currentFilter = cat;
-    document.querySelectorAll('.label').forEach(el => el.classList.remove('active-filter'));
-    document.getElementById(`filter-${cat}`)?.classList.add('active-filter');
-    if(cat === 'sketchbook') document.body.setAttribute('data-mode', 'workspace');
-    else document.body.removeAttribute('data-mode');
-    renderUI();
+    return recs.map(rec => ({
+      title: toSentenceCase(rec.fields[F.title] || 'Untitled'), 
+      caption: toSentenceCase(rec.fields[F.caption] || ''),
+      cat: toSentenceCase((rec.fields[F.category]||'Personal').trim()),
+      year: rec.fields[F.year] || '2026',
+      bg: rec.fields[F.bg] || '#ffffff',
+      heroAtt:(rec.fields[F.heroImg]||[])[0],
+      atts:[...(rec.fields[F.heroImg]||[]), ...(rec.fields[F.mosaicImg]||[])]
+    }));
+  } catch(e) { console.error(e); return []; }
 }
 
-function openInfo() { document.getElementById('info-overlay').classList.add('active'); document.getElementById('close-btn').style.display = 'block'; }
-function closeAll() { document.getElementById('project-overlay').classList.remove('active'); document.getElementById('info-overlay').classList.remove('active'); document.getElementById('main-container').classList.remove('dimmed'); document.getElementById('close-btn').style.display = 'none'; document.title = "Alex Tait — Studio"; }
-function toggleTheme() { const html = document.documentElement; html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
-function nextProject() { currentIdx = (currentIdx + 1) % all.length; openProject(all[currentIdx].id); }
-function highlight(id) { document.getElementById(`link-${id}`)?.classList.add('active'); const t = document.querySelector(`.rail-item[data-id="${id}"]`); if (t) t.classList.add('highlighted'); }
-function unhighlight() { document.querySelectorAll('.project-link').forEach(el => el.classList.remove('active')); document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('highlighted')); }
-
-// v211: FAIL-SAFE LOAD
-async function run() {
-    try {
-        const res = await fetch(`https://api.airtable.com/v0/${DB.base}/${encodeURIComponent(DB.table)}?sort%5B0%5D%5Bfield%5D=Order`, { headers: { Authorization: `Bearer ${DB.key}` } });
-        const data = await res.json();
-        if (!data.records) throw new Error("No records found");
-
-        all = data.records.map(r => {
-            try {
-                const f = r.fields;
-                const heroField = f['Hero Image'] || f['Hero image'] || f['Image'];
-                if (!heroField || !heroField[0]) return null;
-
-                return {
-                    id: r.id, title: f['Title'] || 'Untitled', client: f['Client'] || 'N/A', year: f['Year'] || '2024',
-                    caption: f['Caption'] || '', cat: String(f.Category || '').toLowerCase().trim(),
-                    mosaic: f['Mosaic Images'] || f['Gallery'] || [], heroUrl: heroField[0].url || '',
-                    isVid: heroField[0].type?.includes('video'), assets: heroField || []
-                };
-            } catch(err) { return null; }
-        }).filter(p => p !== null);
-        renderUI();
-    } catch(e) { console.error("Airtable Data Crash:", e); }
+function buildTopCats(){
+  const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
+  document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" data-filter="${c}">${c}</span>`).join(', ');
+  document.querySelectorAll('.top-cat').forEach(el => el.onclick = () => setFilter(el.dataset.filter));
 }
 
-function renderUI() {
-    rail.innerHTML = '';
-    const lists = { commercial: document.getElementById('list-commercial'), editorial: document.getElementById('list-editorial'), personal: document.getElementById('list-personal') };
-    Object.values(lists).forEach(l => l.innerHTML = '');
-    all.forEach((p, index) => {
-        if (currentFilter === 'all' || p.cat === currentFilter) {
-            const item = document.createElement('div');
-            item.className = 'rail-item'; item.setAttribute('data-id', p.id);
-            item.onmouseenter = () => highlight(p.id); item.onmouseleave = unhighlight;
-            item.onclick = () => openProject(p.id);
-            item.innerHTML = p.isVid ? `<video src="${p.heroUrl}" autoplay loop muted playsinline></video>` : `<img src="${p.heroUrl}" loading="lazy">`;
-            rail.appendChild(item);
-            const media = item.querySelector('img, video');
-            if (p.isVid) item.classList.add('loaded'); else media.onload = () => item.classList.add('loaded');
-        }
-        if (lists[p.cat]) {
-            const link = document.createElement('div');
-            link.className = 'project-link'; link.id = `link-${p.id}`; link.innerText = p.title;
-            link.onmouseenter = () => highlight(p.id); link.onmouseleave = unhighlight;
-            link.onclick = () => openProject(p.id);
-            lists[p.cat].appendChild(link);
-        }
-    });
+function build(){
+  const strip = document.getElementById('strip'); strip.innerHTML = '';
+  if (filtered.length === 0) return;
+  const loop = [...filtered, ...filtered, ...filtered];
+  loop.forEach((p, i) => {
+    const el = document.createElement('div'); el.className = 'strip-item-wrap';
+    const h = document.querySelector('.strip-outer').offsetHeight;
+    const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
+    el.style.width = w + 'px';
+    el.innerHTML = `<div class="strip-meta">${p.title}</div><div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div>`;
+    el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
+    strip.appendChild(el);
+  });
+  activeIdx = filtered.length; goTo(activeIdx, true);
 }
 
-function openProject(id) {
-    currentIdx = all.findIndex(p => p.id === id);
-    const p = all[currentIdx]; if (!p) return;
-    document.title = `${p.title} — Alex Tait`;
-    document.getElementById('det-client').innerText = p.client;
-    document.getElementById('det-title').innerText = p.title;
-    document.getElementById('det-year').innerText = p.year;
-    document.getElementById('det-caption').innerText = p.caption;
-    const gallery = document.getElementById('detail-gallery-col'); gallery.innerHTML = '';
-    (p.mosaic.length > 0 ? p.mosaic : p.assets).forEach(asset => {
-        if (!asset || !asset.url) return;
-        const isV = asset.type?.includes('video');
-        const el = document.createElement(isV ? 'video' : 'img');
-        el.className = 'detail-asset'; el.src = asset.url;
-        if(isV) { el.autoplay = true; el.loop = true; el.muted = true; el.playsInline = true; }
-        gallery.appendChild(el);
-    });
-    document.getElementById('project-overlay').classList.add('active');
-    document.getElementById('main-container').classList.add('dimmed');
-    document.getElementById('close-btn').style.display = 'block';
-    gallery.scrollTop = 0;
+function goTo(i, inst = false){
+  const strip = document.getElementById('strip');
+  strip.style.transition = inst ? 'none' : 'transform 0.9s var(--silk)';
+  activeIdx = i;
+  const items = document.querySelectorAll('.strip-item-wrap');
+  if (!items[i]) return;
+  let x = 0; for(let j=0; j<i; j++) x += items[j].offsetWidth;
+  strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
+  items.forEach((el, j) => el.classList.toggle('active', j === i));
+  const p = filtered[i % filtered.length];
+  if(p){
+    document.body.style.backgroundColor = p.bg;
+    document.body.classList.toggle('is-dark', isDark(p.bg));
+  }
 }
 
-const sld = document.getElementById('zoom-slider');
-sld.addEventListener('input', e => { document.documentElement.style.setProperty('--grid-rows', e.target.value); });
-run();
+function setFilter(f){
+  document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.dataset.filter === f));
+  filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.cat === f);
+  build();
+}
+
+const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1});
+
+function openProject(i){
+  const p = filtered[i]; const next = filtered[(i+1)%filtered.length];
+  document.getElementById('proj-meta-header').innerHTML = `<div>Industry: ${p.cat}</div><div>Year: ${p.year}</div>`;
+  document.getElementById('proj-big-title').textContent = p.title;
+  document.getElementById('next-proj-title').textContent = next.title;
+  const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
+  p.atts.forEach((att, idx) => {
+    const wrap = document.createElement('div'); wrap.className = 'proj-asset-wrap';
+    wrap.setAttribute('data-index', String(idx+1).padStart(2,'0'));
+    wrap.innerHTML = media(att, 'proj-media');
+    if(idx < 2){
+      if(idx===0){ const g = document.createElement('div'); g.className='layout-grid-2'; g.appendChild(wrap); cont.appendChild(g); }
+      else { 
+        if(cont.querySelector('.layout-grid-2')) cont.querySelector('.layout-grid-2').appendChild(wrap);
+        const cap = document.createElement('div'); cap.className='proj-caption-editorial'; cap.textContent=p.caption; cont.appendChild(cap); obs.observe(cap);
+      }
+    } else { wrap.classList.add(['layout-stagger-left','layout-full','layout-stagger-right'][idx%3]); cont.appendChild(wrap); }
+    obs.observe(wrap.querySelector('.proj-media'));
+  });
+  document.getElementById('proj-page').classList.add('open');
+  document.getElementById('proj-page').scrollTop = 0;
+  document.getElementById('proj-next-trigger').onclick = () => { goTo(i+1+filtered.length); openProject((i+1)%filtered.length); };
+}
+
+function media(att, cls){
+  if(!att) return '';
+  const isVid = (att.type?.startsWith('video') || att.url.toLowerCase().endsWith('.mp4'));
+  return isVid ? `<video src="${att.url}" autoplay muted loop playsinline class="${cls}"></video>` : `<img src="${att.url}" class="${cls}">`;
+}
+
+document.getElementById('proj-close').onclick = () => document.getElementById('proj-page').classList.remove('open');
+document.getElementById('top-contact').onclick = () => window.location.href = 'mailto:alex@alexjohntait.com';
+
+window.onwheel = e => { if(!document.getElementById('proj-page').classList.contains('open') && Math.abs(e.deltaY)>20 && !isScrolling){ isScrolling=true; goTo(activeIdx+(e.deltaY>0?1:-1)); setTimeout(()=>isScrolling=false,850); } };
+
+const cur=document.getElementById('cursor'), rng=document.getElementById('cursor-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.onmousemove = e => { 
+  mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; 
+  document.querySelectorAll('.magnetic').forEach(el => {
+    const r = el.getBoundingClientRect();
+    const x = mx - (r.left + r.width/2), y = my - (r.top + r.height/2);
+    if(Math.hypot(x, y) < 80) el.style.transform = `translate(${x*0.25}px, ${y*0.25}px)`;
+    else el.style.transform = `translate(0,0)`;
+  });
+};
+(function anim(){ rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12; rng.style.left=rx+'px'; rng.style.top=ry+'px'; requestAnimationFrame(anim); })();
+document.onmouseover = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .top-contact, .proj-close, .proj-footer-nav, .about-link')) cur.classList.add('big'); };
+document.onmouseout = e => { if(e.target.closest('.strip-item-wrap, .top-cat, .top-contact, .proj-close, .proj-footer-nav, .about-link')) cur.classList.remove('big'); };
+
+async function init(){ 
+  const loaderTimeout = setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 2000);
+  allProjects=await fetchAll(); 
+  if (allProjects.length > 0) { filtered=[...allProjects]; buildTopCats(); build(); }
+  clearTimeout(loaderTimeout);
+  document.getElementById('loading-screen').style.display='none'; 
+}
+init();
 </script>
 </body>
 </html>
