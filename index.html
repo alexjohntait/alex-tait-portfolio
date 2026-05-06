@@ -53,37 +53,46 @@
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
     .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; }
+    .top-cats { display: flex; gap: 12px; font-size: 0.8rem; color: #aaa; transition: color 0.8s; }
+    .top-cat { cursor: pointer; transition: color .2s; }
+    .top-cat.active { color: var(--ink); }
+    
+    .top-right { display: flex; align-items: center; gap: 24px; }
     .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
-    .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; letter-spacing: 0.05em; border: 1px solid var(--ink); padding: 6px 12px; border-radius: 20px; }
+    .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.7rem; border: 1px solid var(--ink); padding: 5px 12px; border-radius: 20px; }
 
     /* ══ CAROUSEL ═════════════════════════ */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
-    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: var(--gap); padding-left: 0; }
+    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: var(--gap); }
     
     .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; }
     .strip-item-wrap:not(.active) { opacity: 0.3; }
-    .strip-item-wrap.active { z-index: 10 !important; opacity: 1; }
+    .strip-item-wrap.active { z-index: 100 !important; opacity: 1; }
+
+    /* RESTORED: Metadata Above Images */
+    .strip-meta { 
+      position: absolute; top: -55px; left: 0; font-family: var(--ff-feature); font-size: 0.65rem; 
+      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; text-transform: lowercase;
+    }
+    .strip-item-wrap.active .strip-meta { opacity: 0.5; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-img { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
     @media (min-width: 769px) { .strip-item-wrap.active .strip-img { transform: scale(1.4); } }
 
-    /* Stationary Project Name */
-    .fixed-meta-container { 
-      width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; 
-      font-family: var(--ff-feature); font-size: 0.75rem; text-transform: lowercase; opacity: 0.5; margin-top: 10px;
-    }
-
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; }
-    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
+    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; transition: color 0.8s, transform 0.6s var(--silk), font-size 0.6s var(--silk); transform-origin: bottom left; }
+    
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; }
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
     .label { opacity: 0.4; font-size: 0.6rem; text-transform: lowercase; margin-bottom: 4px; }
+    .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; }
+    .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* ══ MOBILE OVERLAY ═══════════════════ */
+    /* ══ MOBILE INFO OVERLAY ══════════════ */
     .mobile-info-overlay { 
       position: fixed; inset: 0; background: var(--bg); z-index: 150; 
       display: flex; flex-direction: column; justify-content: center; padding: 40px;
@@ -92,23 +101,26 @@
     .mobile-info-overlay.open { transform: translateY(0); }
     .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.5rem; }
 
-    /* ══ MOBILE FIXES ═══════════════════ */
+    /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
       :root { --header-h: 60px; --strip-h: 40vh; --gap: 15px; }
-      .top-contact, .about-info-col { display: none; }
+      .top-cats, .top-contact, .about-info-col { display: none; }
       .info-trigger { display: block; }
-      .bottom-area { padding-bottom: 60px; }
-      .about-text { font-size: 18pt; transform: translateY(20px); } /* Moved down */
-      .proj-big-title { font-size: 1.5rem; }
-      .fixed-meta-container { margin-top: 5px; font-size: 0.65rem; }
+      .top-bar { padding: 0 20px; }
+      .bottom-area { padding: 0 20px 60px; }
+      .about-text { font-size: 18pt; max-width: 100%; }
+      .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
+      body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
+      .bottom-logo { width: 80px; height: 80px; }
     }
 
-    /* Project Page Takeover (White) */
+    /* ══ PROJECT PAGE TAKEOVER ════════════ */
     .proj-page { position: fixed; inset: 0; z-index: 200; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
     .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 210; }
+    
     .proj-container { padding: 120px 32px; max-width: 1200px; margin: 0 auto; }
-    .proj-big-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 60px; }
+    .proj-big-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 60px; letter-spacing: -0.01em; }
     .proj-media { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 0.8s var(--silk); margin-bottom: 60px; }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
     
@@ -129,9 +141,10 @@
 </div>
 
 <div class="main">
-  <div class="loading-screen" id="loading-screen">Establishing...</div>
+  <div class="loading-screen" id="loading-screen">Establishing session...</div>
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
+    <div class="top-cats" id="top-cats"></div>
     <div class="top-right">
         <div class="top-contact" id="top-contact">Say hello</div>
         <button class="info-trigger" id="info-trigger">Info</button>
@@ -140,18 +153,18 @@
   
   <div class="middle-area">
     <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
-    <div class="fixed-meta-container" id="fixed-project-name"></div>
   </div>
 
   <div class="bottom-area">
     <div class="about-cols">
-      <div class="about-text">Illustrator and motion designer specializing in character design, surreal and spirited.</div>
+      <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
       <div class="about-info-col">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
         <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank" class="about-link">Jelly</a></div>
       </div>
     </div>
+    <div class="bottom-logo"><img src="" alt="logo" id="site-logo"></div>
   </div>
 </div>
 
@@ -166,11 +179,19 @@
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-const F={title:'Title',caption:'Detailed Description',heroImg:'Hero Image',mosaicImg:'Mosaic Images',bg:'Background',order:'Order'};
+const F={title:'Title',caption:'Detailed Description',category:'Category',heroImg:'Hero Image',mosaicImg:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
 setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1000);
+
+function toSentenceCase(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : ''; }
+function isDark(color) {
+  if(!color) return false;
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+  return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
+}
 
 async function fetchAll(){
   try {
@@ -182,10 +203,21 @@ async function fetchAll(){
       let r = await fetch(url, {headers:{Authorization:`Bearer ${AT_TOKEN}`}});
       const d = await r.json(); recs = recs.concat(d.records); off = d.offset || '';
     } while(off);
+    
     recs.sort((a,b) => (a.fields[F.order] || 999) - (b.fields[F.order] || 999));
+    
+    // Recover Logo
+    for(const rec of recs){ 
+      if(rec.fields[F.logo]?.[0]?.url) { 
+        document.getElementById('site-logo').src = rec.fields[F.logo][0].url; 
+        break; 
+      } 
+    }
+
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
-      caption: rec.fields[F.caption] || '',
+      caption: toSentenceCase(rec.fields[F.caption] || ''),
+      cat: toSentenceCase((rec.fields[F.category]||'Personal').trim()),
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.heroImg]||[])[0],
       atts:[...(rec.fields[F.heroImg]||[]), ...(rec.fields[F.mosaicImg]||[])]
@@ -193,19 +225,28 @@ async function fetchAll(){
   } catch(e) { return []; }
 }
 
+function buildTopCats(){
+  const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
+  document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" data-filter="${c}">${c}</span>`).join(', ');
+  document.querySelectorAll('.top-cat').forEach(el => el.onclick = () => setFilter(el.dataset.filter));
+}
+
 function build(){
   const strip = document.getElementById('strip'); strip.innerHTML = '';
-  const loop = [...allProjects, ...allProjects, ...allProjects];
+  if (filtered.length === 0) return;
+  const loop = [...filtered, ...filtered, ...filtered];
+  
   loop.forEach((p, i) => {
     const el = document.createElement('div'); el.className = 'strip-item-wrap';
     const h = document.querySelector('.strip-outer').offsetHeight;
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     el.style.width = w + 'px';
-    el.innerHTML = `<div class="strip-img-wrap"><img src="${p.heroAtt?.url}" class="strip-img"></div>`;
-    el.onclick = () => (activeIdx === i) ? openProject(i % allProjects.length) : goTo(i);
+    // RECOVERY: Integrated media helper for video support
+    el.innerHTML = `<div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div><div class="strip-meta">${p.title.toLowerCase()}</div>`;
+    el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
     strip.appendChild(el);
   });
-  activeIdx = allProjects.length; goTo(activeIdx, true);
+  activeIdx = filtered.length; goTo(activeIdx, true);
 }
 
 function goTo(i, inst = false){
@@ -222,30 +263,47 @@ function goTo(i, inst = false){
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
   items.forEach((el, j) => el.classList.toggle('active', j === i));
   
-  const p = allProjects[i % allProjects.length];
-  document.getElementById('fixed-project-name').textContent = p.title.toLowerCase();
-  document.body.style.backgroundColor = p.bg;
+  const aboutText = document.getElementById('about-text');
+  if(window.innerWidth <= 768) {
+    if(activeIdx !== filtered.length) aboutText.classList.add('shrunk');
+    else aboutText.classList.remove('shrunk');
+  }
+
+  const p = filtered[i % filtered.length];
+  if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   
   if(!inst) {
       strip.addEventListener('transitionend', () => {
-          if(activeIdx < allProjects.length) goTo(activeIdx + allProjects.length, true);
-          if(activeIdx >= allProjects.length * 2) goTo(activeIdx - allProjects.length, true);
+          if(activeIdx < filtered.length) goTo(activeIdx + filtered.length, true);
+          if(activeIdx >= filtered.length * 2) goTo(activeIdx - filtered.length, true);
       }, {once: true});
   }
 }
 
+function setFilter(f){
+  document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.dataset.filter === f));
+  filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.cat === f);
+  build();
+}
+
 function openProject(i){
-  const p = allProjects[i];
+  const p = filtered[i];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
   p.atts.forEach((att, idx) => {
-    const m = document.createElement(att.type?.startsWith('video') ? 'video' : 'img');
-    m.src = att.url; m.className = 'proj-media'; 
-    if(att.type?.startsWith('video')) { m.autoplay = m.muted = m.loop = m.playsInline = true; }
+    const mStr = media(att, 'proj-media');
+    const temp = document.createElement('div'); temp.innerHTML = mStr;
+    const m = temp.firstChild;
     cont.appendChild(m);
     new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1}).observe(m);
   });
   document.getElementById('proj-page').classList.add('open');
+}
+
+function media(att, cls){
+  if(!att) return '';
+  const isVid = (att.type?.startsWith('video') || att.url.toLowerCase().endsWith('.mp4'));
+  return isVid ? `<video src="${att.url}" autoplay muted loop playsinline class="${cls}"></video>` : `<img src="${att.url}" class="${cls}">`;
 }
 
 document.getElementById('proj-close').onclick = () => document.getElementById('proj-page').classList.remove('open');
@@ -263,7 +321,7 @@ window.addEventListener('touchend', e => {
 
 async function init(){ 
   allProjects = await fetchAll(); 
-  if (allProjects.length > 0) { build(); }
+  if (allProjects.length > 0) { filtered = [...allProjects]; buildTopCats(); build(); }
   document.getElementById('loading-screen').style.display='none'; 
 }
 init();
