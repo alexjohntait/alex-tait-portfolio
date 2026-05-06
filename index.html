@@ -67,11 +67,12 @@
     }
     .strip-item-wrap.active { z-index: 10 !important; }
 
+    /* Refined technical project names below image */
     .strip-meta { 
-      position: absolute; bottom: -40px; left: 15px; font-size: 0.75rem; 
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; 
+      position: absolute; bottom: -35px; left: 15px; font-family: var(--ff-feature); font-size: 0.65rem; 
+      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; text-transform: lowercase;
     }
-    .strip-item-wrap.active .strip-meta { opacity: 0.6; }
+    .strip-item-wrap.active .strip-meta { opacity: 0.5; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-img { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
@@ -83,7 +84,10 @@
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; }
-    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
+    .about-text { 
+      font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; 
+      transition: color 0.8s, transform 0.6s var(--silk), font-size 0.6s var(--silk); transform-origin: bottom left; 
+    }
     
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; line-height: 1.2; }
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
@@ -120,19 +124,23 @@
     .next-sub { font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; margin-bottom: 8px; }
     .next-title { font-size: 1.5rem; font-weight: 600; }
 
-    /* ══ MOBILE FIXES ═══════════════════ */
+    /* ══ MOBILE OVERHAUL ════════════════ */
     @media (max-width: 768px) {
-      :root { --header-h: 60px; --strip-h: 40vh; }
+      :root { --header-h: 60px; --strip-h: 42vh; }
       .top-bar { height: var(--header-h); padding: 0 20px; }
-      .middle-area { padding-top: 0; }
+      .middle-area { padding-top: 0; align-items: flex-start; }
       .strip-item-wrap { padding: 0 10px; }
-      .strip-meta { bottom: -30px; left: 10px; font-size: 0.65rem; }
+      .strip-meta { bottom: -30px; left: 10px; opacity: 0.5 !important; } /* Always show on mobile */
       
-      .bottom-area { flex-direction: column; align-items: flex-start; gap: 40px; padding: 20px 20px 80px; height: auto; }
-      .about-cols { flex-direction: column; align-items: flex-start; gap: 35px; }
+      .bottom-area { flex-direction: column; align-items: flex-start; gap: 30px; padding: 20px 20px 60px; height: auto; }
+      .about-cols { flex-direction: column; align-items: flex-start; gap: 35px; width: 100%; }
       .about-text { font-size: 18pt; max-width: 100%; }
       .about-info-col { flex-direction: column; gap: 15px; width: 100%; }
       
+      /* Mobile dynamic scale classes */
+      .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
+      body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
+
       .bottom-logo { width: 80px; height: 80px; }
       .proj-container { padding: 80px 20px 0; }
       .proj-big-title { font-size: 1.5rem; }
@@ -159,7 +167,7 @@
   <div class="middle-area"><div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div></div>
   <div class="bottom-area">
     <div class="about-cols">
-      <div class="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+      <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
       <div class="about-info-col">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
@@ -229,7 +237,6 @@ async function fetchAll(){
 function build(){
   const strip = document.getElementById('strip'); strip.innerHTML = '';
   if (filtered.length === 0) return;
-  // Unified Looping for all devices
   const loop = [...filtered, ...filtered, ...filtered];
 
   loop.forEach((p, i) => {
@@ -253,6 +260,14 @@ function goTo(i, inst = false){
   let x = 0; for(let j=0; j<i; j++) x += items[j].offsetWidth;
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
   items.forEach((el, j) => el.classList.toggle('active', j === i));
+  
+  // Mobile Bio Scaling Logic
+  const aboutText = document.getElementById('about-text');
+  if(window.innerWidth <= 768) {
+    if(activeIdx !== filtered.length) aboutText.classList.add('shrunk');
+    else aboutText.classList.remove('shrunk');
+  }
+
   const p = filtered[i % filtered.length];
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   if(!inst) {
