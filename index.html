@@ -65,13 +65,13 @@
     .strip-item-wrap:not(.active) { opacity: 0.2; }
     .strip-item-wrap.active { z-index: 100 !important; opacity: 1; }
 
-    /* Desktop Info Labels (Above) */
+    /* Desktop Info Labels (Fixed Position Above) */
     .strip-meta { 
-      position: absolute; top: -75px; left: 0; font-family: var(--ff-feature); font-size: 0.9rem; 
+      position: absolute; top: -85px; left: 0; font-family: var(--ff-feature); font-size: 0.9rem; 
       opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; line-height: 1.4; text-align: left;
     }
-    .strip-item-wrap.active .strip-meta { opacity: 0.8; }
-    .meta-detail { opacity: 0.6; font-size: 0.6rem; text-transform: lowercase; margin-top: 4px; }
+    .strip-item-wrap.active .strip-meta { opacity: 0.85; visibility: visible; }
+    .meta-detail { opacity: 0.6; font-size: 0.65rem; text-transform: lowercase; margin-top: 4px; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
@@ -93,7 +93,7 @@
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; }
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
     .label { opacity: 0.4; font-size: 0.6rem; text-transform: lowercase; margin-bottom: 4px; }
-    .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; transform: translateY(15px); } /* Lowered Logo */
+    .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; transform: translateY(20px); } 
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
     /* ══ MOBILE INFO OVERLAY ══════════════ */
@@ -112,7 +112,7 @@
       .about-text { font-size: 18pt; max-width: 100%; text-align: left; }
       .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
       body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
-      .bottom-logo { width: 80px; height: 80px; transform: translateY(25px); } /* Further Lowered on Mobile */
+      .bottom-logo { width: 80px; height: 80px; transform: translateY(30px); } 
     }
 
     /* ══ PROJECT PAGE TAKEOVER ════════════ */
@@ -185,7 +185,7 @@ const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727
 const AT_BASE='appjYUthm8ib2ctuH';
 const F={title:'Title',desc:'Detailed Description',cat:'Category',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
-let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
+let allProjects=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
 setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1000);
 
