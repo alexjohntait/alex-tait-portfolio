@@ -26,7 +26,7 @@
       --silk: cubic-bezier(.22, 1, .36, 1);
       --bg: #FFFFFF;
       --ink: #000000;
-      --strip-h: 30vh; /* REDUCED HEIGHT */
+      --strip-h: 22vh; /* REDUCED FOR BETTER SCALE */
       --header-h: 80px;
     }
 
@@ -62,11 +62,11 @@
 
     /* ══ CENTRAL STATIONARY PROJECT INFO ══ */
     .meta-container {
-      width: 100%; text-align: center; margin-bottom: 80px; 
+      width: 100%; text-align: center; margin-bottom: 60px; 
       font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
     }
-    .meta-title { font-size: 1.4rem; text-transform: lowercase; }
-    .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; }
+    .meta-title { font-size: 1.4rem; text-transform: lowercase; color: var(--ink); }
+    .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; color: var(--ink); }
 
     /* ══ CAROUSEL ═════════════════════════ */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
@@ -75,17 +75,17 @@
     .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; padding: 0; opacity: 1; }
     .strip-item-wrap.active { z-index: 10 !important; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
-    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.15); } } /* REDUCED SCALE */
+    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.1); } }
 
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
-    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
+    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; color: var(--ink); }
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.85rem; }
-    .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
+    .bottom-logo { width: 160px; height: 160px; flex-shrink: 0; transform: translateY(30px); } 
 
     @media (max-width: 768px) {
-      :root { --header-h: 60px; --strip-h: 30vh; }
+      :root { --header-h: 60px; --strip-h: 28vh; }
       .top-cats, .top-contact, .about-info-col { display: none !important; }
       .info-trigger { display: block; }
       .top-bar { padding: 0 20px; }
@@ -93,38 +93,37 @@
       .meta-title { font-size: 1.1rem; }
       .bottom-area { padding: 0 20px 40px; }
       .about-text { font-size: 18pt; max-width: 100%; }
-      .bottom-logo { width: 120px; height: 120px; transform: translateY(55px); } 
+      .bottom-logo { width: 100px; height: 100px; transform: translateY(45px); } 
     }
 
-    /* ══ PROJECT PAGE (BLACK TYPE) ════════ */
+    /* ══ PROJECT PAGE (BASELINE ALIGNED) ══ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
     
     .proj-close { 
       position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; 
-      display: flex; align-items: center; justify-content: center; font-size: 2.5rem; 
-      color: #000; z-index: 500; font-weight: 300;
+      display: flex; align-items: center; justify-content: center; font-size: 3rem; 
+      color: #000; z-index: 500; font-weight: 200;
     }
     
     .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
     
-    /* Baselined Header */
+    /* Perfect Baseline Alignment */
     .proj-header { display: flex; align-items: baseline; gap: 40px; margin-bottom: 80px; }
-    .proj-big-title { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 0.9; text-transform: lowercase; }
-    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.5; color: #000; text-align: left; }
+    .proj-big-title { font-size: 4rem; font-weight: 700; letter-spacing: -0.04em; line-height: 0.85; text-transform: lowercase; margin: 0; }
+    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.4; color: #000; text-align: left; margin: 0; padding-bottom: 4px; }
 
-    .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 32ch; margin: 80px 0; font-weight: 400; color: #000; }
-    .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 100px; }
-    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 0.5; }
+    .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 34ch; margin: 80px 0; font-weight: 400; color: #000; }
+    .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 120px; }
+    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 1; }
     
-    .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 100px; }
-    .proj-media { width: 100%; border-radius: 3px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
+    .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 120px; }
+    .proj-media { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
     @media (max-width: 768px) {
       .proj-header { flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 40px; }
       .proj-big-title { font-size: 2.8rem; }
-      .proj-close { top: 20px; right: 20px; }
     }
 
     .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; opacity: 0; pointer-events: none; transform: translateY(-20px); transition: all 0.6s var(--silk); }
@@ -182,7 +181,7 @@
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-// Column B is 'Caption', which holds the descriptive text in your screenshot
+// MAPPED TO COLUMN B 'Caption' BASED ON SCREENSHOT 18.44.37.JPG
 const F={title:'Title',caption:'Caption',client:'Client',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
@@ -203,7 +202,7 @@ async function fetchAll(){
     for(const rec of recs){ if(rec.fields[F.logo]?.[0]?.url) { document.getElementById('site-logo').src = rec.fields[F.logo][0].url; break; } }
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
-      caption: rec.fields[F.caption] || '', // Pulled from Airtable Column B
+      caption: rec.fields[F.caption] || '', // Correctly pulls descriptive text
       client: rec.fields[F.client] || 'Personal',
       year: rec.fields[F.year] || '2026', 
       bg: rec.fields[F.bg] || '#ffffff',
@@ -268,10 +267,10 @@ function openProject(i){
   document.getElementById('proj-meta-side').innerHTML = `<div>${p.year}</div><div>${p.client.toLowerCase()}</div>`;
   
   const flow = document.getElementById('proj-content-flow'); flow.innerHTML = '';
-  // Hero Image
+  // Hero Image (fig. 01)
   flow.appendChild(createAsset(p.atts[0], 1));
 
-  // Caption (Pulling Column B 'Caption')
+  // Caption Recovery (Pulling 'Caption' Column B)
   if(p.caption) {
     const desc = document.createElement('div');
     desc.className = 'proj-description';
@@ -279,7 +278,7 @@ function openProject(i){
     flow.appendChild(desc);
   }
 
-  // Gallery Grid
+  // Alternating Grid Flow
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
       if(rest[j+1]) {
