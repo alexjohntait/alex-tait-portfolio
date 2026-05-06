@@ -56,28 +56,14 @@
     .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.7rem; border: 1px solid var(--ink); padding: 5px 12px; border-radius: 20px; }
 
-    /* ══ CAROUSEL ═════════════════════════ */
-    .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
-    .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
-    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
-    
-    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; padding: 0; }
-    .strip-item-wrap:not(.active) { opacity: 0.2; }
-    .strip-item-wrap.active { z-index: 100 !important; opacity: 1; }
-
-    /* Desktop Info Labels (Fixed Position Above) */
-    .strip-meta { 
-      position: absolute; top: -85px; left: 0; font-family: var(--ff-feature); font-size: 0.9rem; 
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; line-height: 1.4; text-align: left;
+    /* ══ FIXED INFO CONTAINERS (The Fix) ══ */
+    .desktop-fixed-meta {
+      width: 100%; text-align: center; font-family: var(--ff-feature); 
+      margin-bottom: 30px; line-height: 1.4; z-index: 50; pointer-events: none;
     }
-    .strip-item-wrap.active .strip-meta { opacity: 0.85; visibility: visible; }
-    .meta-detail { opacity: 0.6; font-size: 0.65rem; text-transform: lowercase; margin-top: 4px; }
+    .desktop-fixed-meta .d-title { font-size: 1rem; text-transform: lowercase; }
+    .desktop-fixed-meta .d-sub { font-size: 0.65rem; opacity: 0.5; text-transform: lowercase; margin-top: 4px; }
 
-    .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
-    .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
-    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.4); } }
-
-    /* Mobile Fixed Info Container (Left Aligned) */
     .mobile-fixed-meta {
       display: none; width: 100%; padding: 0 20px; text-align: left; font-family: var(--ff-feature); 
       margin-top: 25px; line-height: 1.4; pointer-events: none;
@@ -85,10 +71,23 @@
     .mobile-fixed-meta .m-title { font-size: 0.9rem; margin-bottom: 2px; }
     .mobile-fixed-meta .m-sub { font-size: 0.65rem; opacity: 0.5; text-transform: lowercase; }
 
+    /* ══ CAROUSEL ═════════════════════════ */
+    .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
+    .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
+    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
+    
+    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; padding: 0; }
+    .strip-item-wrap:not(.active) { opacity: 0.15; }
+    .strip-item-wrap.active { z-index: 10 !important; opacity: 1; }
+
+    .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
+    .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
+    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.4); } }
+
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
-    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; transition: color 0.8s, transform 0.6s var(--silk), font-size 0.6s var(--silk); transform-origin: bottom left; }
+    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
     
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; }
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
@@ -96,35 +95,33 @@
     .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; transform: translateY(20px); } 
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* ══ MOBILE INFO OVERLAY ══════════════ */
-    .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; flex-direction: column; justify-content: center; padding: 40px; transform: translateY(-100%); transition: transform 0.6s var(--silk); }
-    .mobile-info-overlay.open { transform: translateY(0); }
-    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.5rem; }
-
     /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
       :root { --header-h: 60px; --strip-h: 40vh; }
-      .top-contact, .about-info-col, .strip-meta { display: none !important; }
+      .desktop-fixed-meta, .top-contact, .about-info-col { display: none !important; }
       .info-trigger, .mobile-fixed-meta { display: block; }
       .top-bar { padding: 0 20px; }
       .bottom-area { padding: 0 20px 40px; }
       .about-cols { gap: 0; }
       .about-text { font-size: 18pt; max-width: 100%; text-align: left; }
-      .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
-      body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
-      .bottom-logo { width: 80px; height: 80px; transform: translateY(30px); } 
+      .bottom-logo { width: 80px; height: 80px; transform: translateY(55px); } /* Lowered logo */
     }
 
-    /* ══ PROJECT PAGE TAKEOVER ════════════ */
-    .proj-page { position: fixed; inset: 0; z-index: 300; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
+    /* Info Overlay (Mobile) */
+    .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; transform: translateY(-100%); transition: transform 0.6s var(--silk); }
+    .mobile-info-overlay.open { transform: translateY(0); }
+    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.5rem; }
+
+    /* Project Page */
+    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
-    .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 310; }
+    .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 410; }
     .proj-container { padding: 120px 32px; max-width: 1200px; margin: 0 auto; text-align: left; }
     .proj-big-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 60px; }
     .proj-asset { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 0.8s var(--silk); margin-bottom: 60px; }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
     
-    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 500; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
+    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 600; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
   </style>
 </head>
 <body>
@@ -151,8 +148,15 @@
   </div>
   
   <div class="middle-area">
+    <!-- Desktop Stationary Meta -->
+    <div class="desktop-fixed-meta" id="desktop-meta">
+        <div class="d-title" id="d-title"></div>
+        <div class="d-sub" id="d-sub"></div>
+    </div>
+
     <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
-    <!-- Mobile Fixed Meta -->
+
+    <!-- Mobile Stationary Meta -->
     <div class="mobile-fixed-meta" id="mobile-meta">
         <div class="m-title" id="m-title"></div>
         <div class="m-sub" id="m-sub"></div>
@@ -223,14 +227,7 @@ function build(){
     const h = document.querySelector('.strip-outer').offsetHeight;
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     el.style.width = w + 'px';
-    
-    el.innerHTML = `
-      <div class="strip-meta">
-        <div>${p.title.toLowerCase()}</div>
-        <div class="meta-detail">industry: ${p.cat.toLowerCase()} — 2026</div>
-      </div>
-      <div class="strip-img-wrap">${media(p.heroAtt, 'strip-media')}</div>
-    `;
+    el.innerHTML = `<div class="strip-img-wrap">${media(p.heroAtt, 'strip-media')}</div>`;
     el.onclick = () => (activeIdx === i) ? openProject(i % allProjects.length) : goTo(i);
     strip.appendChild(el);
   });
@@ -246,18 +243,15 @@ function goTo(i, inst = false){
   
   let x = 0; for(let j=0; j<i; j++) x += items[j].offsetWidth;
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
-  
   items.forEach((el, j) => el.classList.toggle('active', j === i));
   
   const p = allProjects[i % allProjects.length];
   
-  // Mobile Fixed Meta Update
+  // UPDATE BOTH FIXED META LAYERS (THE FIX)
+  document.getElementById('d-title').textContent = p.title.toLowerCase();
+  document.getElementById('d-sub').textContent = `industry: ${p.cat.toLowerCase()} — 2026`;
   document.getElementById('m-title').textContent = p.title.toLowerCase();
   document.getElementById('m-sub').textContent = `industry: ${p.cat.toLowerCase()} — 2026`;
-  
-  if(window.innerWidth <= 768) {
-    document.getElementById('about-text').classList.toggle('shrunk', activeIdx !== allProjects.length);
-  }
 
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   
