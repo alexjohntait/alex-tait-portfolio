@@ -15,7 +15,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; width: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; touch-action: none; background: #fff; }
+    html, body { height: 100%; width: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; background: #fff; }
     img, video { display: block; max-width: none; }
     a { color: inherit; text-decoration: none; }
     button { cursor: pointer; border: none; background: none; font: inherit; }
@@ -38,7 +38,6 @@
     body.is-dark { --ink: #FFFFFF; }
     body.is-dark .top-cat { color: #FFFFFF; }
     body.is-dark .top-contact-btn, body.is-dark .info-trigger-mobile { border-color: #FFFFFF; color: #FFFFFF; }
-    body.is-dark .meta-sub { color: #FFFFFF; opacity: 0.6; }
 
     .grain {
       position: fixed; inset: -50%; width: 200%; height: 200%;
@@ -72,14 +71,14 @@
     .meta-title { font-size: 1.4rem; text-transform: lowercase; margin: 0; }
     .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; }
 
-    .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; cursor: grab; }
+    .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; cursor: grab; touch-action: pan-y; }
     .strip { display: flex; height: 100%; will-change: transform; gap: 0px; transform: translate3d(0,0,0); }
     .strip-item-wrap { flex-shrink: 0; height: 100%; position: relative; padding: 0; transition: z-index 0s 0.3s; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.7s var(--silk); transform-origin: center; pointer-events: none; }
     .strip-item-wrap.active { z-index: 100; transition: z-index 0s; }
     .strip-item-wrap.active .strip-media { transform: scale(1.25); }
 
-    /* FOOTER (DESKTOP ONLY) */
+    /* FOOTER (DESKTOP) */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; color: var(--ink); }
     .bottom-right-group { display: flex; align-items: flex-end; gap: 60px; color: var(--ink); }
@@ -92,21 +91,24 @@
       position: fixed; inset: 0; background: #fff; z-index: 5000; 
       padding: 100px 32px; display: flex; flex-direction: column; gap: 40px;
       transform: translateY(100%); transition: transform 0.6s var(--silk); overflow-y: auto; color: #000;
+      pointer-events: none;
     }
-    .mobile-overlay.open { transform: translateY(0); }
+    .mobile-overlay.open { transform: translateY(0); pointer-events: auto; }
     .overlay-close { position: absolute; top: 32px; right: 32px; font-size: 2.5rem; font-weight: 200; }
     .mobile-bio { font-size: 20pt; line-height: 1.2; font-weight: 500; }
 
     /* PROJECT PAGE */
-    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; }
-    .proj-page.open { transform: translateY(0); }
+    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; pointer-events: none; }
+    .proj-page.open { transform: translateY(0); pointer-events: auto; }
     .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #000; z-index: 500; font-weight: 200; }
     .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; color: #000 !important; }
+    
     .proj-header { margin-bottom: 80px; }
     .proj-big-title { font-size: 4rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; text-transform: lowercase; margin: 0; color: #000; }
     .proj-narrative-block { margin-top: 60px; margin-bottom: 80px; }
     .proj-meta-tech { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.6; color: #000; text-align: left; margin-bottom: 20px; text-transform: lowercase; }
     .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 36ch; font-weight: 400; color: #000 !important; text-align: left; }
+    
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 120px; }
     .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 1; font-weight: 500; }
     .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 120px; }
@@ -114,7 +116,7 @@
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
     @media (max-width: 768px) {
-      :root { --header-h: 70px; --strip-h: 55vh; } /* BIGGER VERTICAL GALLERY */
+      :root { --header-h: 70px; --strip-h: 55vh; }
       .top-cats, .top-contact-btn, .bottom-area { display: none !important; }
       .info-trigger-mobile { display: block; }
       .top-bar, .meta-container { padding: 0 24px; }
@@ -210,17 +212,15 @@ async function fetchAll(){
 
 function media(att, cls){
   if(!att || !att.url) return '';
-  const url = att.url.toLowerCase();
-  const type = (att.type || '').toLowerCase();
-  const isVideo = type.includes('video') || url.endsWith('.mp4') || url.endsWith('.mov');
+  const isVideo = (att.type?.includes('video') || att.url.toLowerCase().endsWith('.mp4') || att.url.toLowerCase().endsWith('.mov'));
   if (isVideo) return `<video src="${att.url}" autoplay muted loop playsinline preload="auto" class="${cls}" style="background:transparent;"></video>`;
   return `<img src="${att.url}" class="${cls}" loading="eager">`;
 }
 
-function isDark(hexcolor){
-  if(!hexcolor) return false;
-  const hex = hexcolor.replace('#','');
-  const r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
+function isDark(hex){
+  if(!hex) return false;
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
   return ((r*299)+(g*587)+(b*114))/1000 < 128;
 }
 
@@ -253,9 +253,9 @@ function update(){
        scrollX += (snapX - scrollX) * SNAP_FORCE;
        
        items.forEach((el, j) => {
-          const isActive = j === closestIdx;
-          el.classList.toggle('active', isActive);
-          if(isActive){
+          const active = j === closestIdx;
+          el.classList.toggle('active', active);
+          if(active){
             const p = filtered[closestIdx % filtered.length];
             document.getElementById('meta-title').textContent = p.title.toLowerCase();
             document.getElementById('meta-sub').textContent = `${p.client.toLowerCase()} — ${p.year}`;
@@ -275,41 +275,40 @@ function update(){
   requestAnimationFrame(update);
 }
 
-function setFilter(f){
-    document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.textContent === f));
-    filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.client.toLowerCase().includes(f.toLowerCase()));
-    scrollX = 0; velX = 0;
-    build();
-    setTimeout(() => {
-        let initialX = 0; for(let i=0; i<filtered.length; i++) initialX += (items[i].offsetWidth);
-        scrollX = -initialX + (window.innerWidth/2) - (items[filtered.length].offsetWidth/2);
-    }, 50);
-}
+// TOUCH PRIORITY FIX
+const stripOuter = document.getElementById('strip-outer');
+let startX = 0;
 
 window.addEventListener('wheel', e => {
   if(document.getElementById('proj-page').classList.contains('open') || document.getElementById('mobile-overlay').classList.contains('open')) return;
   velX -= e.deltaY * 0.5;
 }, {passive: true});
 
-let startX = 0;
-window.addEventListener('touchstart', e => { isDragging = true; startX = e.touches[0].clientX; velX = 0; });
-window.addEventListener('touchmove', e => {
+stripOuter.addEventListener('touchstart', e => {
+  isDragging = true;
+  startX = e.touches[0].clientX;
+  velX = 0;
+}, {passive: true});
+
+stripOuter.addEventListener('touchmove', e => {
   if(document.getElementById('proj-page').classList.contains('open') || document.getElementById('mobile-overlay').classList.contains('open')) return;
-  const dx = e.touches[0].clientX - startX; scrollX += dx; startX = e.touches[0].clientX;
-});
-window.addEventListener('touchend', () => { isDragging = false; });
+  const dx = e.touches[0].clientX - startX;
+  scrollX += dx;
+  startX = e.touches[0].clientX;
+  // Prevent browser scroll fight
+  if(Math.abs(dx) > 5) e.preventDefault();
+}, {passive: false});
+
+window.addEventListener('touchend', () => isDragging = false);
+window.addEventListener('touchcancel', () => isDragging = false); // Safety reset
 
 function openProject(i){
   const p = filtered[i];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   const flow = document.getElementById('proj-flow'); flow.innerHTML = '';
   flow.appendChild(createAsset(p.atts[0], 1));
-  const narr = document.createElement('div');
-  narr.className = 'proj-narrative-block';
-  narr.innerHTML = `
-    <div class="proj-meta-tech">${p.year} / ${p.client.toLowerCase()}</div>
-    <div class="proj-description">${p.caption}</div>
-  `;
+  const narr = document.createElement('div'); narr.className = 'proj-narrative-block';
+  narr.innerHTML = `<div class="proj-meta-tech">${p.year} / ${p.client.toLowerCase()}</div><div class="proj-description">${p.caption}</div>`;
   flow.appendChild(narr);
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
@@ -346,6 +345,15 @@ async function init(){
         update();
     }, 1200);
   }
+}
+function setFilter(f){
+    document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.textContent === f));
+    filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.client.toLowerCase().includes(f.toLowerCase()));
+    scrollX = 0; velX = 0; build();
+    setTimeout(() => {
+        let initialX = 0; for(let i=0; i<filtered.length; i++) initialX += (items[i].offsetWidth);
+        scrollX = -initialX + (window.innerWidth/2) - (items[filtered.length].offsetWidth/2);
+    }, 50);
 }
 init();
 </script>
