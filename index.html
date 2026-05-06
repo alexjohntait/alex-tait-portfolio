@@ -100,40 +100,34 @@
       .bottom-logo { width: 120px; height: 120px; transform: translateY(55px); } 
     }
 
-    /* ══ OVERLAY FIX ══════════════════════ */
-    .mobile-info-overlay { 
-      position: fixed; inset: 0; background: var(--bg); z-index: 300; 
-      display: flex; flex-direction: column; justify-content: center; padding: 40px; 
-      opacity: 0; pointer-events: none; transform: translateY(-20px); transition: all 0.6s var(--silk); 
-    }
-    .mobile-info-overlay.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-
-    /* ══ PROJECT PAGE (NEW LAYOUT) ════════ */
+    /* ══ PROJECT PAGE (RESTORED & ALIGNED) ══ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
     
-    /* Fixed 'x' Top Right */
     .proj-close { 
       position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; 
       display: flex; align-items: center; justify-content: center; font-size: 2.2rem; 
-      color: #ff3b30; z-index: 500; font-weight: 300; line-height: 1;
+      color: #000; z-index: 500; font-weight: 300; line-height: 1;
     }
     
     .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
     
-    /* Reorganized Header */
-    .proj-header { display: flex; align-items: flex-start; gap: 80px; margin-bottom: 80px; }
-    .proj-big-title { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; text-transform: lowercase; }
-    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.6; color: #ff3b30; text-align: left; }
+    /* Flex Header for Perfect Alignment */
+    .proj-header { display: flex; align-items: flex-end; gap: 40px; margin-bottom: 80px; }
+    .proj-big-title { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 0.9; text-transform: lowercase; }
+    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.4; color: #000; text-align: left; margin-bottom: 2px; }
 
     .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 32ch; margin: 80px 0; font-weight: 400; opacity: 0.8; }
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 100px; }
-    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; }
+    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 0.4; }
     
     .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 100px; }
     .proj-media { width: 100%; border-radius: 3px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
-    
+
+    /* Overlay Lockdown */
+    .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; opacity: 0; pointer-events: none; transform: translateY(-20px); transition: all 0.6s var(--silk); }
+    .mobile-info-overlay.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
     .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 600; font-size: .7rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
   </style>
 </head>
@@ -180,9 +174,7 @@
         <div class="proj-big-title" id="proj-big-title"></div>
         <div class="proj-meta-side" id="proj-meta-side"></div>
     </div>
-    <div id="proj-hero-area"></div>
-    <div id="proj-description-area"></div>
-    <div id="proj-gallery-area"></div>
+    <div id="proj-content-flow"></div>
   </div>
 </div>
 
@@ -268,28 +260,26 @@ function setFilter(f){
   build();
 }
 
-/* ══ NEW: Detailed Project Page Engine ══ */
+/* ══ Editorial Project Page Engine ══ */
 function openProject(i){
   const p = filtered[i % filtered.length];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   document.getElementById('proj-meta-side').innerHTML = `<div>${p.year}</div><div>${p.cat}</div>`;
   
-  const heroArea = document.getElementById('proj-hero-area'); heroArea.innerHTML = '';
-  const descArea = document.getElementById('proj-description-area'); descArea.innerHTML = '';
-  const galleryArea = document.getElementById('proj-gallery-area'); galleryArea.innerHTML = '';
+  const flow = document.getElementById('proj-content-flow'); flow.innerHTML = '';
 
-  // 1. Hero Image (fig. 01)
-  heroArea.appendChild(createAsset(p.atts[0], 1));
+  // 1. Fig 01 (Hero)
+  flow.appendChild(createAsset(p.atts[0], 1));
 
-  // 2. Caption Text specifically between Hero and Gallery
+  // 2. Caption injected specifically after Fig 01
   if(p.caption) {
     const desc = document.createElement('div');
     desc.className = 'proj-description';
     desc.textContent = p.caption;
-    descArea.appendChild(desc);
+    flow.appendChild(desc);
   }
 
-  // 3. Side-by-Side Gallery logic
+  // 3. Grid Gallery
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
       if(rest[j+1]) {
@@ -297,9 +287,9 @@ function openProject(i){
           grid.className = 'proj-asset-grid';
           grid.appendChild(createAsset(rest[j], j + 2));
           grid.appendChild(createAsset(rest[j+1], j + 3));
-          galleryArea.appendChild(grid);
+          flow.appendChild(grid);
       } else {
-          galleryArea.appendChild(createAsset(rest[j], j + 2));
+          flow.appendChild(createAsset(rest[j], j + 2));
       }
   }
   document.getElementById('proj-page').classList.add('open');
