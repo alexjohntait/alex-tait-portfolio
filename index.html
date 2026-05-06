@@ -26,7 +26,7 @@
       --silk: cubic-bezier(.22, 1, .36, 1);
       --bg: #FFFFFF;
       --ink: #000000;
-      --strip-h: 37vh; 
+      --strip-h: 38vh; 
       --header-h: 80px;
     }
 
@@ -51,25 +51,18 @@
       flex-shrink: 0; height: var(--header-h); display: flex;
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
-    .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; }
+    .top-name { font-family: var(--ff-feature); font-size: 1.1rem; letter-spacing: -0.01em; }
     .top-right { display: flex; align-items: center; gap: 24px; }
-    .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
-    .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.7rem; border: 1px solid var(--ink); padding: 5px 12px; border-radius: 20px; }
+    .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
+    .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; border: 1.2px solid var(--ink); padding: 6px 14px; border-radius: 20px; }
 
-    /* ══ FIXED INFO CONTAINERS (The Fix) ══ */
-    .desktop-fixed-meta {
-      width: 100%; text-align: center; font-family: var(--ff-feature); 
-      margin-bottom: 30px; line-height: 1.4; z-index: 50; pointer-events: none;
+    /* ══ STATIONARY PROJECT INFO (Above Carousel) ══ */
+    .meta-container {
+      width: 100%; padding: 0 32px; margin-bottom: 20px; 
+      font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
     }
-    .desktop-fixed-meta .d-title { font-size: 1rem; text-transform: lowercase; }
-    .desktop-fixed-meta .d-sub { font-size: 0.65rem; opacity: 0.5; text-transform: lowercase; margin-top: 4px; }
-
-    .mobile-fixed-meta {
-      display: none; width: 100%; padding: 0 20px; text-align: left; font-family: var(--ff-feature); 
-      margin-top: 25px; line-height: 1.4; pointer-events: none;
-    }
-    .mobile-fixed-meta .m-title { font-size: 0.9rem; margin-bottom: 2px; }
-    .mobile-fixed-meta .m-sub { font-size: 0.65rem; opacity: 0.5; text-transform: lowercase; }
+    .meta-title { font-size: 1.2rem; text-transform: lowercase; }
+    .meta-sub { font-size: 0.7rem; opacity: 0.5; text-transform: lowercase; margin-top: 2px; }
 
     /* ══ CAROUSEL ═════════════════════════ */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
@@ -82,46 +75,55 @@
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
-    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.4); } }
+    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.35); } }
 
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
     
-    .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; }
+    .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.85rem; }
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
-    .label { opacity: 0.4; font-size: 0.6rem; text-transform: lowercase; margin-bottom: 4px; }
-    .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; transform: translateY(20px); } 
+    .label { opacity: 0.4; font-size: 0.65rem; text-transform: lowercase; margin-bottom: 4px; }
+    
+    /* BIGGER LOGO */
+    .bottom-logo { width: 160px; height: 160px; flex-shrink: 0; transform: translateY(30px); } 
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
     /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
       :root { --header-h: 60px; --strip-h: 40vh; }
-      .desktop-fixed-meta, .top-contact, .about-info-col { display: none !important; }
-      .info-trigger, .mobile-fixed-meta { display: block; }
+      .top-contact, .about-info-col { display: none !important; }
+      .info-trigger { display: block; }
       .top-bar { padding: 0 20px; }
+      .meta-container { padding: 0 20px; margin-bottom: 15px; }
+      .meta-title { font-size: 1.1rem; }
       .bottom-area { padding: 0 20px 40px; }
       .about-cols { gap: 0; }
       .about-text { font-size: 18pt; max-width: 100%; text-align: left; }
-      .bottom-logo { width: 80px; height: 80px; transform: translateY(55px); } /* Lowered logo */
+      .bottom-logo { width: 120px; height: 120px; transform: translateY(45px); } 
     }
 
     /* Info Overlay (Mobile) */
     .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; transform: translateY(-100%); transition: transform 0.6s var(--silk); }
     .mobile-info-overlay.open { transform: translateY(0); }
-    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.5rem; }
+    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.8rem; }
 
-    /* Project Page */
+    /* ══ PROJECT PAGE (Reimagined) ═══════ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
-    .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 410; }
-    .proj-container { padding: 120px 32px; max-width: 1200px; margin: 0 auto; text-align: left; }
-    .proj-big-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 60px; }
-    .proj-asset { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 0.8s var(--silk); margin-bottom: 60px; }
+    .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: #fff; z-index: 410; }
+    
+    .proj-container { padding: 140px 32px; max-width: 1200px; margin: 0 auto; text-align: left; }
+    .proj-big-title { font-size: 3.5rem; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.03em; line-height: 1; }
+    .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 32ch; margin-bottom: 100px; font-weight: 400; opacity: 0.8; }
+    
+    .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 100px; }
+    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; }
+    .proj-media { width: 100%; border-radius: 3px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
     
-    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 600; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
+    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 600; font-size: .7rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
   </style>
 </head>
 <body>
@@ -138,7 +140,8 @@
 </div>
 
 <div class="main">
-  <div class="loading-screen" id="loading-screen">Establishing session...</div>
+  <div class="loading-screen" id="loading-screen">establishing session...</div>
+  
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
     <div class="top-right">
@@ -148,19 +151,11 @@
   </div>
   
   <div class="middle-area">
-    <!-- Desktop Stationary Meta -->
-    <div class="desktop-fixed-meta" id="desktop-meta">
-        <div class="d-title" id="d-title"></div>
-        <div class="d-sub" id="d-sub"></div>
+    <div class="meta-container">
+        <div class="meta-title" id="meta-title"></div>
+        <div class="meta-sub" id="meta-sub"></div>
     </div>
-
     <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
-
-    <!-- Mobile Stationary Meta -->
-    <div class="mobile-fixed-meta" id="mobile-meta">
-        <div class="m-title" id="m-title"></div>
-        <div class="m-sub" id="m-sub"></div>
-    </div>
   </div>
 
   <div class="bottom-area">
@@ -180,6 +175,7 @@
   <button class="proj-close" id="proj-close">×</button>
   <div class="proj-container">
     <div class="proj-big-title" id="proj-big-title"></div>
+    <div class="proj-description" id="proj-description"></div>
     <div id="proj-dynamic-content"></div>
   </div>
 </div>
@@ -209,6 +205,7 @@ async function fetchAll(){
 
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
+      caption: rec.fields[F.desc] || 'Project description coming soon.',
       cat: (rec.fields[F.cat] || 'Personal').trim(),
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.hero]||[])[0],
@@ -243,15 +240,14 @@ function goTo(i, inst = false){
   
   let x = 0; for(let j=0; j<i; j++) x += items[j].offsetWidth;
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
+  
   items.forEach((el, j) => el.classList.toggle('active', j === i));
   
   const p = allProjects[i % allProjects.length];
   
-  // UPDATE BOTH FIXED META LAYERS (THE FIX)
-  document.getElementById('d-title').textContent = p.title.toLowerCase();
-  document.getElementById('d-sub').textContent = `industry: ${p.cat.toLowerCase()} — 2026`;
-  document.getElementById('m-title').textContent = p.title.toLowerCase();
-  document.getElementById('m-sub').textContent = `industry: ${p.cat.toLowerCase()} — 2026`;
+  // FIXED: Static Meta Update (Above Carousel)
+  document.getElementById('meta-title').textContent = p.title.toLowerCase();
+  document.getElementById('meta-sub').textContent = `industry: ${p.cat.toLowerCase()} — 2026`;
 
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   
@@ -266,11 +262,19 @@ function goTo(i, inst = false){
 function openProject(i){
   const p = allProjects[i];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
+  document.getElementById('proj-description').textContent = p.caption;
+  
   const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
-  p.atts.forEach((att) => {
-    const temp = document.createElement('div'); temp.innerHTML = media(att, 'proj-asset');
-    const m = temp.firstChild;
-    cont.appendChild(m);
+  p.atts.forEach((att, idx) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'proj-asset-wrap';
+    wrap.setAttribute('data-index', String(idx + 1).padStart(2, '0'));
+    
+    const mStr = media(att, 'proj-media');
+    wrap.innerHTML = mStr;
+    const m = wrap.firstChild;
+    
+    cont.appendChild(wrap);
     new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1}).observe(m);
   });
   document.getElementById('proj-page').classList.add('open');
