@@ -54,28 +54,31 @@
     .top-left { display: flex; align-items: center; gap: 40px; }
     .top-name { font-family: var(--ff-feature); font-size: 1.1rem; letter-spacing: -0.01em; }
     
-    .top-cats { display: flex; gap: 12px; font-family: var(--ff-feature); font-size: 0.75rem; color: #aaa; }
-    .top-cat { cursor: pointer; transition: color .2s; }
-    .top-cat.active { color: var(--ink); }
+    /* FIX: Improved Category Visibility */
+    .top-cats { display: flex; gap: 16px; font-family: var(--ff-feature); font-size: 0.75rem; }
+    .top-cat { cursor: pointer; opacity: 0.3; transition: opacity .3s; }
+    .top-cat:hover { opacity: 0.6; }
+    .top-cat.active { opacity: 1; }
 
     .top-right { display: flex; align-items: center; gap: 24px; }
     .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; border: 1.2px solid var(--ink); padding: 6px 14px; border-radius: 20px; }
 
-    /* ══ STATIONARY CENTRAL PROJECT INFO ══ */
+    /* ══ CENTRAL STATIONARY PROJECT INFO ══ */
     .meta-container {
       width: 100%; text-align: center; margin-bottom: 125px; 
       font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
     }
     .meta-title { font-size: 1.4rem; text-transform: lowercase; }
-    .meta-sub { font-size: 0.75rem; opacity: 0.45; text-transform: lowercase; margin-top: 4px; }
+    .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; }
 
     /* ══ CAROUSEL ═════════════════════════ */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
     .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
     
-    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; padding: 0; opacity: 1; }
+    /* FIX: Full Opacity for all images */
+    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; padding: 0; opacity: 1; }
     .strip-item-wrap.active { z-index: 10 !important; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
@@ -222,7 +225,7 @@ async function fetchAll(){
 
 function buildTopCats(){
   const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
-  document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" data-filter="${c}">${c}</span>`).join(', ');
+  document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" data-filter="${c}">${c}</span>`).join('');
   document.querySelectorAll('.top-cat').forEach(el => el.onclick = () => setFilter(el.dataset.filter));
 }
 
