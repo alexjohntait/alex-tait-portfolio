@@ -28,6 +28,7 @@
       --ink: #000000;
       --strip-h: 37vh; 
       --header-h: 80px;
+      --gap: 20px;
     }
 
     body {
@@ -35,7 +36,6 @@
       font-family: var(--ff); background: var(--bg); color: var(--ink);
       transition: background-color 0.8s var(--silk), color 0.8s var(--silk);
     }
-
     body.is-dark { --ink: #FFFFFF; }
 
     .grain {
@@ -53,161 +53,124 @@
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
     .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; }
-    .top-right { display: flex; align-items: center; gap: 32px; }
     .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
+    .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; letter-spacing: 0.05em; border: 1px solid var(--ink); padding: 6px 12px; border-radius: 20px; }
 
     /* ══ CAROUSEL ═════════════════════════ */
-    .middle-area { flex: 1; display: flex; align-items: center; overflow: visible; width: 100%; }
+    .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
-    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; }
+    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: var(--gap); padding-left: 0; }
     
-    .strip-item-wrap { 
-      flex-shrink: 0; height: 100%; display: flex; flex-direction: column; 
-      cursor: pointer; position: relative; padding: 0 15px; z-index: 1;
-    }
-    .strip-item-wrap.active { z-index: 10 !important; }
-
-    /* Refined technical project names below image */
-    .strip-meta { 
-      position: absolute; bottom: -35px; left: 15px; font-family: var(--ff-feature); font-size: 0.65rem; 
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; text-transform: lowercase;
-    }
-    .strip-item-wrap.active .strip-meta { opacity: 0.5; }
+    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; }
+    .strip-item-wrap:not(.active) { opacity: 0.3; }
+    .strip-item-wrap.active { z-index: 10 !important; opacity: 1; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-img { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
-    
-    @media (min-width: 769px) { 
-      .strip-item-wrap.active .strip-img { transform: scale(1.4); } 
+    @media (min-width: 769px) { .strip-item-wrap.active .strip-img { transform: scale(1.4); } }
+
+    /* Stationary Project Name */
+    .fixed-meta-container { 
+      width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; 
+      font-family: var(--ff-feature); font-size: 0.75rem; text-transform: lowercase; opacity: 0.5; margin-top: 10px;
     }
 
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; }
-    .about-text { 
-      font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; 
-      transition: color 0.8s, transform 0.6s var(--silk), font-size 0.6s var(--silk); transform-origin: bottom left; 
-    }
-    
-    .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; line-height: 1.2; }
+    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
+    .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; }
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
     .label { opacity: 0.4; font-size: 0.6rem; text-transform: lowercase; margin-bottom: 4px; }
-    .bottom-logo { width: 100px; height: 100px; flex-shrink: 0; }
 
-    /* ══ WHITE PROJECT PAGE ═══════ */
-    .proj-page { 
-      position: fixed; inset: 0; z-index: 200; overflow-y: auto; 
-      background: #FFFFFF !important; color: #000000 !important; 
-      transform: translateY(100%); transition: transform .7s var(--silk); 
-      scrollbar-width: none; touch-action: auto;
+    /* ══ MOBILE OVERLAY ═══════════════════ */
+    .mobile-info-overlay { 
+      position: fixed; inset: 0; background: var(--bg); z-index: 150; 
+      display: flex; flex-direction: column; justify-content: center; padding: 40px;
+      transform: translateY(-100%); transition: transform 0.6s var(--silk);
     }
-    .proj-page.open { transform: translateY(0); }
-    .proj-close-wrap { position: fixed; top: 32px; right: 32px; z-index: 210; }
-    .proj-close { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; }
-    
-    .proj-container { padding: 120px 32px 0; max-width: 1200px; margin: 0 auto; }
-    .proj-meta-row { display: flex; gap: 40px; margin-bottom: 20px; font-family: var(--ff-feature); font-size: 0.5rem; opacity: 0.4; }
-    .proj-big-title { font-size: 1.8rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 60px; }
-    
-    .proj-asset-wrap { position: relative; margin-bottom: 60px; }
-    .proj-media { width: 100%; height: auto; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: all 0.8s var(--silk); }
-    .proj-asset-wrap::before { content: "fig " attr(data-index); position: absolute; top: -18px; left: 0; font-family: var(--ff-feature); font-size: 8px; opacity: 0.3; }
+    .mobile-info-overlay.open { transform: translateY(0); }
+    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.5rem; }
 
-    .layout-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-    .layout-stagger-left { width: 70%; margin-right: auto; }
-    .layout-stagger-right { width: 70%; margin-left: auto; }
-    
-    .proj-caption-editorial { font-size: 1.5rem; line-height: 1.3; font-weight: 400; max-width: 32ch; margin: 100px 0; opacity: 0; transform: translateY(20px); transition: 0.8s var(--silk); }
-    .revealed { opacity: 1 !important; transform: translateY(0) !important; }
-
-    .proj-footer-nav { height: 40vh; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 100px; cursor: pointer; }
-    .next-sub { font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; margin-bottom: 8px; }
-    .next-title { font-size: 1.5rem; font-weight: 600; }
-
-    /* ══ MOBILE OVERHAUL ════════════════ */
+    /* ══ MOBILE FIXES ═══════════════════ */
     @media (max-width: 768px) {
-      :root { --header-h: 60px; --strip-h: 42vh; }
-      .top-bar { height: var(--header-h); padding: 0 20px; }
-      .middle-area { padding-top: 0; align-items: flex-start; }
-      .strip-item-wrap { padding: 0 10px; }
-      .strip-meta { bottom: -30px; left: 10px; opacity: 0.5 !important; } /* Always show on mobile */
-      
-      .bottom-area { flex-direction: column; align-items: flex-start; gap: 30px; padding: 20px 20px 60px; height: auto; }
-      .about-cols { flex-direction: column; align-items: flex-start; gap: 35px; width: 100%; }
-      .about-text { font-size: 18pt; max-width: 100%; }
-      .about-info-col { flex-direction: column; gap: 15px; width: 100%; }
-      
-      /* Mobile dynamic scale classes */
-      .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
-      body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
-
-      .bottom-logo { width: 80px; height: 80px; }
-      .proj-container { padding: 80px 20px 0; }
+      :root { --header-h: 60px; --strip-h: 40vh; --gap: 15px; }
+      .top-contact, .about-info-col { display: none; }
+      .info-trigger { display: block; }
+      .bottom-area { padding-bottom: 60px; }
+      .about-text { font-size: 18pt; transform: translateY(20px); } /* Moved down */
       .proj-big-title { font-size: 1.5rem; }
-      .layout-grid-2 { grid-template-columns: 1fr; gap: 20px; }
-      .layout-stagger-left, .layout-stagger-right { width: 100%; }
-      .proj-caption-editorial { font-size: 1.2rem; }
-      .cursor, .cursor-ring { display: none !important; }
-      * { cursor: auto !important; }
+      .fixed-meta-container { margin-top: 5px; font-size: 0.65rem; }
     }
 
-    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 300; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); text-transform: lowercase; }
+    /* Project Page Takeover (White) */
+    .proj-page { position: fixed; inset: 0; z-index: 200; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
+    .proj-page.open { transform: translateY(0); }
+    .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 210; }
+    .proj-container { padding: 120px 32px; max-width: 1200px; margin: 0 auto; }
+    .proj-big-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 60px; }
+    .proj-media { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 0.8s var(--silk); margin-bottom: 60px; }
+    .revealed { opacity: 1 !important; transform: translateY(0) !important; }
+    
+    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 300; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
   </style>
 </head>
 <body>
 
 <div class="grain"></div>
 
+<div class="mobile-info-overlay" id="info-overlay">
+  <button class="close-info" id="close-info">×</button>
+  <div class="about-info-col" style="display:flex !important; font-size: 1.2rem;">
+    <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
+    <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
+    <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank" class="about-link">Jelly</a></div>
+  </div>
+</div>
+
 <div class="main">
-  <div class="loading-screen" id="loading-screen">Establishing session...</div>
+  <div class="loading-screen" id="loading-screen">Establishing...</div>
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
-    <div class="top-right"><div class="top-contact" id="top-contact">Say hello</div></div>
+    <div class="top-right">
+        <div class="top-contact" id="top-contact">Say hello</div>
+        <button class="info-trigger" id="info-trigger">Info</button>
+    </div>
   </div>
-  <div class="middle-area"><div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div></div>
+  
+  <div class="middle-area">
+    <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
+    <div class="fixed-meta-container" id="fixed-project-name"></div>
+  </div>
+
   <div class="bottom-area">
     <div class="about-cols">
-      <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+      <div class="about-text">Illustrator and motion designer specializing in character design, surreal and spirited.</div>
       <div class="about-info-col">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
         <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank" class="about-link">Jelly</a></div>
       </div>
     </div>
-    <div class="bottom-logo"><img src="https://via.placeholder.com/150" alt="logo" id="site-logo"></div>
   </div>
 </div>
 
 <div class="proj-page" id="proj-page">
-  <div class="proj-close-wrap"><button class="proj-close" id="proj-close">×</button></div>
+  <button class="proj-close" id="proj-close">×</button>
   <div class="proj-container">
-    <div class="proj-meta-row" id="proj-meta-header"></div>
     <div class="proj-big-title" id="proj-big-title"></div>
     <div id="proj-dynamic-content"></div>
-    <div class="proj-footer-nav" id="proj-next-trigger">
-        <span class="next-sub">Next project</span>
-        <span class="next-title" id="next-proj-title"></span>
-    </div>
   </div>
 </div>
 
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-const F={title:'Title',caption:'Detailed Description',category:'Category',heroImg:'Hero Image',mosaicImg:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
+const F={title:'Title',caption:'Detailed Description',heroImg:'Hero Image',mosaicImg:'Mosaic Images',bg:'Background',order:'Order'};
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
-const hideLoader = () => { document.getElementById('loading-screen').style.display='none'; };
-setTimeout(hideLoader, 1000);
-
-function toSentenceCase(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : ''; }
-function isDark(color) {
-  if(!color) return false;
-  const hex = color.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
-  return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
-}
+setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1000);
 
 async function fetchAll(){
   try {
@@ -217,16 +180,12 @@ async function fetchAll(){
       let url = `https://api.airtable.com/v0/${AT_BASE}/${encodeURIComponent(table)}?pageSize=100`;
       if (off) url += `&offset=${off}`;
       let r = await fetch(url, {headers:{Authorization:`Bearer ${AT_TOKEN}`}});
-      const d = await r.json(); 
-      if (d.records) recs = recs.concat(d.records); 
-      off = d.offset || '';
+      const d = await r.json(); recs = recs.concat(d.records); off = d.offset || '';
     } while(off);
     recs.sort((a,b) => (a.fields[F.order] || 999) - (b.fields[F.order] || 999));
-    for(const rec of recs){ if(rec.fields[F.logo]?.[0]?.url) { document.getElementById('site-logo').src = rec.fields[F.logo][0].url; break; } }
     return recs.map(rec => ({
-      title: toSentenceCase(rec.fields[F.title] || 'Untitled'), 
-      caption: toSentenceCase(rec.fields[F.caption] || ''),
-      cat: toSentenceCase((rec.fields[F.category]||'Personal').trim()),
+      title: rec.fields[F.title] || 'Untitled', 
+      caption: rec.fields[F.caption] || '',
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.heroImg]||[])[0],
       atts:[...(rec.fields[F.heroImg]||[]), ...(rec.fields[F.mosaicImg]||[])]
@@ -236,19 +195,17 @@ async function fetchAll(){
 
 function build(){
   const strip = document.getElementById('strip'); strip.innerHTML = '';
-  if (filtered.length === 0) return;
-  const loop = [...filtered, ...filtered, ...filtered];
-
+  const loop = [...allProjects, ...allProjects, ...allProjects];
   loop.forEach((p, i) => {
     const el = document.createElement('div'); el.className = 'strip-item-wrap';
     const h = document.querySelector('.strip-outer').offsetHeight;
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     el.style.width = w + 'px';
-    el.innerHTML = `<div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div><div class="strip-meta">${p.title}</div>`;
-    el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
+    el.innerHTML = `<div class="strip-img-wrap"><img src="${p.heroAtt?.url}" class="strip-img"></div>`;
+    el.onclick = () => (activeIdx === i) ? openProject(i % allProjects.length) : goTo(i);
     strip.appendChild(el);
   });
-  activeIdx = filtered.length; goTo(activeIdx, true);
+  activeIdx = allProjects.length; goTo(activeIdx, true);
 }
 
 function goTo(i, inst = false){
@@ -257,80 +214,57 @@ function goTo(i, inst = false){
   activeIdx = i;
   const items = document.querySelectorAll('.strip-item-wrap');
   if (!items[i]) return;
-  let x = 0; for(let j=0; j<i; j++) x += items[j].offsetWidth;
+  
+  let x = 0; 
+  const gap = 20;
+  for(let j=0; j<i; j++) x += items[j].offsetWidth + gap;
+  
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
   items.forEach((el, j) => el.classList.toggle('active', j === i));
   
-  // Mobile Bio Scaling Logic
-  const aboutText = document.getElementById('about-text');
-  if(window.innerWidth <= 768) {
-    if(activeIdx !== filtered.length) aboutText.classList.add('shrunk');
-    else aboutText.classList.remove('shrunk');
-  }
-
-  const p = filtered[i % filtered.length];
-  if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
+  const p = allProjects[i % allProjects.length];
+  document.getElementById('fixed-project-name').textContent = p.title.toLowerCase();
+  document.body.style.backgroundColor = p.bg;
+  
   if(!inst) {
       strip.addEventListener('transitionend', () => {
-          if(activeIdx < filtered.length) goTo(activeIdx + filtered.length, true);
-          if(activeIdx >= filtered.length * 2) goTo(activeIdx - filtered.length, true);
+          if(activeIdx < allProjects.length) goTo(activeIdx + allProjects.length, true);
+          if(activeIdx >= allProjects.length * 2) goTo(activeIdx - allProjects.length, true);
       }, {once: true});
   }
 }
 
-const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1});
-
 function openProject(i){
-  const p = filtered[i]; const next = filtered[(i+1)%filtered.length];
-  document.getElementById('proj-meta-header').innerHTML = `<div>Industry: ${p.cat}</div>`;
-  document.getElementById('proj-big-title').textContent = p.title;
-  document.getElementById('next-proj-title').textContent = next.title;
+  const p = allProjects[i];
+  document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
   p.atts.forEach((att, idx) => {
-    const wrap = document.createElement('div'); wrap.className = 'proj-asset-wrap';
-    wrap.setAttribute('data-index', String(idx+1).padStart(2,'0'));
-    wrap.innerHTML = media(att, 'proj-media');
-    if(idx < 2){
-      if(idx===0){ const g = document.createElement('div'); g.className='layout-grid-2'; g.appendChild(wrap); cont.appendChild(g); }
-      else { 
-        if(cont.querySelector('.layout-grid-2')) cont.querySelector('.layout-grid-2').appendChild(wrap);
-        const cap = document.createElement('div'); cap.className='proj-caption-editorial'; cap.textContent=p.caption; cont.appendChild(cap); obs.observe(cap);
-      }
-    } else { wrap.classList.add(['layout-stagger-left','layout-full','layout-stagger-right'][idx%3]); cont.appendChild(wrap); }
-    obs.observe(wrap.querySelector('.proj-media'));
+    const m = document.createElement(att.type?.startsWith('video') ? 'video' : 'img');
+    m.src = att.url; m.className = 'proj-media'; 
+    if(att.type?.startsWith('video')) { m.autoplay = m.muted = m.loop = m.playsInline = true; }
+    cont.appendChild(m);
+    new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1}).observe(m);
   });
   document.getElementById('proj-page').classList.add('open');
-  document.getElementById('proj-page').scrollTop = 0;
-  document.getElementById('proj-next-trigger').onclick = () => { goTo(i+1+filtered.length); openProject((i+1)%filtered.length); };
-}
-
-function media(att, cls){
-  if(!att) return '';
-  const isVid = (att.type?.startsWith('video') || att.url.toLowerCase().endsWith('.mp4'));
-  return isVid ? `<video src="${att.url}" autoplay muted loop playsinline class="${cls}"></video>` : `<img src="${att.url}" class="${cls}">`;
 }
 
 document.getElementById('proj-close').onclick = () => document.getElementById('proj-page').classList.remove('open');
+document.getElementById('info-trigger').onclick = () => document.getElementById('info-overlay').classList.add('open');
+document.getElementById('close-info').onclick = () => document.getElementById('info-overlay').classList.remove('open');
 document.getElementById('top-contact').onclick = () => window.location.href = 'mailto:alex@alexjohntait.com';
 
-window.onwheel = e => { 
-  if(!document.getElementById('proj-page').classList.contains('open') && Math.abs(e.deltaY)>15 && !isScrolling){ 
-    isScrolling=true; goTo(activeIdx+(e.deltaY>0?1:-1)); setTimeout(()=>isScrolling=false,400); 
-  } 
-};
-
+window.onwheel = e => { if(!document.getElementById('proj-page').classList.contains('open') && Math.abs(e.deltaY)>15 && !isScrolling){ isScrolling=true; goTo(activeIdx+(e.deltaY>0?1:-1)); setTimeout(()=>isScrolling=false,400); } };
 window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, false);
 window.addEventListener('touchend', e => {
     if(document.getElementById('proj-page').classList.contains('open') || isScrolling) return;
-    let touchEndX = e.changedTouches[0].clientX;
-    let delta = touchStartX - touchEndX;
+    let delta = touchStartX - e.changedTouches[0].clientX;
     if(Math.abs(delta) > 40) { isScrolling=true; goTo(activeIdx+(delta > 0 ? 1 : -1)); setTimeout(()=>isScrolling=false,400); }
 }, false);
 
 async function init(){ 
-  allProjects=await fetchAll(); 
-  if (allProjects.length > 0) { filtered=[...allProjects]; build(); }
-  hideLoader(); 
+  allProjects = await fetchAll(); 
+  if (allProjects.length > 0) { build(); }
+  document.getElementById('loading-screen').style.display='none'; 
 }
 init();
 </script>
