@@ -46,6 +46,7 @@
 
     .main { display: flex; flex-direction: column; height: 100vh; width: 100%; overflow: hidden; position: relative; }
 
+    /* ══ TOP BAR ══════════════════════════ */
     .top-bar {
       flex-shrink: 0; height: var(--header-h); display: flex;
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
@@ -62,7 +63,7 @@
     .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; border: 1.2px solid var(--ink); padding: 6px 14px; border-radius: 20px; }
 
-    /* STATIONARY CENTRAL PROJECT INFO (100px CLEARANCE) */
+    /* ══ CENTRAL STATIONARY PROJECT INFO ══ */
     .meta-container {
       width: 100%; text-align: center; margin-bottom: 125px; 
       font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
@@ -70,6 +71,7 @@
     .meta-title { font-size: 1.4rem; text-transform: lowercase; }
     .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; }
 
+    /* ══ CAROUSEL ═════════════════════════ */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
     .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
@@ -81,6 +83,7 @@
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
     @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.35); } }
 
+    /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
@@ -105,6 +108,15 @@
       .bottom-logo { width: 120px; height: 120px; transform: translateY(55px); } 
     }
 
+    /* ══ OVERLAY FIX ══════════════════════ */
+    .mobile-info-overlay { 
+      position: fixed; inset: 0; background: var(--bg); z-index: 300; 
+      display: flex; flex-direction: column; justify-content: center; padding: 40px; 
+      opacity: 0; pointer-events: none; transform: translateY(-20px); transition: all 0.6s var(--silk); 
+    }
+    .mobile-info-overlay.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.8rem; }
+
     /* ══ PROJECT PAGE LAYOUT ══════════════ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
@@ -117,7 +129,6 @@
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 100px; }
     .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; }
     
-    /* Grid system for side-by-side images */
     .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 100px; }
     .proj-asset-grid .proj-asset-wrap { margin-bottom: 0; }
 
@@ -273,17 +284,16 @@ function setFilter(f){
   build();
 }
 
-/* ══ NEW: Editorial Layout Engine ══ */
+/* ══ Editorial Layout Engine ══ */
 function openProject(i){
-  const p = filtered[i];
+  const p = filtered[i % filtered.length];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
 
-  // 1. Render Fig 01
-  const fig01 = createAsset(p.atts[0], 1);
-  cont.appendChild(fig01);
+  // 1. Hero Image
+  cont.appendChild(createAsset(p.atts[0], 1));
 
-  // 2. Render Caption under Fig 01
+  // 2. Caption under Hero
   if(p.caption) {
     const desc = document.createElement('div');
     desc.className = 'proj-description';
@@ -291,20 +301,18 @@ function openProject(i){
     cont.appendChild(desc);
   }
 
-  // 3. Render rest of assets with alternating grid
-  let remaining = p.atts.slice(1);
-  for(let j=0; j < remaining.length; j++) {
-    // If we have at least 2 remaining and it's time for a grid (even index)
-    if(j+1 < remaining.length && j % 3 === 0) {
-      const grid = document.createElement('div');
-      grid.className = 'proj-asset-grid';
-      grid.appendChild(createAsset(remaining[j], j + 2));
-      grid.appendChild(createAsset(remaining[j+1], j + 3));
-      cont.appendChild(grid);
-      j++; // skip next since we paired it
-    } else {
-      cont.appendChild(createAsset(remaining[j], j + 2));
-    }
+  // 3. Gallery Grid
+  let rest = p.atts.slice(1);
+  for(let j=0; j < rest.length; j += 2) {
+      if(rest[j+1]) {
+          const grid = document.createElement('div');
+          grid.className = 'proj-asset-grid';
+          grid.appendChild(createAsset(rest[j], j + 2));
+          grid.appendChild(createAsset(rest[j+1], j + 3));
+          cont.appendChild(grid);
+      } else {
+          cont.appendChild(createAsset(rest[j], j + 2));
+      }
   }
 
   document.getElementById('proj-page').classList.add('open');
