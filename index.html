@@ -70,12 +70,13 @@
     .strip-item-wrap:not(.active) { opacity: 0.3; }
     .strip-item-wrap.active { z-index: 100 !important; opacity: 1; }
 
-    /* RESTORED: Metadata Above Images */
+    /* RESTORED: Detailed Metadata Above Images */
     .strip-meta { 
-      position: absolute; top: -55px; left: 0; font-family: var(--ff-feature); font-size: 0.65rem; 
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; text-transform: lowercase;
+      position: absolute; top: -65px; left: 0; font-family: var(--ff-feature); font-size: 0.65rem; 
+      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; line-height: 1.4;
     }
     .strip-item-wrap.active .strip-meta { opacity: 0.5; }
+    .meta-detail { opacity: 0.6; font-size: 0.55rem; text-transform: lowercase; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-img { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
@@ -112,6 +113,7 @@
       .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
       body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
       .bottom-logo { width: 80px; height: 80px; }
+      .strip-meta { top: -45px; }
     }
 
     /* ══ PROJECT PAGE TAKEOVER ════════════ */
@@ -206,7 +208,6 @@ async function fetchAll(){
     
     recs.sort((a,b) => (a.fields[F.order] || 999) - (b.fields[F.order] || 999));
     
-    // Recover Logo
     for(const rec of recs){ 
       if(rec.fields[F.logo]?.[0]?.url) { 
         document.getElementById('site-logo').src = rec.fields[F.logo][0].url; 
@@ -218,6 +219,7 @@ async function fetchAll(){
       title: rec.fields[F.title] || 'Untitled', 
       caption: toSentenceCase(rec.fields[F.caption] || ''),
       cat: toSentenceCase((rec.fields[F.category]||'Personal').trim()),
+      year: rec.fields['Year'] || '2026', // Fallback to current year as per base
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.heroImg]||[])[0],
       atts:[...(rec.fields[F.heroImg]||[]), ...(rec.fields[F.mosaicImg]||[])]
@@ -241,8 +243,15 @@ function build(){
     const h = document.querySelector('.strip-outer').offsetHeight;
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     el.style.width = w + 'px';
-    // RECOVERY: Integrated media helper for video support
-    el.innerHTML = `<div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div><div class="strip-meta">${p.title.toLowerCase()}</div>`;
+    
+    // RESTORED: Detailed technical label
+    el.innerHTML = `
+      <div class="strip-meta">
+        <div>${p.title.toLowerCase()}</div>
+        <div class="meta-detail">industry: ${p.cat} — ${p.year}</div>
+      </div>
+      <div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div>
+    `;
     el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
     strip.appendChild(el);
   });
