@@ -25,7 +25,7 @@
       --ff-feature: 'Avenue Mono', 'Geist Mono', monospace; 
       --silk: cubic-bezier(.22, 1, .36, 1);
       --ink: #000000;
-      --strip-h: 34vh; 
+      --strip-h: 42.5vh; /* INCREASED BY 25% */
       --header-h: 80px;
     }
 
@@ -67,7 +67,11 @@
 
     /* CAROUSEL CONTAINER */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; position: relative; overflow: visible; }
-    .meta-container { width: 100%; text-align: center; margin-bottom: 60px; font-family: var(--ff-feature); line-height: 1.4; pointer-events: none; color: var(--ink); }
+    
+    .meta-container { 
+      width: 100%; text-align: center; margin-bottom: 60px; /* MOVED UP FOR DESKTOP */
+      font-family: var(--ff-feature); line-height: 1.4; pointer-events: none; color: var(--ink); 
+    }
     .meta-title { font-size: 1.4rem; text-transform: lowercase; margin: 0; }
     .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; }
 
@@ -75,8 +79,9 @@
     .strip { display: flex; height: 100%; will-change: transform; gap: 0px; transform: translate3d(0,0,0); }
     .strip-item-wrap { flex-shrink: 0; height: 100%; position: relative; padding: 0; transition: z-index 0s 0.3s; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.7s var(--silk); transform-origin: center; pointer-events: none; }
+    
     .strip-item-wrap.active { z-index: 100; transition: z-index 0s; }
-    .strip-item-wrap.active .strip-media { transform: scale(1.25); }
+    .strip-item-wrap.active .strip-media { transform: scale(1.2); }
 
     /* FOOTER (DESKTOP) */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 15vh; z-index: 10; }
@@ -86,7 +91,7 @@
     .label { opacity: 0.4; font-size: 0.65rem; text-transform: lowercase; margin-bottom: 4px; }
     .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
 
-    /* MOBILE INFO OVERLAY */
+    /* MOBILE OVERLAY */
     .mobile-overlay { 
       position: fixed; inset: 0; background: #fff; z-index: 5000; 
       padding: 100px 32px; display: flex; flex-direction: column; gap: 40px;
@@ -98,17 +103,15 @@
     .mobile-bio { font-size: 20pt; line-height: 1.2; font-weight: 500; }
 
     /* PROJECT PAGE */
-    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; }
+    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; pointer-events: none; }
     .proj-page.open { transform: translateY(0); pointer-events: auto; }
     .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #000; z-index: 500; font-weight: 200; }
     .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; color: #000 !important; }
-    
     .proj-header { margin-bottom: 80px; }
     .proj-big-title { font-size: 4rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; text-transform: lowercase; margin: 0; color: #000; }
     .proj-narrative-block { margin-top: 60px; margin-bottom: 80px; }
     .proj-meta-tech { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.6; color: #000; text-align: left; margin-bottom: 20px; text-transform: lowercase; }
     .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 36ch; font-weight: 400; color: #000 !important; text-align: left; }
-    
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 120px; }
     .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 1; font-weight: 500; }
     .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 120px; }
@@ -116,11 +119,18 @@
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
     @media (max-width: 768px) {
-      :root { --header-h: 70px; --strip-h: 50vh; }
+      :root { --header-h: 70px; --strip-h: 65vh; } /* FILL SCREEN VERTICALLY */
       .top-cats, .top-contact-btn, .bottom-area { display: none !important; }
       .info-trigger-mobile { display: block; }
-      .top-bar, .meta-container { padding: 0 24px; }
-      .meta-container { margin-bottom: 30px; text-align: left; }
+      .top-bar { padding: 0 24px; }
+      
+      /* REORDER: INFO BELOW IMAGE ON MOBILE */
+      .middle-area { flex-direction: column-reverse; justify-content: flex-end; padding-top: 20px; }
+      .meta-container { margin-bottom: 0; margin-top: 30px; text-align: left; padding: 0 24px; }
+      .meta-title { font-size: 1.2rem; }
+
+      .strip-item-wrap { max-width: 90vw; } /* ENSURE BIG BUT WITHIN BOUNDS */
+      .strip-media { width: 100%; height: 100%; object-fit: contain; }
       .proj-big-title { font-size: 2.8rem; }
     }
   </style>
@@ -181,7 +191,7 @@ const AT_BASE='appjYUthm8ib2ctuH';
 const F={title:'Title',caption:'Caption',client:'Client',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], filtered=[], items=[], scrollX=0, velX=0, isDragging=false;
-const FRICTION=0.96, SNAP_FORCE=0.15; // LIGHTER FRICTION
+const FRICTION=0.96, SNAP_FORCE=0.15;
 
 function toggleOverlay(open) { document.getElementById('mobile-overlay').classList.toggle('open', open); }
 
@@ -210,8 +220,10 @@ async function fetchAll(){
 
 function media(att, cls){
   if(!att || !att.url) return '';
-  const isVideo = (att.type?.includes('video') || att.url.toLowerCase().endsWith('.mp4') || att.url.toLowerCase().endsWith('.mov'));
-  if (isVideo) return `<video src="${att.url}" autoplay muted loop playsinline class="${cls}" style="background:transparent;"></video>`;
+  const url = att.url.toLowerCase();
+  const type = (att.type || '').toLowerCase();
+  const isVideo = type.includes('video') || url.endsWith('.mp4') || url.endsWith('.mov');
+  if (isVideo) return `<video src="${att.url}" autoplay muted loop playsinline preload="auto" class="${cls}" style="background:transparent;"></video>`;
   return `<img src="${att.url}" class="${cls}" loading="eager">`;
 }
 
@@ -287,7 +299,7 @@ stripOuter.addEventListener('touchstart', e => {
 
 stripOuter.addEventListener('touchmove', e => {
   if(document.getElementById('proj-page').classList.contains('open') || document.getElementById('mobile-overlay').classList.contains('open')) return;
-  const dx = (e.touches[0].clientX - startX) * 2.5; // BOOSTED SENSITIVITY
+  const dx = (e.touches[0].clientX - startX) * 2.5; 
   scrollX += dx; startX = e.touches[0].clientX;
   if(Math.abs(dx) > 5) e.preventDefault();
 }, {passive: false});
