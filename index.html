@@ -51,10 +51,7 @@
       flex-shrink: 0; height: var(--header-h); display: flex;
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
-    .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; }
-    .top-cats { display: flex; gap: 12px; font-size: 0.8rem; color: #aaa; transition: color 0.8s; }
-    .top-cat { cursor: pointer; transition: color .2s; }
-    .top-cat.active { color: var(--ink); }
+    .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; z-index: 101; }
     
     .top-right { display: flex; align-items: center; gap: 24px; }
     .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
@@ -65,11 +62,11 @@
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
     .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
     
-    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; }
+    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; padding: 0; }
     .strip-item-wrap:not(.active) { opacity: 0.2; }
     .strip-item-wrap.active { z-index: 100 !important; opacity: 1; }
 
-    /* RESTORED: Metadata Above Images */
+    /* Desktop Info Labels (Above) */
     .strip-meta { 
       position: absolute; top: -75px; left: 0; font-family: var(--ff-feature); font-size: 0.9rem; 
       opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; line-height: 1.4;
@@ -80,6 +77,14 @@
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
     @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.4); } }
+
+    /* Mobile Fixed Info Container */
+    .mobile-fixed-meta {
+      display: none; width: 100%; text-align: center; font-family: var(--ff-feature); 
+      margin-top: 20px; line-height: 1.4; pointer-events: none;
+    }
+    .mobile-fixed-meta .m-title { font-size: 0.9rem; margin-bottom: 2px; }
+    .mobile-fixed-meta .m-sub { font-size: 0.65rem; opacity: 0.5; text-transform: lowercase; }
 
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
@@ -92,33 +97,34 @@
     .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; }
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* ══ MOBILE OVERLAY & FIXES ═══════════ */
-    .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 150; display: flex; flex-direction: column; justify-content: center; padding: 40px; transform: translateY(-100%); transition: transform 0.6s var(--silk); }
+    /* ══ MOBILE INFO OVERLAY ══════════════ */
+    .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: flex; flex-direction: column; justify-content: center; padding: 40px; transform: translateY(-100%); transition: transform 0.6s var(--silk); }
     .mobile-info-overlay.open { transform: translateY(0); }
     .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.5rem; }
 
+    /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
       :root { --header-h: 60px; --strip-h: 40vh; }
-      .top-cats, .top-contact, .about-info-col { display: none; }
-      .info-trigger { display: block; }
+      .top-contact, .about-info-col, .strip-meta { display: none !important; }
+      .info-trigger, .mobile-fixed-meta { display: block; }
       .top-bar { padding: 0 20px; }
       .bottom-area { padding: 0 20px 60px; }
       .about-text { font-size: 18pt; max-width: 100%; }
       .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
       body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
       .bottom-logo { width: 80px; height: 80px; }
-      .strip-meta { top: -65px; font-size: 0.8rem; }
     }
 
     /* ══ PROJECT PAGE TAKEOVER ════════════ */
-    .proj-page { position: fixed; inset: 0; z-index: 200; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
+    .proj-page { position: fixed; inset: 0; z-index: 300; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
-    .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 210; }
+    .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 310; }
     .proj-container { padding: 120px 32px; max-width: 1200px; margin: 0 auto; }
     .proj-big-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 60px; }
     .proj-asset { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 0.8s var(--silk); margin-bottom: 60px; }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
-    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 300; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
+    
+    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 500; font-size: .65rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
   </style>
 </head>
 <body>
@@ -138,7 +144,6 @@
   <div class="loading-screen" id="loading-screen">Establishing session...</div>
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
-    <div class="top-cats" id="top-cats"></div>
     <div class="top-right">
         <div class="top-contact" id="top-contact">Say hello</div>
         <button class="info-trigger" id="info-trigger">Info</button>
@@ -147,11 +152,16 @@
   
   <div class="middle-area">
     <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
+    <!-- Mobile Static Project Info -->
+    <div class="mobile-fixed-meta" id="mobile-meta">
+        <div class="m-title" id="m-title"></div>
+        <div class="m-sub" id="m-sub"></div>
+    </div>
   </div>
 
   <div class="bottom-area">
     <div class="about-cols">
-      <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+      <div class="about-text" id="about-text">Illustrator and motion designer specializing in character design, surreal and spirited.</div>
       <div class="about-info-col">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
@@ -173,7 +183,6 @@
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-// MAPPING FROM SCREENSHOT 2026-05-05 AT 23.36.59.JPG
 const F={title:'Title',desc:'Detailed Description',cat:'Category',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
@@ -196,9 +205,7 @@ async function fetchAll(){
 
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
-      caption: rec.fields[F.desc] || '',
       cat: (rec.fields[F.cat] || 'Personal').trim(),
-      year: '2026', // Column hidden or missing in screenshot, defaulting
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.hero]||[])[0],
       atts:[...(rec.fields[F.hero]||[]), ...(rec.fields[F.mosaic]||[])]
@@ -206,16 +213,10 @@ async function fetchAll(){
   } catch(e) { return []; }
 }
 
-function buildTopCats(){
-  const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
-  document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" data-filter="${c}">${c}</span>`).join(', ');
-  document.querySelectorAll('.top-cat').forEach(el => el.onclick = () => setFilter(el.dataset.filter));
-}
-
 function build(){
   const strip = document.getElementById('strip'); strip.innerHTML = '';
-  if (filtered.length === 0) return;
-  const loop = [...filtered, ...filtered, ...filtered];
+  if (allProjects.length === 0) return;
+  const loop = [...allProjects, ...allProjects, ...allProjects];
   
   loop.forEach((p, i) => {
     const el = document.createElement('div'); el.className = 'strip-item-wrap';
@@ -226,14 +227,14 @@ function build(){
     el.innerHTML = `
       <div class="strip-meta">
         <div>${p.title.toLowerCase()}</div>
-        <div class="meta-detail">industry: ${p.cat.toLowerCase()} — ${p.year}</div>
+        <div class="meta-detail">industry: ${p.cat.toLowerCase()} — 2026</div>
       </div>
       <div class="strip-img-wrap">${media(p.heroAtt, 'strip-media')}</div>
     `;
-    el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
+    el.onclick = () => (activeIdx === i) ? openProject(i % allProjects.length) : goTo(i);
     strip.appendChild(el);
   });
-  activeIdx = filtered.length; goTo(activeIdx, true);
+  activeIdx = allProjects.length; goTo(activeIdx, true);
 }
 
 function goTo(i, inst = false){
@@ -245,31 +246,31 @@ function goTo(i, inst = false){
   
   let x = 0; for(let j=0; j<i; j++) x += items[j].offsetWidth;
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
+  
   items.forEach((el, j) => el.classList.toggle('active', j === i));
   
+  const p = allProjects[i % allProjects.length];
+  
+  // Mobile Fixed Meta Update
+  document.getElementById('m-title').textContent = p.title.toLowerCase();
+  document.getElementById('m-sub').textContent = `industry: ${p.cat.toLowerCase()} — 2026`;
+  
   if(window.innerWidth <= 768) {
-    document.getElementById('about-text').classList.toggle('shrunk', activeIdx !== filtered.length);
+    document.getElementById('about-text').classList.toggle('shrunk', activeIdx !== allProjects.length);
   }
 
-  const p = filtered[i % filtered.length];
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   
   if(!inst) {
       strip.addEventListener('transitionend', () => {
-          if(activeIdx < filtered.length) goTo(activeIdx + filtered.length, true);
-          if(activeIdx >= filtered.length * 2) goTo(activeIdx - filtered.length, true);
+          if(activeIdx < allProjects.length) goTo(activeIdx + allProjects.length, true);
+          if(activeIdx >= allProjects.length * 2) goTo(activeIdx - allProjects.length, true);
       }, {once: true});
   }
 }
 
-function setFilter(f){
-  document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.dataset.filter === f));
-  filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.cat.toLowerCase() === f.toLowerCase());
-  build();
-}
-
 function openProject(i){
-  const p = filtered[i];
+  const p = allProjects[i];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
   p.atts.forEach((att) => {
@@ -287,6 +288,12 @@ function media(att, cls){
   return isVid ? `<video src="${att.url}" autoplay muted loop playsinline class="${cls}"></video>` : `<img src="${att.url}" class="${cls}">`;
 }
 
+function isDark(color) {
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+  return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
+}
+
 document.getElementById('proj-close').onclick = () => document.getElementById('proj-page').classList.remove('open');
 document.getElementById('info-trigger').onclick = () => document.getElementById('info-overlay').classList.add('open');
 document.getElementById('close-info').onclick = () => document.getElementById('info-overlay').classList.remove('open');
@@ -300,16 +307,9 @@ window.addEventListener('touchend', e => {
     if(Math.abs(delta) > 40) { isScrolling=true; goTo(activeIdx+(delta > 0 ? 1 : -1)); setTimeout(()=>isScrolling=false,400); }
 }, false);
 
-function isDark(color) {
-  const hex = color.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
-  return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
-}
-
 async function init(){ 
   allProjects = await fetchAll(); 
-  if (allProjects.length > 0) { filtered = [...allProjects]; buildTopCats(); build(); }
-  document.getElementById('loading-screen').style.display='none'; 
+  if (allProjects.length > 0) { build(); }
 }
 init();
 </script>
