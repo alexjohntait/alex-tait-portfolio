@@ -28,7 +28,7 @@
       --ink: #000000;
       --strip-h: 37vh; 
       --header-h: 80px;
-      --gap: 20px;
+      --gap: 0px; /* ELIMINATED GAPS */
     }
 
     body {
@@ -53,10 +53,6 @@
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
     .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; }
-    .top-cats { display: flex; gap: 12px; font-size: 0.8rem; color: #aaa; transition: color 0.8s; }
-    .top-cat { cursor: pointer; transition: color .2s; }
-    .top-cat.active { color: var(--ink); }
-    
     .top-right { display: flex; align-items: center; gap: 24px; }
     .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.7rem; border: 1px solid var(--ink); padding: 5px 12px; border-radius: 20px; }
@@ -66,17 +62,17 @@
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
     .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: var(--gap); }
     
-    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; }
+    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; padding: 0; }
     .strip-item-wrap:not(.active) { opacity: 0.3; }
     .strip-item-wrap.active { z-index: 100 !important; opacity: 1; }
 
-    /* RESTORED: Detailed Metadata Above Images */
+    /* Technical labels above images */
     .strip-meta { 
-      position: absolute; top: -65px; left: 0; font-family: var(--ff-feature); font-size: 0.65rem; 
+      position: absolute; top: -80px; left: 0; font-family: var(--ff-feature); font-size: 0.9rem; /* LARGER TYPE */
       opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; line-height: 1.4;
     }
-    .strip-item-wrap.active .strip-meta { opacity: 0.5; }
-    .meta-detail { opacity: 0.6; font-size: 0.55rem; text-transform: lowercase; }
+    .strip-item-wrap.active .strip-meta { opacity: 0.7; }
+    .meta-detail { opacity: 0.6; font-size: 0.65rem; text-transform: lowercase; margin-top: 4px; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-img { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
@@ -104,7 +100,7 @@
 
     /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
-      :root { --header-h: 60px; --strip-h: 40vh; --gap: 15px; }
+      :root { --header-h: 60px; --strip-h: 40vh; --gap: 0px; }
       .top-cats, .top-contact, .about-info-col { display: none; }
       .info-trigger { display: block; }
       .top-bar { padding: 0 20px; }
@@ -113,7 +109,7 @@
       .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
       body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
       .bottom-logo { width: 80px; height: 80px; }
-      .strip-meta { top: -45px; }
+      .strip-meta { top: -65px; font-size: 0.8rem; }
     }
 
     /* ══ PROJECT PAGE TAKEOVER ════════════ */
@@ -146,7 +142,7 @@
   <div class="loading-screen" id="loading-screen">Establishing session...</div>
   <div class="top-bar">
     <div class="top-name">Alex Tait</div>
-    <div class="top-cats" id="top-cats"></div>
+    <div id="top-cats" style="display:none;"></div> <!-- Reserved for filter logic -->
     <div class="top-right">
         <div class="top-contact" id="top-contact">Say hello</div>
         <button class="info-trigger" id="info-trigger">Info</button>
@@ -159,7 +155,7 @@
 
   <div class="bottom-area">
     <div class="about-cols">
-      <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+      <div class="about-text" id="about-text">Illustrator and motion designer specializing in character design, surreal and spirited.</div>
       <div class="about-info-col">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
@@ -219,7 +215,7 @@ async function fetchAll(){
       title: rec.fields[F.title] || 'Untitled', 
       caption: toSentenceCase(rec.fields[F.caption] || ''),
       cat: toSentenceCase((rec.fields[F.category]||'Personal').trim()),
-      year: rec.fields['Year'] || '2026', // Fallback to current year as per base
+      year: rec.fields['Year'] || '2026', 
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.heroImg]||[])[0],
       atts:[...(rec.fields[F.heroImg]||[]), ...(rec.fields[F.mosaicImg]||[])]
@@ -227,16 +223,10 @@ async function fetchAll(){
   } catch(e) { return []; }
 }
 
-function buildTopCats(){
-  const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
-  document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" data-filter="${c}">${c}</span>`).join(', ');
-  document.querySelectorAll('.top-cat').forEach(el => el.onclick = () => setFilter(el.dataset.filter));
-}
-
 function build(){
   const strip = document.getElementById('strip'); strip.innerHTML = '';
-  if (filtered.length === 0) return;
-  const loop = [...filtered, ...filtered, ...filtered];
+  if (allProjects.length === 0) return;
+  const loop = [...allProjects, ...allProjects, ...allProjects];
   
   loop.forEach((p, i) => {
     const el = document.createElement('div'); el.className = 'strip-item-wrap';
@@ -244,7 +234,6 @@ function build(){
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     el.style.width = w + 'px';
     
-    // RESTORED: Detailed technical label
     el.innerHTML = `
       <div class="strip-meta">
         <div>${p.title.toLowerCase()}</div>
@@ -252,10 +241,10 @@ function build(){
       </div>
       <div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div>
     `;
-    el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
+    el.onclick = () => (activeIdx === i) ? openProject(i % allProjects.length) : goTo(i);
     strip.appendChild(el);
   });
-  activeIdx = filtered.length; goTo(activeIdx, true);
+  activeIdx = allProjects.length; goTo(activeIdx, true);
 }
 
 function goTo(i, inst = false){
@@ -266,37 +255,30 @@ function goTo(i, inst = false){
   if (!items[i]) return;
   
   let x = 0; 
-  const gap = 20;
-  for(let j=0; j<i; j++) x += items[j].offsetWidth + gap;
+  for(let j=0; j<i; j++) x += items[j].offsetWidth;
   
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
   items.forEach((el, j) => el.classList.toggle('active', j === i));
   
   const aboutText = document.getElementById('about-text');
   if(window.innerWidth <= 768) {
-    if(activeIdx !== filtered.length) aboutText.classList.add('shrunk');
+    if(activeIdx !== allProjects.length) aboutText.classList.add('shrunk');
     else aboutText.classList.remove('shrunk');
   }
 
-  const p = filtered[i % filtered.length];
+  const p = allProjects[i % allProjects.length];
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   
   if(!inst) {
       strip.addEventListener('transitionend', () => {
-          if(activeIdx < filtered.length) goTo(activeIdx + filtered.length, true);
-          if(activeIdx >= filtered.length * 2) goTo(activeIdx - filtered.length, true);
+          if(activeIdx < allProjects.length) goTo(activeIdx + allProjects.length, true);
+          if(activeIdx >= allProjects.length * 2) goTo(activeIdx - allProjects.length, true);
       }, {once: true});
   }
 }
 
-function setFilter(f){
-  document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.dataset.filter === f));
-  filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.cat === f);
-  build();
-}
-
 function openProject(i){
-  const p = filtered[i];
+  const p = allProjects[i];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
   p.atts.forEach((att, idx) => {
@@ -330,7 +312,7 @@ window.addEventListener('touchend', e => {
 
 async function init(){ 
   allProjects = await fetchAll(); 
-  if (allProjects.length > 0) { filtered = [...allProjects]; buildTopCats(); build(); }
+  if (allProjects.length > 0) { build(); }
   document.getElementById('loading-screen').style.display='none'; 
 }
 init();
