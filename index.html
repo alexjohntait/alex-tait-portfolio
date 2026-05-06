@@ -46,7 +46,6 @@
 
     .main { display: flex; flex-direction: column; height: 100vh; width: 100%; overflow: hidden; position: relative; }
 
-    /* ══ TOP BAR ══════════════════════════ */
     .top-bar {
       flex-shrink: 0; height: var(--header-h); display: flex;
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
@@ -54,7 +53,6 @@
     .top-left { display: flex; align-items: center; gap: 40px; }
     .top-name { font-family: var(--ff-feature); font-size: 1.1rem; letter-spacing: -0.01em; }
     
-    /* FIX: Improved Category Visibility */
     .top-cats { display: flex; gap: 16px; font-family: var(--ff-feature); font-size: 0.75rem; }
     .top-cat { cursor: pointer; opacity: 0.3; transition: opacity .3s; }
     .top-cat:hover { opacity: 0.6; }
@@ -64,7 +62,7 @@
     .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; border: 1.2px solid var(--ink); padding: 6px 14px; border-radius: 20px; }
 
-    /* ══ CENTRAL STATIONARY PROJECT INFO ══ */
+    /* STATIONARY CENTRAL PROJECT INFO (100px CLEARANCE) */
     .meta-container {
       width: 100%; text-align: center; margin-bottom: 125px; 
       font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
@@ -72,12 +70,10 @@
     .meta-title { font-size: 1.4rem; text-transform: lowercase; }
     .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; }
 
-    /* ══ CAROUSEL ═════════════════════════ */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
     .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
     
-    /* FIX: Full Opacity for all images */
     .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; padding: 0; opacity: 1; }
     .strip-item-wrap.active { z-index: 10 !important; }
 
@@ -85,7 +81,6 @@
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
     @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.35); } }
 
-    /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
@@ -97,7 +92,6 @@
     .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
       :root { --header-h: 60px; --strip-h: 40vh; }
       .top-cats, .top-contact, .about-info-col { display: none !important; }
@@ -111,20 +105,22 @@
       .bottom-logo { width: 120px; height: 120px; transform: translateY(55px); } 
     }
 
-    .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; transform: translateY(-100%); transition: transform 0.6s var(--silk); }
-    .mobile-info-overlay.open { transform: translateY(0); }
-    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.8rem; }
-
+    /* ══ PROJECT PAGE LAYOUT ══════════════ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
     .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: #fff; z-index: 410; }
     
     .proj-container { padding: 140px 32px; max-width: 1100px; margin: 0 auto; text-align: left; }
-    .proj-big-title { font-size: 3.5rem; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.03em; line-height: 1; text-transform: lowercase; }
+    .proj-big-title { font-size: 3.5rem; font-weight: 700; margin-bottom: 60px; letter-spacing: -0.03em; line-height: 1; text-transform: lowercase; }
     .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 32ch; margin-bottom: 100px; font-weight: 400; opacity: 0.8; }
     
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 100px; }
     .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; }
+    
+    /* Grid system for side-by-side images */
+    .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 100px; }
+    .proj-asset-grid .proj-asset-wrap { margin-bottom: 0; }
+
     .proj-media { width: 100%; border-radius: 3px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
     
@@ -183,7 +179,6 @@
   <button class="proj-close" id="proj-close">×</button>
   <div class="proj-container">
     <div class="proj-big-title" id="proj-big-title"></div>
-    <div class="proj-description" id="proj-description"></div>
     <div id="proj-dynamic-content"></div>
   </div>
 </div>
@@ -213,7 +208,7 @@ async function fetchAll(){
 
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
-      caption: rec.fields[F.desc] || 'Project description coming soon.',
+      caption: rec.fields[F.desc] || '',
       cat: (rec.fields[F.cat] || 'Personal').trim(),
       year: rec.fields[F.year] || '2026', 
       bg: rec.fields[F.bg] || '#ffffff',
@@ -278,22 +273,51 @@ function setFilter(f){
   build();
 }
 
+/* ══ NEW: Editorial Layout Engine ══ */
 function openProject(i){
   const p = filtered[i];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
-  document.getElementById('proj-description').textContent = p.caption;
-  
   const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
-  p.atts.forEach((att, idx) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'proj-asset-wrap';
-    wrap.setAttribute('data-index', String(idx + 1).padStart(2, '0'));
-    wrap.innerHTML = media(att, 'proj-media');
-    const m = wrap.firstChild;
-    cont.appendChild(wrap);
-    new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1}).observe(m);
-  });
+
+  // 1. Render Fig 01
+  const fig01 = createAsset(p.atts[0], 1);
+  cont.appendChild(fig01);
+
+  // 2. Render Caption under Fig 01
+  if(p.caption) {
+    const desc = document.createElement('div');
+    desc.className = 'proj-description';
+    desc.textContent = p.caption;
+    cont.appendChild(desc);
+  }
+
+  // 3. Render rest of assets with alternating grid
+  let remaining = p.atts.slice(1);
+  for(let j=0; j < remaining.length; j++) {
+    // If we have at least 2 remaining and it's time for a grid (even index)
+    if(j+1 < remaining.length && j % 3 === 0) {
+      const grid = document.createElement('div');
+      grid.className = 'proj-asset-grid';
+      grid.appendChild(createAsset(remaining[j], j + 2));
+      grid.appendChild(createAsset(remaining[j+1], j + 3));
+      cont.appendChild(grid);
+      j++; // skip next since we paired it
+    } else {
+      cont.appendChild(createAsset(remaining[j], j + 2));
+    }
+  }
+
   document.getElementById('proj-page').classList.add('open');
+}
+
+function createAsset(att, idx) {
+  const wrap = document.createElement('div');
+  wrap.className = 'proj-asset-wrap';
+  wrap.setAttribute('data-index', String(idx).padStart(2, '0'));
+  wrap.innerHTML = media(att, 'proj-media');
+  const m = wrap.querySelector('.proj-media');
+  new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('revealed'); }), {threshold: 0.1}).observe(m);
+  return wrap;
 }
 
 function media(att, cls){
