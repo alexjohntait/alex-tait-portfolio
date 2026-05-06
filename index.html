@@ -15,7 +15,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; width: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; touch-action: none; }
+    html, body { height: 100%; width: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; touch-action: none; background: #fff; }
     img, video { display: block; max-width: none; }
     a { color: inherit; text-decoration: none; }
     button { cursor: pointer; border: none; background: none; font: inherit; }
@@ -26,14 +26,14 @@
       --silk: cubic-bezier(.22, 1, .36, 1);
       --bg: #FFFFFF;
       --ink: #000000;
-      --strip-h: 24vh; /* CALIBRATED FOR SCALE */
+      --strip-h: 28vh; /* RECALIBRATED BASE HEIGHT */
       --header-h: 80px;
     }
 
     body {
       display: flex; flex-direction: column; height: 100vh;
-      font-family: var(--ff); background: var(--bg); color: var(--ink);
-      transition: background-color 0.8s var(--silk), color 0.8s var(--silk);
+      font-family: var(--ff); color: var(--ink);
+      transition: background-color 0.8s var(--silk);
     }
     body.is-dark { --ink: #FFFFFF; }
 
@@ -55,49 +55,44 @@
     .top-cats { display: flex; gap: 16px; font-family: var(--ff-feature); font-size: 0.75rem; }
     .top-cat { cursor: pointer; opacity: 0.3; transition: opacity .3s; color: var(--ink); }
     .top-cat.active { opacity: 1; }
-
     .top-right { display: flex; align-items: center; gap: 24px; }
-    .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
+    .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; cursor: pointer; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; border: 1.2px solid var(--ink); padding: 6px 14px; border-radius: 20px; }
 
-    /* ══ CENTRAL STATIONARY PROJECT INFO ══ */
+    /* ══ MAIN CAROUSEL ════════════════════ */
+    .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+    
     .meta-container {
-      width: 100%; text-align: center; margin-bottom: 50px; 
+      width: 100%; text-align: center; margin-bottom: 60px; 
       font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
     }
-    .meta-title { font-size: 1.4rem; text-transform: lowercase; color: var(--ink); }
-    .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; color: var(--ink); }
+    .meta-title { font-size: 1.4rem; text-transform: lowercase; margin: 0; }
+    .meta-sub { font-size: 0.75rem; opacity: 0.8; text-transform: lowercase; margin-top: 4px; }
 
-    /* ══ CAROUSEL ═════════════════════════ */
-    .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
-    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
-    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; padding: 0; opacity: 1; }
+    .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; gap: 0px; }
+    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; padding: 0; opacity: 1; }
     .strip-item-wrap.active { z-index: 10 !important; }
-    .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
-    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.1); } }
+    .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center; }
+    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.2); } }
 
-    /* ══ BOTTOM AREA ══════════════════════ */
+    /* ══ FOOTER ═══════════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
-    .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
-    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; color: var(--ink); }
-    .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.85rem; }
+    .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
     .bottom-logo { width: 160px; height: 160px; flex-shrink: 0; transform: translateY(30px); } 
 
     @media (max-width: 768px) {
-      :root { --header-h: 60px; --strip-h: 28vh; }
-      .top-cats, .top-contact, .about-info-col { display: none !important; }
+      :root { --header-h: 60px; --strip-h: 30vh; }
+      .top-cats, .top-contact { display: none !important; }
       .info-trigger { display: block; }
-      .top-bar { padding: 0 20px; }
-      .meta-container { padding: 0 20px; margin-bottom: 25px; text-align: left; }
-      .meta-title { font-size: 1.1rem; }
-      .bottom-area { padding: 0 20px 40px; }
+      .top-bar, .meta-container, .bottom-area { padding: 0 20px; }
+      .meta-container { text-align: left; margin-bottom: 25px; }
       .about-text { font-size: 18pt; max-width: 100%; }
       .bottom-logo { width: 100px; height: 100px; transform: translateY(45px); } 
     }
 
-    /* ══ PROJECT PAGE (BASELINE & BLACK) ══ */
-    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
+    /* ══ PROJECT PAGE (BASELINE LOCK) ═════ */
+    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; }
     .proj-page.open { transform: translateY(0); }
     
     .proj-close { 
@@ -106,18 +101,19 @@
       color: #000; z-index: 500; font-weight: 200;
     }
     
-    .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
+    .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; color: #000 !important; }
     
-    /* FIX: Proper Baseline Alignment per Screenshot 18.47.17 */
+    /* Header Baseline Alignment Fix */
     .proj-header { display: flex; align-items: baseline; gap: 30px; margin-bottom: 80px; }
-    .proj-big-title { font-size: 4rem; font-weight: 700; letter-spacing: -0.04em; line-height: 0.85; text-transform: lowercase; margin: 0; color: #000; }
-    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.5; color: #000; text-align: left; margin: 0; padding-bottom: 4px; }
+    .proj-big-title { font-size: 4rem; font-weight: 700; letter-spacing: -0.04em; line-height: 0.8; text-transform: lowercase; margin: 0; color: #000; }
+    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.4; color: #000; text-align: left; margin: 0; }
 
-    .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 36ch; margin: 80px 0; font-weight: 400; color: #000 !important; }
-    .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 120px; }
-    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 1; }
+    .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 34ch; margin: 80px 0; font-weight: 400; color: #000; }
     
-    .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 120px; }
+    .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 120px; }
+    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 1; font-weight: 500; }
+    
+    .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 120px; }
     .proj-media { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
@@ -126,15 +122,14 @@
       .proj-big-title { font-size: 2.8rem; }
     }
 
-    /* FIX: No Leak Overlay */
+    /* Info Overlay (Secure Toggle) */
     .mobile-info-overlay { 
-      position: fixed; inset: 0; background: var(--bg); z-index: 300; 
+      position: fixed; inset: 0; background: #fff; z-index: 300; 
       display: flex; flex-direction: column; justify-content: center; padding: 40px; 
-      opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(-20px); transition: all 0.6s var(--silk); 
+      opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(-20px); transition: all 0.5s var(--silk); 
     }
     .mobile-info-overlay.open { opacity: 1; pointer-events: auto; visibility: visible; transform: translateY(0); }
-
-    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 600; font-size: .7rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
+    .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 600; font-size: .7rem; font-family: var(--ff-feature); color: rgba(0,0,0,.3); }
   </style>
 </head>
 <body>
@@ -142,33 +137,28 @@
 <div class="grain"></div>
 
 <div class="mobile-info-overlay" id="info-overlay">
-  <button class="close-info" id="close-info">×</button>
-  <div class="about-info-col" style="display:flex !important; font-size: 1.2rem; text-align: left;">
-    <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
-    <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
-    <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank" class="about-link">Jelly</a></div>
+  <button class="close-info" style="position:absolute; top:20px; right:20px; font-size:2rem;" id="close-info">×</button>
+  <div style="display:flex; flex-direction:column; gap:20px; font-size:1.2rem; font-family:var(--ff-feature);">
+    <div><div style="opacity:0.4; font-size:0.7rem;">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank">@alexjohntait</a></div>
+    <div><div style="opacity:0.4; font-size:0.7rem;">Email</div><a href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a></div>
+    <div><div style="opacity:0.4; font-size:0.7rem;">Representation</div><a href="https://jelly.london" target="_blank">Jelly</a></div>
   </div>
 </div>
 
 <div class="main">
-  <div class="loading-screen" id="loading-screen">establishing session...</div>
+  <div class="loading-screen" id="loading-screen">establishing connection...</div>
   <div class="top-bar">
     <div class="top-left"><div class="top-name">Alex Tait</div><div class="top-cats" id="top-cats"></div></div>
-    <div class="top-right"><div class="top-contact" id="top-contact">Say hello</div><button class="info-trigger" id="info-trigger">Info</button></div>
+    <div class="top-right"><div class="top-contact" onclick="window.location.href='mailto:alex@alexjohntait.com'">Say hello</div><button class="info-trigger" id="info-trigger">Info</button></div>
   </div>
+  
   <div class="middle-area">
     <div class="meta-container"><div class="meta-title" id="meta-title"></div><div class="meta-sub" id="meta-sub"></div></div>
-    <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
+    <div class="strip-outer"><div class="strip" id="strip"></div></div>
   </div>
+
   <div class="bottom-area">
-    <div class="about-cols">
-      <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
-      <div class="about-info-col">
-        <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
-        <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
-        <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank" class="about-link">Jelly</a></div>
-      </div>
-    </div>
+    <div class="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
     <div class="bottom-logo"><img src="" alt="logo" id="site-logo"></div>
   </div>
 </div>
@@ -180,26 +170,23 @@
         <div class="proj-big-title" id="proj-big-title"></div>
         <div class="proj-meta-side" id="proj-meta-side"></div>
     </div>
-    <div id="proj-content-flow"></div>
+    <div id="proj-flow"></div>
   </div>
 </div>
 
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-// EXACT MAPPING FROM SCREENSHOT 18.44.37.JPG
+// Column B in Airtable is 'Caption' - mapped to caption here.
 const F={title:'Title',caption:'Caption',client:'Client',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
-setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 1000);
-
 async function fetchAll(){
   try {
-    const table = 'Projects';
     let recs=[], off='';
     do {
-      let url = `https://api.airtable.com/v0/${AT_BASE}/${encodeURIComponent(table)}?pageSize=100`;
+      let url = `https://api.airtable.com/v0/${AT_BASE}/Projects?pageSize=100`;
       if (off) url += `&offset=${off}`;
       let r = await fetch(url, {headers:{Authorization:`Bearer ${AT_TOKEN}`}});
       const d = await r.json(); recs = recs.concat(d.records); off = d.offset || '';
@@ -208,7 +195,7 @@ async function fetchAll(){
     for(const rec of recs){ if(rec.fields[F.logo]?.[0]?.url) { document.getElementById('site-logo').src = rec.fields[F.logo][0].url; break; } }
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
-      caption: rec.fields[F.caption] || '', // Pulled from Column B 'Caption'
+      caption: rec.fields[F.caption] || '', // COLUMN B DATA
       client: rec.fields[F.client] || 'Personal',
       year: rec.fields[F.year] || '2026', 
       bg: rec.fields[F.bg] || '#ffffff',
@@ -233,7 +220,7 @@ function build(){
     const h = document.querySelector('.strip-outer').offsetHeight;
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     el.style.width = w + 'px';
-    el.innerHTML = `<div class="strip-img-wrap">${media(p.heroAtt, 'strip-media')}</div>`;
+    el.innerHTML = `<div style="height:100%; overflow:visible;">${media(p.heroAtt, 'strip-media')}</div>`;
     el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
     strip.appendChild(el);
   });
@@ -252,7 +239,7 @@ function goTo(i, inst = false){
   const p = filtered[i % filtered.length];
   document.getElementById('meta-title').textContent = p.title.toLowerCase();
   document.getElementById('meta-sub').textContent = `${p.client.toLowerCase()} — ${p.year}`;
-  if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
+  if(p){ document.body.style.backgroundColor = p.bg; }
   if(!inst) {
       strip.addEventListener('transitionend', () => {
           if(activeIdx < filtered.length) goTo(activeIdx + filtered.length, true);
@@ -271,20 +258,20 @@ function openProject(i){
   const p = filtered[i % filtered.length];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   document.getElementById('proj-meta-side').innerHTML = `<div>${p.year}</div><div>${p.client.toLowerCase()}</div>`;
-  
-  const flow = document.getElementById('proj-content-flow'); flow.innerHTML = '';
-  // Hero (fig. 01)
+  const flow = document.getElementById('proj-flow'); flow.innerHTML = '';
+
+  // 1. Hero Image (fig. 01)
   flow.appendChild(createAsset(p.atts[0], 1));
 
-  // Caption Recovery
-  if(p.caption) {
+  // 2. Caption injected specifically after fig. 01
+  if(p.caption && p.caption.trim() !== "") {
     const desc = document.createElement('div');
     desc.className = 'proj-description';
     desc.textContent = p.caption;
     flow.appendChild(desc);
   }
 
-  // Gallery
+  // 3. Grid for rest of images
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
       if(rest[j+1]) {
@@ -316,16 +303,9 @@ function media(att, cls){
   return isVid ? `<video src="${att.url}" autoplay muted loop playsinline class="${cls}"></video>` : `<img src="${att.url}" class="${cls}">`;
 }
 
-function isDark(color) {
-  const hex = color.replace('#', '');
-  const r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
-  return ((r * 299) + (g * 587) + (b * 114)) / 1000 < 128;
-}
-
 document.getElementById('proj-close').onclick = () => document.getElementById('proj-page').classList.remove('open');
 document.getElementById('info-trigger').onclick = () => document.getElementById('info-overlay').classList.add('open');
 document.getElementById('close-info').onclick = () => document.getElementById('info-overlay').classList.remove('open');
-document.getElementById('top-contact').onclick = () => window.location.href = 'mailto:alex@alexjohntait.com';
 
 window.onwheel = e => { if(!document.getElementById('proj-page').classList.contains('open') && Math.abs(e.deltaY)>15 && !isScrolling){ isScrolling=true; goTo(activeIdx+(e.deltaY>0?1:-1)); setTimeout(()=>isScrolling=false,400); } };
 window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, false);
@@ -338,6 +318,7 @@ window.addEventListener('touchend', e => {
 async function init(){ 
   allProjects = await fetchAll(); 
   if (allProjects.length > 0) { filtered = [...allProjects]; buildTopCats(); build(); }
+  document.getElementById('loading-screen').style.display='none'; 
 }
 init();
 </script>
