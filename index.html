@@ -67,7 +67,6 @@
     }
     .strip-item-wrap.active { z-index: 10 !important; }
 
-    /* Project names moved below images */
     .strip-meta { 
       position: absolute; bottom: -40px; left: 15px; font-size: 0.75rem; 
       opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; 
@@ -129,7 +128,6 @@
       .strip-item-wrap { padding: 0 10px; }
       .strip-meta { bottom: -30px; left: 10px; font-size: 0.65rem; }
       
-      /* Vertical Link Stack */
       .bottom-area { flex-direction: column; align-items: flex-start; gap: 40px; padding: 20px 20px 80px; height: auto; }
       .about-cols { flex-direction: column; align-items: flex-start; gap: 35px; }
       .about-text { font-size: 18pt; max-width: 100%; }
@@ -192,7 +190,6 @@ const F={title:'Title',caption:'Detailed Description',category:'Category',heroIm
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
-// Hard-coded reveal safety
 const hideLoader = () => { document.getElementById('loading-screen').style.display='none'; };
 setTimeout(hideLoader, 1000);
 
@@ -232,20 +229,19 @@ async function fetchAll(){
 function build(){
   const strip = document.getElementById('strip'); strip.innerHTML = '';
   if (filtered.length === 0) return;
+  // Unified Looping for all devices
   const loop = [...filtered, ...filtered, ...filtered];
-  const isMobile = window.innerWidth <= 768;
-  const itemsToRender = isMobile ? filtered : loop;
 
-  itemsToRender.forEach((p, i) => {
+  loop.forEach((p, i) => {
     const el = document.createElement('div'); el.className = 'strip-item-wrap';
     const h = document.querySelector('.strip-outer').offsetHeight;
     const w = p.heroAtt ? Math.round(h * (p.heroAtt.width/p.heroAtt.height)) : 300;
     el.style.width = w + 'px';
     el.innerHTML = `<div class="strip-img-wrap">${media(p.heroAtt, 'strip-img')}</div><div class="strip-meta">${p.title}</div>`;
-    el.onclick = () => isMobile ? openProject(i) : (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
+    el.onclick = () => (activeIdx === i) ? openProject(i % filtered.length) : goTo(i);
     strip.appendChild(el);
   });
-  if(!isMobile) { activeIdx = filtered.length; goTo(activeIdx, true); }
+  activeIdx = filtered.length; goTo(activeIdx, true);
 }
 
 function goTo(i, inst = false){
@@ -290,7 +286,7 @@ function openProject(i){
   });
   document.getElementById('proj-page').classList.add('open');
   document.getElementById('proj-page').scrollTop = 0;
-  document.getElementById('proj-next-trigger').onclick = () => { if(window.innerWidth > 768) goTo(i+1+filtered.length); openProject((i+1)%filtered.length); };
+  document.getElementById('proj-next-trigger').onclick = () => { goTo(i+1+filtered.length); openProject((i+1)%filtered.length); };
 }
 
 function media(att, cls){
