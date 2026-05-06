@@ -46,7 +46,6 @@
 
     .main { display: flex; flex-direction: column; height: 100vh; width: 100%; overflow: hidden; position: relative; }
 
-    /* ══ TOP BAR ══════════════════════════ */
     .top-bar {
       flex-shrink: 0; height: var(--header-h); display: flex;
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
@@ -56,28 +55,25 @@
     .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; border: 1.2px solid var(--ink); padding: 6px 14px; border-radius: 20px; }
 
-    /* ══ STATIONARY CENTRAL PROJECT INFO ══ */
+    /* STATIONARY CENTRAL PROJECT INFO (100px CLEARANCE) */
     .meta-container {
-      width: 100%; text-align: center; margin-bottom: 125px; /* SHIFTED UP 100px */
+      width: 100%; text-align: center; margin-bottom: 125px; 
       font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
     }
     .meta-title { font-size: 1.4rem; text-transform: lowercase; }
     .meta-sub { font-size: 0.75rem; opacity: 0.45; text-transform: lowercase; margin-top: 4px; }
 
-    /* ══ CAROUSEL ═════════════════════════ */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
     .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
     
-    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: opacity 0.4s; padding: 0; }
-    .strip-item-wrap:not(.active) { opacity: 0.15; }
-    .strip-item-wrap.active { z-index: 10 !important; opacity: 1; }
+    .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; transition: transform 0.6s var(--silk); padding: 0; opacity: 1; /* FULL OPACITY */ }
+    .strip-item-wrap.active { z-index: 10 !important; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
     @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.35); } }
 
-    /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
@@ -86,17 +82,14 @@
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
     .label { opacity: 0.4; font-size: 0.65rem; text-transform: lowercase; margin-bottom: 4px; }
     
-    /* ENLARGED LOGO */
     .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
       :root { --header-h: 60px; --strip-h: 40vh; }
       .top-contact, .about-info-col { display: none !important; }
       .info-trigger { display: block; }
       .top-bar { padding: 0 20px; }
-      /* Stationary Meta Left Aligned on Mobile */
       .meta-container { padding: 0 20px; margin-bottom: 25px; text-align: left; }
       .meta-title { font-size: 1.1rem; }
       .bottom-area { padding: 0 20px 40px; }
@@ -105,12 +98,10 @@
       .bottom-logo { width: 120px; height: 120px; transform: translateY(55px); } 
     }
 
-    /* Info Overlay (Mobile) */
     .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; transform: translateY(-100%); transition: transform 0.6s var(--silk); }
     .mobile-info-overlay.open { transform: translateY(0); }
     .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.8rem; }
 
-    /* ══ PROJECT PAGE (RESTORED) ═══════════ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
     .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: #fff; z-index: 410; }
@@ -184,7 +175,7 @@
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-const F={title:'Title',desc:'Detailed Description',cat:'Category',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
+const F={title:'Title',desc:'Detailed Description',cat:'Category',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
@@ -208,6 +199,7 @@ async function fetchAll(){
       title: rec.fields[F.title] || 'Untitled', 
       caption: rec.fields[F.desc] || 'Project description coming soon.',
       cat: (rec.fields[F.cat] || 'Personal').trim(),
+      year: rec.fields[F.year] || '2026', // Use year from Airtable
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.hero]||[])[0],
       atts:[...(rec.fields[F.hero]||[]), ...(rec.fields[F.mosaic]||[])]
@@ -246,9 +238,9 @@ function goTo(i, inst = false){
   
   const p = allProjects[i % allProjects.length];
   
-  // STATIONARY UPDATE (Above Carousel)
+  // Update Meta using Year from Airtable
   document.getElementById('meta-title').textContent = p.title.toLowerCase();
-  document.getElementById('meta-sub').textContent = `industry: ${p.cat.toLowerCase()} — 2026`;
+  document.getElementById('meta-sub').textContent = `industry: ${p.cat.toLowerCase()} — ${p.year}`;
 
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   
