@@ -75,11 +75,8 @@
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; overflow: visible; width: 100%; }
     .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; }
     .strip { display: flex; height: 100%; transition: transform 0.6s var(--silk); will-change: transform; overflow: visible; gap: 0px; }
-    
     .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; padding: 0; opacity: 1; }
     .strip-item-wrap.active { z-index: 10 !important; }
-
-    .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
     @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.35); } }
 
@@ -87,11 +84,8 @@
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
-    
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.85rem; }
-    .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
     .label { opacity: 0.4; font-size: 0.65rem; text-transform: lowercase; margin-bottom: 4px; }
-    
     .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
@@ -101,10 +95,8 @@
       .info-trigger { display: block; }
       .top-bar { padding: 0 20px; }
       .meta-container { padding: 0 20px; margin-bottom: 25px; text-align: left; }
-      .meta-title { font-size: 1.1rem; }
       .bottom-area { padding: 0 20px 40px; }
-      .about-cols { gap: 0; }
-      .about-text { font-size: 18pt; max-width: 100%; text-align: left; }
+      .about-text { font-size: 18pt; }
       .bottom-logo { width: 120px; height: 120px; transform: translateY(55px); } 
     }
 
@@ -115,23 +107,30 @@
       opacity: 0; pointer-events: none; transform: translateY(-20px); transition: all 0.6s var(--silk); 
     }
     .mobile-info-overlay.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-    .close-info { position: absolute; top: 20px; right: 20px; font-family: var(--ff-feature); font-size: 1.8rem; }
 
-    /* ══ PROJECT PAGE LAYOUT ══════════════ */
+    /* ══ PROJECT PAGE (NEW LAYOUT) ════════ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
-    .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; background: #fff; z-index: 410; }
     
-    .proj-container { padding: 140px 32px; max-width: 1100px; margin: 0 auto; text-align: left; }
-    .proj-big-title { font-size: 3.5rem; font-weight: 700; margin-bottom: 60px; letter-spacing: -0.03em; line-height: 1; text-transform: lowercase; }
-    .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 32ch; margin-bottom: 100px; font-weight: 400; opacity: 0.8; }
+    /* Fixed 'x' Top Right */
+    .proj-close { 
+      position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; 
+      display: flex; align-items: center; justify-content: center; font-size: 2.2rem; 
+      color: #ff3b30; z-index: 500; font-weight: 300; line-height: 1;
+    }
     
+    .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
+    
+    /* Reorganized Header */
+    .proj-header { display: flex; align-items: flex-start; gap: 80px; margin-bottom: 80px; }
+    .proj-big-title { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1; text-transform: lowercase; }
+    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.6; color: #ff3b30; text-align: left; }
+
+    .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 32ch; margin: 80px 0; font-weight: 400; opacity: 0.8; }
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 100px; }
     .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; opacity: 0.4; }
     
     .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 100px; }
-    .proj-asset-grid .proj-asset-wrap { margin-bottom: 0; }
-
     .proj-media { width: 100%; border-radius: 3px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
     
@@ -153,26 +152,14 @@
 
 <div class="main">
   <div class="loading-screen" id="loading-screen">establishing session...</div>
-  
   <div class="top-bar">
-    <div class="top-left">
-        <div class="top-name">Alex Tait</div>
-        <div class="top-cats" id="top-cats"></div>
-    </div>
-    <div class="top-right">
-        <div class="top-contact" id="top-contact">Say hello</div>
-        <button class="info-trigger" id="info-trigger">Info</button>
-    </div>
+    <div class="top-left"><div class="top-name">Alex Tait</div><div class="top-cats" id="top-cats"></div></div>
+    <div class="top-right"><div class="top-contact" id="top-contact">Say hello</div><button class="info-trigger" id="info-trigger">Info</button></div>
   </div>
-  
   <div class="middle-area">
-    <div class="meta-container">
-        <div class="meta-title" id="meta-title"></div>
-        <div class="meta-sub" id="meta-sub"></div>
-    </div>
+    <div class="meta-container"><div class="meta-title" id="meta-title"></div><div class="meta-sub" id="meta-sub"></div></div>
     <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
   </div>
-
   <div class="bottom-area">
     <div class="about-cols">
       <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
@@ -189,8 +176,13 @@
 <div class="proj-page" id="proj-page">
   <button class="proj-close" id="proj-close">×</button>
   <div class="proj-container">
-    <div class="proj-big-title" id="proj-big-title"></div>
-    <div id="proj-dynamic-content"></div>
+    <div class="proj-header">
+        <div class="proj-big-title" id="proj-big-title"></div>
+        <div class="proj-meta-side" id="proj-meta-side"></div>
+    </div>
+    <div id="proj-hero-area"></div>
+    <div id="proj-description-area"></div>
+    <div id="proj-gallery-area"></div>
   </div>
 </div>
 
@@ -213,10 +205,8 @@ async function fetchAll(){
       let r = await fetch(url, {headers:{Authorization:`Bearer ${AT_TOKEN}`}});
       const d = await r.json(); recs = recs.concat(d.records); off = d.offset || '';
     } while(off);
-    
     recs.sort((a,b) => (a.fields[F.order] || 999) - (b.fields[F.order] || 999));
     for(const rec of recs){ if(rec.fields[F.logo]?.[0]?.url) { document.getElementById('site-logo').src = rec.fields[F.logo][0].url; break; } }
-
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
       caption: rec.fields[F.desc] || '',
@@ -239,7 +229,6 @@ function build(){
   const strip = document.getElementById('strip'); strip.innerHTML = '';
   if (filtered.length === 0) return;
   const loop = [...filtered, ...filtered, ...filtered];
-  
   loop.forEach((p, i) => {
     const el = document.createElement('div'); el.className = 'strip-item-wrap';
     const h = document.querySelector('.strip-outer').offsetHeight;
@@ -258,18 +247,13 @@ function goTo(i, inst = false){
   activeIdx = i;
   const items = document.querySelectorAll('.strip-item-wrap');
   if (!items[i]) return;
-  
   let x = 0; for(let j=0; j<i; j++) x += items[j].offsetWidth;
   strip.style.transform = `translateX(${-(x + items[i].offsetWidth/2 - window.innerWidth/2)}px)`;
-  
   items.forEach((el, j) => el.classList.toggle('active', j === i));
-  
   const p = filtered[i % filtered.length];
   document.getElementById('meta-title').textContent = p.title.toLowerCase();
   document.getElementById('meta-sub').textContent = `industry: ${p.cat.toLowerCase()} — ${p.year}`;
-
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
-  
   if(!inst) {
       strip.addEventListener('transitionend', () => {
           if(activeIdx < filtered.length) goTo(activeIdx + filtered.length, true);
@@ -284,24 +268,28 @@ function setFilter(f){
   build();
 }
 
-/* ══ Editorial Layout Engine ══ */
+/* ══ NEW: Detailed Project Page Engine ══ */
 function openProject(i){
   const p = filtered[i % filtered.length];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
-  const cont = document.getElementById('proj-dynamic-content'); cont.innerHTML = '';
+  document.getElementById('proj-meta-side').innerHTML = `<div>${p.year}</div><div>${p.cat}</div>`;
+  
+  const heroArea = document.getElementById('proj-hero-area'); heroArea.innerHTML = '';
+  const descArea = document.getElementById('proj-description-area'); descArea.innerHTML = '';
+  const galleryArea = document.getElementById('proj-gallery-area'); galleryArea.innerHTML = '';
 
-  // 1. Hero Image
-  cont.appendChild(createAsset(p.atts[0], 1));
+  // 1. Hero Image (fig. 01)
+  heroArea.appendChild(createAsset(p.atts[0], 1));
 
-  // 2. Caption under Hero
+  // 2. Caption Text specifically between Hero and Gallery
   if(p.caption) {
     const desc = document.createElement('div');
     desc.className = 'proj-description';
     desc.textContent = p.caption;
-    cont.appendChild(desc);
+    descArea.appendChild(desc);
   }
 
-  // 3. Gallery Grid
+  // 3. Side-by-Side Gallery logic
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
       if(rest[j+1]) {
@@ -309,12 +297,11 @@ function openProject(i){
           grid.className = 'proj-asset-grid';
           grid.appendChild(createAsset(rest[j], j + 2));
           grid.appendChild(createAsset(rest[j+1], j + 3));
-          cont.appendChild(grid);
+          galleryArea.appendChild(grid);
       } else {
-          cont.appendChild(createAsset(rest[j], j + 2));
+          galleryArea.appendChild(createAsset(rest[j], j + 2));
       }
   }
-
   document.getElementById('proj-page').classList.add('open');
 }
 
@@ -355,11 +342,7 @@ window.addEventListener('touchend', e => {
 
 async function init(){ 
   allProjects = await fetchAll(); 
-  if (allProjects.length > 0) { 
-    filtered = [...allProjects]; 
-    buildTopCats();
-    build(); 
-  }
+  if (allProjects.length > 0) { filtered = [...allProjects]; buildTopCats(); build(); }
 }
 init();
 </script>
