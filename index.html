@@ -51,8 +51,7 @@
       flex-shrink: 0; height: var(--header-h); display: flex;
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
-    .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; z-index: 101; }
-    
+    .top-name { font-family: var(--ff-feature); font-size: 1rem; letter-spacing: -0.01em; }
     .top-right { display: flex; align-items: center; gap: 24px; }
     .top-contact { font-size: 0.8rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.7rem; border: 1px solid var(--ink); padding: 5px 12px; border-radius: 20px; }
@@ -69,32 +68,32 @@
     /* Desktop Info Labels (Above) */
     .strip-meta { 
       position: absolute; top: -75px; left: 0; font-family: var(--ff-feature); font-size: 0.9rem; 
-      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; line-height: 1.4;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; line-height: 1.4; text-align: left;
     }
-    .strip-item-wrap.active .strip-meta { opacity: 0.7; }
+    .strip-item-wrap.active .strip-meta { opacity: 0.8; }
     .meta-detail { opacity: 0.6; font-size: 0.6rem; text-transform: lowercase; margin-top: 4px; }
 
     .strip-img-wrap { height: 100%; position: relative; overflow: visible; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
     @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.4); } }
 
-    /* Mobile Fixed Info Container */
+    /* Mobile Fixed Info Container (Left Aligned) */
     .mobile-fixed-meta {
-      display: none; width: 100%; text-align: center; font-family: var(--ff-feature); 
-      margin-top: 20px; line-height: 1.4; pointer-events: none;
+      display: none; width: 100%; padding: 0 20px; text-align: left; font-family: var(--ff-feature); 
+      margin-top: 25px; line-height: 1.4; pointer-events: none;
     }
     .mobile-fixed-meta .m-title { font-size: 0.9rem; margin-bottom: 2px; }
     .mobile-fixed-meta .m-sub { font-size: 0.65rem; opacity: 0.5; text-transform: lowercase; }
 
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
-    .about-cols { display: flex; align-items: flex-end; gap: 100px; }
+    .about-cols { display: flex; align-items: flex-end; gap: 100px; text-align: left; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; transition: color 0.8s, transform 0.6s var(--silk), font-size 0.6s var(--silk); transform-origin: bottom left; }
     
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.8rem; }
     .about-link { border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 2px; }
     .label { opacity: 0.4; font-size: 0.6rem; text-transform: lowercase; margin-bottom: 4px; }
-    .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; }
+    .bottom-logo { width: 110px; height: 110px; flex-shrink: 0; transform: translateY(15px); } /* Lowered Logo */
     .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
     /* ══ MOBILE INFO OVERLAY ══════════════ */
@@ -108,18 +107,19 @@
       .top-contact, .about-info-col, .strip-meta { display: none !important; }
       .info-trigger, .mobile-fixed-meta { display: block; }
       .top-bar { padding: 0 20px; }
-      .bottom-area { padding: 0 20px 60px; }
-      .about-text { font-size: 18pt; max-width: 100%; }
+      .bottom-area { padding: 0 20px 40px; }
+      .about-cols { gap: 0; }
+      .about-text { font-size: 18pt; max-width: 100%; text-align: left; }
       .about-text.shrunk { font-size: 11pt; transform: translateY(10px); color: rgba(0,0,0,0.4); }
       body.is-dark .about-text.shrunk { color: rgba(255,255,255,0.4); }
-      .bottom-logo { width: 80px; height: 80px; }
+      .bottom-logo { width: 80px; height: 80px; transform: translateY(25px); } /* Further Lowered on Mobile */
     }
 
     /* ══ PROJECT PAGE TAKEOVER ════════════ */
     .proj-page { position: fixed; inset: 0; z-index: 300; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
     .proj-close { position: fixed; top: 32px; right: 32px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid #000; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #fff; z-index: 310; }
-    .proj-container { padding: 120px 32px; max-width: 1200px; margin: 0 auto; }
+    .proj-container { padding: 120px 32px; max-width: 1200px; margin: 0 auto; text-align: left; }
     .proj-big-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 60px; }
     .proj-asset { width: 100%; border-radius: 2px; opacity: 0; transform: translateY(20px); transition: 0.8s var(--silk); margin-bottom: 60px; }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
@@ -133,7 +133,7 @@
 
 <div class="mobile-info-overlay" id="info-overlay">
   <button class="close-info" id="close-info">×</button>
-  <div class="about-info-col" style="display:flex !important; font-size: 1.2rem;">
+  <div class="about-info-col" style="display:flex !important; font-size: 1.2rem; text-align: left;">
     <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
     <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
     <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank" class="about-link">Jelly</a></div>
@@ -152,7 +152,7 @@
   
   <div class="middle-area">
     <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
-    <!-- Mobile Static Project Info -->
+    <!-- Mobile Fixed Meta -->
     <div class="mobile-fixed-meta" id="mobile-meta">
         <div class="m-title" id="m-title"></div>
         <div class="m-sub" id="m-sub"></div>
@@ -161,7 +161,7 @@
 
   <div class="bottom-area">
     <div class="about-cols">
-      <div class="about-text" id="about-text">Illustrator and motion designer specializing in character design, surreal and spirited.</div>
+      <div class="about-text" id="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
       <div class="about-info-col">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank" class="about-link">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com" class="about-link">alex@alexjohntait.com</a></div>
