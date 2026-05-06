@@ -25,7 +25,7 @@
       --ff-feature: 'Avenue Mono', 'Geist Mono', monospace; 
       --silk: cubic-bezier(.22, 1, .36, 1);
       --ink: #000000;
-      --strip-h: 35vh; 
+      --strip-h: 34vh; 
       --header-h: 80px;
     }
 
@@ -37,7 +37,7 @@
     
     body.is-dark { --ink: #FFFFFF; }
     body.is-dark .top-cat { color: #FFFFFF; }
-    body.is-dark .top-contact-btn { border-color: #FFFFFF; color: #FFFFFF; }
+    body.is-dark .top-contact-btn, body.is-dark .info-trigger-mobile { border-color: #FFFFFF; color: #FFFFFF; }
     body.is-dark .meta-sub { color: #FFFFFF; opacity: 0.6; }
 
     .grain {
@@ -48,12 +48,11 @@
 
     .loading-screen { 
         position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; 
-        background: #fff; z-index: 9000; transition: opacity 0.8s var(--silk);
-        font-family: var(--ff-feature); font-size: 0.7rem; color: #000;
+        background: #fff; z-index: 9000; font-family: var(--ff-feature); font-size: 0.7rem;
     }
-    .loading-screen.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+    .loading-screen.hidden { opacity: 0; pointer-events: none; }
 
-    .main { display: flex; flex-direction: column; height: 100vh; width: 100%; overflow: hidden; position: relative; opacity: 0; transition: opacity 1s ease; }
+    .main { display: flex; flex-direction: column; height: 100vh; width: 100%; overflow: hidden; position: relative; opacity: 0; transition: opacity 0.8s ease; }
     .main.ready { opacity: 1; }
 
     /* TOP BAR */
@@ -63,9 +62,11 @@
     .top-cats { display: flex; gap: 16px; font-family: var(--ff-feature); font-size: 0.75rem; }
     .top-cat { cursor: pointer; opacity: 0.3; transition: opacity .3s; color: var(--ink); }
     .top-cat.active { opacity: 1; }
+    
     .top-contact-btn { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; color: var(--ink); cursor: pointer; }
+    .info-trigger-mobile { display: none; font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; color: var(--ink); }
 
-    /* ICE CAROUSEL (MOMENTUM) */
+    /* CAROUSEL */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; position: relative; }
     .meta-container { width: 100%; text-align: center; margin-bottom: 100px; font-family: var(--ff-feature); line-height: 1.4; pointer-events: none; color: var(--ink); }
     .meta-title { font-size: 1.4rem; text-transform: lowercase; margin: 0; }
@@ -75,11 +76,10 @@
     .strip { display: flex; height: 100%; will-change: transform; gap: 0px; transform: translate3d(0,0,0); }
     .strip-item-wrap { flex-shrink: 0; height: 100%; position: relative; padding: 0; transition: z-index 0s 0.3s; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.7s var(--silk); transform-origin: center; pointer-events: none; }
-    
     .strip-item-wrap.active { z-index: 100; transition: z-index 0s; }
     .strip-item-wrap.active .strip-media { transform: scale(1.25); }
 
-    /* FOOTER */
+    /* FOOTER (DESKTOP ONLY) */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; color: var(--ink); }
     .bottom-right-group { display: flex; align-items: flex-end; gap: 60px; color: var(--ink); }
@@ -87,19 +87,26 @@
     .label { opacity: 0.4; font-size: 0.65rem; text-transform: lowercase; margin-bottom: 4px; }
     .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
 
-    /* PROJECT PAGE (NEW METADATA HIERARCHY) */
+    /* MOBILE INFO OVERLAY */
+    .mobile-overlay { 
+      position: fixed; inset: 0; background: #fff; z-index: 5000; 
+      padding: 100px 32px; display: flex; flex-direction: column; gap: 40px;
+      transform: translateY(100%); transition: transform 0.6s var(--silk); overflow-y: auto; color: #000;
+    }
+    .mobile-overlay.open { transform: translateY(0); }
+    .overlay-close { position: absolute; top: 32px; right: 32px; font-size: 2.5rem; font-weight: 200; }
+    .mobile-bio { font-size: 20pt; line-height: 1.2; font-weight: 500; }
+
+    /* PROJECT PAGE */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; }
     .proj-page.open { transform: translateY(0); }
     .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #000; z-index: 500; font-weight: 200; }
     .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; color: #000 !important; }
-    
     .proj-header { margin-bottom: 80px; }
     .proj-big-title { font-size: 4rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; text-transform: lowercase; margin: 0; color: #000; }
-    
     .proj-narrative-block { margin-top: 60px; margin-bottom: 80px; }
     .proj-meta-tech { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.6; color: #000; text-align: left; margin-bottom: 20px; text-transform: lowercase; }
     .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 36ch; font-weight: 400; color: #000 !important; text-align: left; }
-    
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 120px; }
     .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 1; font-weight: 500; }
     .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 120px; }
@@ -107,12 +114,11 @@
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
     @media (max-width: 768px) {
-      :root { --header-h: 60px; --strip-h: 30vh; }
-      .top-cats, .top-contact-btn, .bottom-contact-col { display: none !important; }
-      .top-bar, .meta-container, .bottom-area { padding: 0 20px; }
-      .meta-container { text-align: left; margin-bottom: 30px; }
-      .about-text { font-size: 18pt; max-width: 100%; }
-      .bottom-logo { width: 100px; height: 100px; transform: translateY(45px); } 
+      :root { --header-h: 70px; --strip-h: 55vh; } /* BIGGER VERTICAL GALLERY */
+      .top-cats, .top-contact-btn, .bottom-area { display: none !important; }
+      .info-trigger-mobile { display: block; }
+      .top-bar, .meta-container { padding: 0 24px; }
+      .meta-container { margin-bottom: 40px; text-align: left; }
       .proj-big-title { font-size: 2.8rem; }
     }
   </style>
@@ -122,10 +128,23 @@
 <div class="grain"></div>
 <div class="loading-screen" id="loading-screen">establishing connection...</div>
 
+<div class="mobile-overlay" id="mobile-overlay">
+    <button class="overlay-close" onclick="toggleOverlay(false)">×</button>
+    <div class="mobile-bio">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+    <div class="bottom-contact-col" style="display: flex !important; font-size: 1.2rem;">
+        <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank">@alexjohntait</a></div>
+        <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a></div>
+        <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank">Jelly</a></div>
+    </div>
+</div>
+
 <div class="main" id="main-content">
   <div class="top-bar">
     <div class="top-left"><div class="top-name">Alex Tait</div><div class="top-cats" id="top-cats"></div></div>
-    <div class="top-right"><div class="top-contact-btn" onclick="window.location.href='mailto:alex@alexjohntait.com'">Say hello</div></div>
+    <div class="top-right">
+        <div class="top-contact-btn" onclick="window.location.href='mailto:alex@alexjohntait.com'">Say hello</div>
+        <div class="info-trigger-mobile" onclick="toggleOverlay(true)">Info</div>
+    </div>
   </div>
   
   <div class="middle-area">
@@ -157,11 +176,14 @@
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-// Column mapping
-const F={title:'Title',caption:'Caption',client:'Client',year:'Year',category:'Category',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
+const F={title:'Title',caption:'Caption',client:'Client',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], filtered=[], items=[], scrollX=0, velX=0, isDragging=false;
 const FRICTION=0.95, SNAP_FORCE=0.12;
+
+function toggleOverlay(open) {
+    document.getElementById('mobile-overlay').classList.toggle('open', open);
+}
 
 async function fetchAll(){
   try {
@@ -179,7 +201,6 @@ async function fetchAll(){
       caption: rec.fields[F.caption] || '', 
       client: rec.fields[F.client] || 'Personal',
       year: rec.fields[F.year] || '2026', 
-      category: rec.fields[F.category] || 'Personal',
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.hero]||[])[0],
       atts:[...(rec.fields[F.hero]||[]), ...(rec.fields[F.mosaic]||[])]
@@ -256,9 +277,7 @@ function update(){
 
 function setFilter(f){
     document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.textContent === f));
-    filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.category.toLowerCase().includes(f.toLowerCase()) || p.client.toLowerCase().includes(f.toLowerCase()));
-    
-    // PHYSICS RESET FOR NEW RIBBON
+    filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.client.toLowerCase().includes(f.toLowerCase()));
     scrollX = 0; velX = 0;
     build();
     setTimeout(() => {
@@ -268,14 +287,14 @@ function setFilter(f){
 }
 
 window.addEventListener('wheel', e => {
-  if(document.getElementById('proj-page').classList.contains('open')) return;
+  if(document.getElementById('proj-page').classList.contains('open') || document.getElementById('mobile-overlay').classList.contains('open')) return;
   velX -= e.deltaY * 0.5;
 }, {passive: true});
 
 let startX = 0;
 window.addEventListener('touchstart', e => { isDragging = true; startX = e.touches[0].clientX; velX = 0; });
 window.addEventListener('touchmove', e => {
-  if(document.getElementById('proj-page').classList.contains('open')) return;
+  if(document.getElementById('proj-page').classList.contains('open') || document.getElementById('mobile-overlay').classList.contains('open')) return;
   const dx = e.touches[0].clientX - startX; scrollX += dx; startX = e.touches[0].clientX;
 });
 window.addEventListener('touchend', () => { isDragging = false; });
@@ -285,8 +304,6 @@ function openProject(i){
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
   const flow = document.getElementById('proj-flow'); flow.innerHTML = '';
   flow.appendChild(createAsset(p.atts[0], 1));
-  
-  // METADATA ABOVE CAPTION
   const narr = document.createElement('div');
   narr.className = 'proj-narrative-block';
   narr.innerHTML = `
@@ -294,7 +311,6 @@ function openProject(i){
     <div class="proj-description">${p.caption}</div>
   `;
   flow.appendChild(narr);
-
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
       if(rest[j+1]) {
