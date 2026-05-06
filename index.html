@@ -26,7 +26,7 @@
       --silk: cubic-bezier(.22, 1, .36, 1);
       --bg: #FFFFFF;
       --ink: #000000;
-      --strip-h: 34vh; 
+      --strip-h: 30vh; /* REDUCED HEIGHT */
       --header-h: 80px;
     }
 
@@ -51,16 +51,16 @@
       align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100;
     }
     .top-left { display: flex; align-items: center; gap: 40px; }
-    .top-name { font-family: var(--ff-feature); font-size: 1.1rem; letter-spacing: -0.01em; }
+    .top-name { font-family: var(--ff-feature); font-size: 1.1rem; letter-spacing: -0.01em; color: var(--ink); }
     .top-cats { display: flex; gap: 16px; font-family: var(--ff-feature); font-size: 0.75rem; }
-    .top-cat { cursor: pointer; opacity: 0.3; transition: opacity .3s; color: #000; }
+    .top-cat { cursor: pointer; opacity: 0.3; transition: opacity .3s; color: var(--ink); }
     .top-cat.active { opacity: 1; }
 
     .top-right { display: flex; align-items: center; gap: 24px; }
     .top-contact { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; }
     .info-trigger { display: none; font-family: var(--ff-feature); font-size: 0.75rem; border: 1.2px solid var(--ink); padding: 6px 14px; border-radius: 20px; }
 
-    /* ══ STATIONARY CENTRAL PROJECT INFO ══ */
+    /* ══ CENTRAL STATIONARY PROJECT INFO ══ */
     .meta-container {
       width: 100%; text-align: center; margin-bottom: 80px; 
       font-family: var(--ff-feature); line-height: 1.4; pointer-events: none;
@@ -75,7 +75,7 @@
     .strip-item-wrap { flex-shrink: 0; height: 100%; cursor: pointer; position: relative; z-index: 1; padding: 0; opacity: 1; }
     .strip-item-wrap.active { z-index: 10 !important; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.6s var(--silk); transform-origin: center center; }
-    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.2); } }
+    @media (min-width: 769px) { .strip-item-wrap.active .strip-media { transform: scale(1.15); } } /* REDUCED SCALE */
 
     /* ══ BOTTOM AREA ══════════════════════ */
     .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 20vh; z-index: 10; }
@@ -83,60 +83,52 @@
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; }
     .about-info-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.85rem; }
     .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
-    .bottom-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-    /* ══ MOBILE FIXES ═════════════════════ */
     @media (max-width: 768px) {
-      :root { --header-h: 60px; --strip-h: 38vh; }
+      :root { --header-h: 60px; --strip-h: 30vh; }
       .top-cats, .top-contact, .about-info-col { display: none !important; }
       .info-trigger { display: block; }
       .top-bar { padding: 0 20px; }
       .meta-container { padding: 0 20px; margin-bottom: 25px; text-align: left; }
       .meta-title { font-size: 1.1rem; }
       .bottom-area { padding: 0 20px 40px; }
-      .about-cols { gap: 0; }
-      .about-text { font-size: 18pt; max-width: 100%; text-align: left; }
+      .about-text { font-size: 18pt; max-width: 100%; }
       .bottom-logo { width: 120px; height: 120px; transform: translateY(55px); } 
     }
 
-    /* ══ OVERLAY FIX ══════════════════════ */
-    .mobile-info-overlay { 
-      position: fixed; inset: 0; background: var(--bg); z-index: 300; 
-      display: flex; flex-direction: column; justify-content: center; padding: 40px; 
-      opacity: 0; pointer-events: none; transform: translateY(-20px); transition: all 0.6s var(--silk); 
-    }
-    .mobile-info-overlay.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-
-    /* ══ PROJECT PAGE (ALIGNED) ═══════════ */
+    /* ══ PROJECT PAGE (BLACK TYPE) ════════ */
     .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; color: #000 !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; touch-action: auto; }
     .proj-page.open { transform: translateY(0); }
     
     .proj-close { 
       position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; 
-      display: flex; align-items: center; justify-content: center; font-size: 2.2rem; 
+      display: flex; align-items: center; justify-content: center; font-size: 2.5rem; 
       color: #000; z-index: 500; font-weight: 300;
     }
     
     .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; }
     
-    .proj-header { display: flex; align-items: flex-end; gap: 40px; margin-bottom: 80px; }
+    /* Baselined Header */
+    .proj-header { display: flex; align-items: baseline; gap: 40px; margin-bottom: 80px; }
     .proj-big-title { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 0.9; text-transform: lowercase; }
-    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.4; color: #000; text-align: left; margin-bottom: 2px; }
-
-    @media (max-width: 768px) {
-      .proj-header { flex-direction: column; align-items: flex-start; gap: 20px; margin-bottom: 40px; }
-      .proj-big-title { font-size: 2.5rem; }
-      .proj-close { top: 20px; right: 20px; }
-    }
+    .proj-meta-side { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.5; color: #000; text-align: left; }
 
     .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 32ch; margin: 80px 0; font-weight: 400; color: #000; }
     .proj-asset-wrap { position: relative; width: 100%; margin-bottom: 100px; }
-    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 0.4; }
+    .proj-asset-wrap::before { content: "fig. " attr(data-index); position: absolute; top: -25px; left: 0; font-family: var(--ff-feature); font-size: 0.7rem; color: #000; opacity: 0.5; }
     
     .proj-asset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 100px; }
     .proj-media { width: 100%; border-radius: 3px; opacity: 0; transform: translateY(20px); transition: 1s var(--silk); }
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
-    
+
+    @media (max-width: 768px) {
+      .proj-header { flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 40px; }
+      .proj-big-title { font-size: 2.8rem; }
+      .proj-close { top: 20px; right: 20px; }
+    }
+
+    .mobile-info-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; opacity: 0; pointer-events: none; transform: translateY(-20px); transition: all 0.6s var(--silk); }
+    .mobile-info-overlay.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
     .loading-screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 600; font-size: .7rem; color: rgba(0,0,0,.3); font-family: var(--ff-feature); }
   </style>
 </head>
@@ -190,7 +182,8 @@
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-const F={title:'Title',desc:'Detailed Description',cat:'Category',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
+// Column B is 'Caption', which holds the descriptive text in your screenshot
+const F={title:'Title',caption:'Caption',client:'Client',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
 
 let allProjects=[], filtered=[], activeIdx=0, isScrolling=false, touchStartX = 0;
 
@@ -210,8 +203,8 @@ async function fetchAll(){
     for(const rec of recs){ if(rec.fields[F.logo]?.[0]?.url) { document.getElementById('site-logo').src = rec.fields[F.logo][0].url; break; } }
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
-      caption: rec.fields[F.desc] || '',
-      cat: (rec.fields[F.cat] || 'Personal').trim(),
+      caption: rec.fields[F.caption] || '', // Pulled from Airtable Column B
+      client: rec.fields[F.client] || 'Personal',
       year: rec.fields[F.year] || '2026', 
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.hero]||[])[0],
@@ -253,7 +246,7 @@ function goTo(i, inst = false){
   items.forEach((el, j) => el.classList.toggle('active', j === i));
   const p = filtered[i % filtered.length];
   document.getElementById('meta-title').textContent = p.title.toLowerCase();
-  document.getElementById('meta-sub').textContent = `industry: ${p.cat.toLowerCase()} — ${p.year}`;
+  document.getElementById('meta-sub').textContent = `${p.client.toLowerCase()} — ${p.year}`;
   if(p){ document.body.style.backgroundColor = p.bg; document.body.classList.toggle('is-dark', isDark(p.bg)); }
   if(!inst) {
       strip.addEventListener('transitionend', () => {
@@ -265,18 +258,20 @@ function goTo(i, inst = false){
 
 function setFilter(f){
   document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.dataset.filter === f));
-  filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.cat.toLowerCase() === f.toLowerCase());
+  filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.client.toLowerCase().includes(f.toLowerCase()) || p.title.toLowerCase().includes(f.toLowerCase()));
   build();
 }
 
 function openProject(i){
   const p = filtered[i % filtered.length];
   document.getElementById('proj-big-title').textContent = p.title.toLowerCase();
-  document.getElementById('proj-meta-side').innerHTML = `<div>${p.year}</div><div>${p.cat}</div>`;
+  document.getElementById('proj-meta-side').innerHTML = `<div>${p.year}</div><div>${p.client.toLowerCase()}</div>`;
   
   const flow = document.getElementById('proj-content-flow'); flow.innerHTML = '';
+  // Hero Image
   flow.appendChild(createAsset(p.atts[0], 1));
 
+  // Caption (Pulling Column B 'Caption')
   if(p.caption) {
     const desc = document.createElement('div');
     desc.className = 'proj-description';
@@ -284,6 +279,7 @@ function openProject(i){
     flow.appendChild(desc);
   }
 
+  // Gallery Grid
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
       if(rest[j+1]) {
