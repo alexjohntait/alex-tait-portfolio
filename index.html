@@ -39,7 +39,7 @@
     body.is-dark .top-cat { color: #FFFFFF; }
     body.is-dark .top-contact-btn, body.is-dark .info-trigger-mobile { border-color: #FFFFFF; color: #FFFFFF; }
 
-    /* GLOBAL HUD (ALWAYS TOP) */
+    /* GLOBAL HUD */
     .global-hud { position: fixed; inset: 0; pointer-events: none; z-index: 999999; }
     .hud-element { pointer-events: auto; position: absolute; }
 
@@ -47,23 +47,35 @@
     .global-logo img { width: 100%; height: 100%; object-fit: contain; }
     .global-logo:hover { transform: scale(1.1) rotate(-3deg); }
 
-    /* FIXED CLOSE BUTTON STYLE */
+    /* CLOSE BUTTON STYLE */
     .proj-close { 
-        top: 32px; 
-        right: 32px; 
-        width: 80px; 
-        height: 80px; 
-        display: none; 
-        align-items: center; 
-        justify-content: center; 
-        font-size: 4rem; /* Adjusted for better visibility */
-        font-weight: 300; 
-        color: #000; /* Solid black to show on white project page */
-        line-height: 1;
-        cursor: pointer;
-        z-index: 1000000;
+        top: 32px; right: 32px; width: 80px; height: 80px; display: none; 
+        align-items: center; justify-content: center; font-size: 4rem; 
+        font-weight: 300; color: #000; line-height: 1; cursor: pointer; z-index: 1000000;
     }
     .proj-close.visible { display: flex; }
+
+    /* NEW BADGE STYLING */
+    .new-badge {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 42px;
+      height: 42px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--ff-feature);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: lowercase;
+      z-index: 10;
+      pointer-events: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
     /* KINETIC CURSOR */
     .custom-cursor {
@@ -159,9 +171,9 @@
 <div class="mobile-overlay" id="mobile-overlay">
     <div style="font-size:1.8rem; font-weight:500; line-height:1.2; margin-bottom:40px; padding: 100px 32px 0;">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
     <div class="bottom-contact-col" style="display: flex !important; font-size: 1.2rem; padding: 0 32px;">
-        <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank">@alexjohntait</a></div>
-        <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a></div>
-        <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank">Jelly</a></div>
+        <div><div class="label">Instagram</div><a href="https://www.instagram.com/alextaitillustration/" target="_blank">@alextaitillustration</a></div>
+        <div><div class="label">Email</div><a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a></div>
+        <div><div class="label">Representation</div><a href="https://www.thisisjelly.com/uk/talent/alex-tait" target="_blank">Jelly</a></div>
     </div>
 </div>
 
@@ -169,7 +181,7 @@
   <div class="top-bar">
     <div class="top-left"><div class="top-name">Alex Tait</div><div class="top-cats" id="top-cats"></div></div>
     <div class="top-right">
-        <div class="top-contact-btn" onclick="window.location.href='mailto:alex@alexjohntait.com'">Say hello</div>
+        <div class="top-contact-btn" onclick="window.location.href='mailto:alexjohntait@gmail.com'">Say hello</div>
         <div class="info-trigger-mobile" onclick="toggleOverlay(true)">Info</div>
     </div>
   </div>
@@ -183,9 +195,9 @@
     <div class="about-text" id="kinetic-bio"></div>
     <div class="bottom-right-group">
       <div class="bottom-contact-col">
-        <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank">@alexjohntait</a></div>
-        <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a></div>
-        <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank">Jelly</a></div>
+        <div><div class="label">Instagram</div><a href="https://www.instagram.com/alextaitillustration/" target="_blank">@alextaitillustration</a></div>
+        <div><div class="label">Email</div><a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a></div>
+        <div><div class="label">Representation</div><a href="https://www.thisisjelly.com/uk/talent/alex-tait" target="_blank">Jelly</a></div>
       </div>
       <div style="width:180px;"></div>
     </div>
@@ -200,9 +212,10 @@
 </div>
 
 <script>
+// AIRTABLE CONFIG
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-const F={title:'Title',caption:'Caption',client:'Client',year:'Year',cat:'Category',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
+const F={title:'Title',caption:'Caption',client:'Client',year:'Year',cat:'Category',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order',new:'New'};
 
 const bioText = "Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.";
 
@@ -229,6 +242,7 @@ function closeLayers() {
     document.getElementById('proj-page').classList.remove('open');
     document.getElementById('mobile-overlay').classList.remove('open');
     document.getElementById('global-close').classList.remove('visible');
+    document.body.style.overflow = 'hidden';
 }
 function toggleOverlay(open) { 
     document.getElementById('mobile-overlay').classList.toggle('open', open);
@@ -244,6 +258,7 @@ async function fetchAll(){
       let r = await fetch(url, {headers:{Authorization:`Bearer ${AT_TOKEN}`}});
       const d = await r.json(); recs = recs.concat(d.records || []); off = d.offset || '';
     } while(off);
+    // Sort by Order column
     recs.sort((a,b) => (a.fields[F.order] || 999) - (b.fields[F.order] || 999));
     const logoRec = recs.find(r => r.fields[F.logo] && r.fields[F.logo][0]);
     if(logoRec) document.getElementById('site-logo-img').src = logoRec.fields[F.logo][0].url;
@@ -255,7 +270,8 @@ async function fetchAll(){
       category: rec.fields[F.cat] || rec.fields[F.client] || 'All',
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.hero]||[])[0],
-      atts:[...(rec.fields[F.hero]||[]), ...(rec.fields[F.mosaic]||[])]
+      atts:[...(rec.fields[F.hero]||[]), ...(rec.fields[F.mosaic]||[])],
+      isNew: rec.fields[F.new] === 'Yes' || rec.fields[F.new] === 'yes' // Logical check for New badge
     }));
   } catch(e) { return []; }
 }
@@ -280,7 +296,8 @@ function build(){
   const loop = [...filtered, ...filtered, ...filtered];
   loop.forEach((p, i) => {
     const el = document.createElement('div'); el.className = 'strip-item-wrap';
-    el.innerHTML = media(p.heroAtt, 'strip-media');
+    const badgeHTML = p.isNew ? `<div class="new-badge">new</div>` : ''; // Badge injection logic
+    el.innerHTML = media(p.heroAtt, 'strip-media') + badgeHTML;
     el.onclick = () => { if(Math.abs(velX) < 1.5) openProject(i % filtered.length); };
     strip.appendChild(el);
   });
@@ -388,7 +405,8 @@ function openProject(i){
       }
   }
   document.getElementById('proj-page').classList.add('open');
-  document.getElementById('global-close').classList.add('visible');
+  document.getElementById('global-close').classList.add('visible'); // X button visibility
+  document.body.style.overflowY = 'auto'; // Enable scrolling on project page
 }
 
 function createAsset(att, idx) {
@@ -406,7 +424,7 @@ async function init(){
   if (allProjects.length > 0) { 
     filtered = [...allProjects]; 
     const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
-    document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" onclick=\"setFilter('${c}')\">${c}</span>`).join('');
+    document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" onclick="setFilter('${c}')">${c}</span>`).join('');
     build(); 
     setTimeout(() => {
         let initialX = 0; for(let i=0; i<filtered.length; i++) initialX += (items[i].offsetWidth);
