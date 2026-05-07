@@ -15,18 +15,18 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; width: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; background: #fff; }
+    html, body { height: 100%; width: 100%; overflow: hidden; -webkit-font-smoothing: antialiased; background: #fff; cursor: none; }
     img, video { display: block; max-width: none; }
-    a { color: inherit; text-decoration: none; }
-    button { cursor: pointer; border: none; background: none; font: inherit; }
+    a, button { color: inherit; text-decoration: none; cursor: none; }
 
     :root {
       --ff: 'Geist', system-ui, sans-serif;
       --ff-feature: 'Avenue Mono', 'Geist Mono', monospace; 
       --silk: cubic-bezier(.22, 1, .36, 1);
       --ink: #000000;
-      --strip-h: 42.5vh; /* INCREASED BY 25% */
+      --strip-h: 50vh; 
       --header-h: 80px;
+      --accent: #FF4D00; 
     }
 
     body {
@@ -39,16 +39,43 @@
     body.is-dark .top-cat { color: #FFFFFF; }
     body.is-dark .top-contact-btn, body.is-dark .info-trigger-mobile { border-color: #FFFFFF; color: #FFFFFF; }
 
-    .grain {
-      position: fixed; inset: -50%; width: 200%; height: 200%;
-      background-image: url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Grain_Noise.png");
-      opacity: 0.04; pointer-events: none; z-index: 999; animation: grain 8s steps(10) infinite;
-    }
+    /* GLOBAL HUD (ALWAYS TOP) */
+    .global-hud { position: fixed; inset: 0; pointer-events: none; z-index: 999999; }
+    .hud-element { pointer-events: auto; position: absolute; }
 
-    .loading-screen { 
-        position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; 
-        background: #fff; z-index: 9000; font-family: var(--ff-feature); font-size: 0.7rem;
+    .global-logo { bottom: 40px; right: 40px; width: 180px; height: 180px; transition: transform 0.6s var(--silk); }
+    .global-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .global-logo:hover { transform: scale(1.1) rotate(-3deg); }
+
+    /* FIXED CLOSE BUTTON STYLE */
+    .proj-close { 
+        top: 32px; 
+        right: 32px; 
+        width: 80px; 
+        height: 80px; 
+        display: none; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 4rem; /* Adjusted for better visibility */
+        font-weight: 300; 
+        color: #000; /* Solid black to show on white project page */
+        line-height: 1;
+        cursor: pointer;
+        z-index: 1000000;
     }
+    .proj-close.visible { display: flex; }
+
+    /* KINETIC CURSOR */
+    .custom-cursor {
+      position: fixed; width: 12px; height: 12px; background: var(--accent);
+      border-radius: 50%; pointer-events: none; z-index: 1000000;
+      transition: transform 0.08s ease-out, width 0.3s var(--silk), height 0.3s var(--silk);
+      transform: translate(-50%, -50%); mix-blend-mode: difference;
+    }
+    .custom-cursor.expanding { width: 80px; height: 80px; opacity: 0.6; }
+
+    .grain { position: fixed; inset: -50%; width: 200%; height: 200%; background-image: url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Grain_Noise.png"); opacity: 0.04; pointer-events: none; z-index: 998; animation: grain 8s steps(10) infinite; }
+    .loading-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 500000; font-family: var(--ff-feature); font-size: 0.7rem; }
     .loading-screen.hidden { opacity: 0; pointer-events: none; }
 
     .main { display: flex; flex-direction: column; height: 100vh; width: 100%; overflow: hidden; position: relative; opacity: 0; transition: opacity 0.8s ease; }
@@ -59,56 +86,42 @@
     .top-left { display: flex; align-items: center; gap: 40px; }
     .top-name { font-family: var(--ff-feature); font-size: 1.1rem; letter-spacing: -0.01em; color: var(--ink); }
     .top-cats { display: flex; gap: 16px; font-family: var(--ff-feature); font-size: 0.75rem; }
-    .top-cat { cursor: pointer; opacity: 0.3; transition: opacity .3s; color: var(--ink); }
+    .top-cat { opacity: 0.3; transition: opacity .3s; color: var(--ink); cursor: pointer; }
     .top-cat.active { opacity: 1; }
-    
     .top-contact-btn { font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; color: var(--ink); cursor: pointer; }
-    .info-trigger-mobile { display: none; font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; color: var(--ink); }
+    .info-trigger-mobile { display: none; font-size: 0.85rem; font-weight: 600; border-bottom: 1.5px solid var(--ink); padding-bottom: 2px; color: var(--ink); cursor: pointer; }
 
-    /* CAROUSEL CONTAINER */
+    /* CAROUSEL CORE */
     .middle-area { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; position: relative; overflow: visible; }
-    
-    .meta-container { 
-      width: 100%; text-align: center; margin-bottom: 60px; /* MOVED UP FOR DESKTOP */
-      font-family: var(--ff-feature); line-height: 1.4; pointer-events: none; color: var(--ink); 
-    }
-    .meta-title { font-size: 1.4rem; text-transform: lowercase; margin: 0; }
-    .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; margin-top: 4px; }
+    .meta-container { width: 100%; text-align: center; margin-bottom: 80px; font-family: var(--ff-feature); line-height: 1.2; pointer-events: none; color: var(--ink); transition: opacity 0.4s ease; }
+    .meta-title { font-size: 1.4rem; text-transform: lowercase; margin: 0; padding-bottom: 4px; }
+    .meta-sub { font-size: 0.75rem; opacity: 0.6; text-transform: lowercase; }
 
-    .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; cursor: grab; touch-action: pan-y; }
+    .strip-outer { width: 100%; height: var(--strip-h); position: relative; overflow: visible; touch-action: pan-y; transition: opacity 0.4s ease; }
     .strip { display: flex; height: 100%; will-change: transform; gap: 0px; transform: translate3d(0,0,0); }
-    .strip-item-wrap { flex-shrink: 0; height: 100%; position: relative; padding: 0; transition: z-index 0s 0.3s; }
+    .strip-item-wrap { flex-shrink: 0; height: 100%; position: relative; padding: 0; transition: z-index 0s 0.3s; cursor: pointer; }
     .strip-media { height: 100%; width: auto; object-fit: contain; transition: transform 0.7s var(--silk); transform-origin: center; pointer-events: none; }
-    
     .strip-item-wrap.active { z-index: 100; transition: z-index 0s; }
     .strip-item-wrap.active .strip-media { transform: scale(1.2); }
 
-    /* FOOTER (DESKTOP) */
-    .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 15vh; z-index: 10; }
+    /* KINETIC BIO */
+    .bottom-area { flex-shrink: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 40px; min-height: 10vh; z-index: 10; }
     .about-text { font-size: 26pt; line-height: 1.1; letter-spacing: -0.02em; font-weight: 500; max-width: 32ch; color: var(--ink); }
+    .about-word { display: inline-block; transition: transform 0.4s var(--silk), color 0.3s ease; }
+    .about-word:hover { transform: translateY(-8px) scale(1.05); color: var(--accent); }
+    
     .bottom-right-group { display: flex; align-items: flex-end; gap: 60px; color: var(--ink); }
     .bottom-contact-col { display: flex; flex-direction: column; gap: 15px; font-family: var(--ff-feature); font-size: 0.85rem; text-align: left; }
     .label { opacity: 0.4; font-size: 0.65rem; text-transform: lowercase; margin-bottom: 4px; }
-    .bottom-logo { width: 180px; height: 180px; flex-shrink: 0; transform: translateY(30px); } 
 
-    /* MOBILE OVERLAY */
-    .mobile-overlay { 
-      position: fixed; inset: 0; background: #fff; z-index: 5000; 
-      padding: 100px 32px; display: flex; flex-direction: column; gap: 40px;
-      transform: translateY(100%); transition: transform 0.6s var(--silk); overflow-y: auto; color: #000;
-      pointer-events: none;
-    }
+    /* OVERLAYS */
+    .mobile-overlay { position: fixed; inset: 0; background: #fff; z-index: 99990; padding: 100px 32px; display: flex; flex-direction: column; gap: 40px; transform: translateY(100%); transition: transform 0.6s var(--silk); overflow-y: auto; color: #000; pointer-events: none; }
     .mobile-overlay.open { transform: translateY(0); pointer-events: auto; }
-    .overlay-close { position: absolute; top: 32px; right: 32px; font-size: 2.5rem; font-weight: 200; }
-    .mobile-bio { font-size: 20pt; line-height: 1.2; font-weight: 500; }
 
-    /* PROJECT PAGE */
-    .proj-page { position: fixed; inset: 0; z-index: 400; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; pointer-events: none; }
+    .proj-page { position: fixed; inset: 0; z-index: 99990; overflow-y: auto; background: #FFF !important; transform: translateY(100%); transition: transform .7s var(--silk); scrollbar-width: none; pointer-events: none; }
     .proj-page.open { transform: translateY(0); pointer-events: auto; }
-    .proj-close { position: fixed; top: 32px; right: 32px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #000; z-index: 500; font-weight: 200; }
     .proj-container { padding: 100px 32px; max-width: 1200px; margin: 0 auto; color: #000 !important; }
-    .proj-header { margin-bottom: 80px; }
-    .proj-big-title { font-size: 4rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; text-transform: lowercase; margin: 0; color: #000; }
+    .proj-big-title { font-size: 4.5rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; text-transform: lowercase; margin: 0 0 100px 0; color: #000; }
     .proj-narrative-block { margin-top: 60px; margin-bottom: 80px; }
     .proj-meta-tech { font-family: var(--ff-feature); font-size: 0.85rem; line-height: 1.6; color: #000; text-align: left; margin-bottom: 20px; text-transform: lowercase; }
     .proj-description { font-size: 1.5rem; line-height: 1.4; max-width: 36ch; font-weight: 400; color: #000 !important; text-align: left; }
@@ -119,31 +132,33 @@
     .revealed { opacity: 1 !important; transform: translateY(0) !important; }
 
     @media (max-width: 768px) {
-      :root { --header-h: 70px; --strip-h: 65vh; } /* FILL SCREEN VERTICALLY */
-      .top-cats, .top-contact-btn, .bottom-area { display: none !important; }
+      :root { --header-h: 70px; --strip-h: 75vh; }
+      .top-cats, .top-contact-btn, .bottom-area, .custom-cursor { display: none !important; }
       .info-trigger-mobile { display: block; }
-      .top-bar { padding: 0 24px; }
-      
-      /* REORDER: INFO BELOW IMAGE ON MOBILE */
       .middle-area { flex-direction: column-reverse; justify-content: flex-end; padding-top: 20px; }
-      .meta-container { margin-bottom: 0; margin-top: 30px; text-align: left; padding: 0 24px; }
-      .meta-title { font-size: 1.2rem; }
-
-      .strip-item-wrap { max-width: 90vw; } /* ENSURE BIG BUT WITHIN BOUNDS */
-      .strip-media { width: 100%; height: 100%; object-fit: contain; }
+      .meta-container { margin: 30px 0 0 0; text-align: left; padding: 0 24px 40px; }
       .proj-big-title { font-size: 2.8rem; }
+      .proj-asset-grid { grid-template-columns: 1fr; gap: 60px; }
+      .global-logo { width: 120px; height: 120px; bottom: 20px; right: 20px; }
     }
   </style>
 </head>
 <body>
 
+<div class="custom-cursor" id="cursor"></div>
 <div class="grain"></div>
 <div class="loading-screen" id="loading-screen">establishing connection...</div>
 
+<div class="global-hud">
+    <div class="hud-element global-logo" onclick="resetSite()">
+        <img src="" alt="Logo" id="site-logo-img">
+    </div>
+    <div class="hud-element proj-close" id="global-close" onclick="closeLayers()">×</div>
+</div>
+
 <div class="mobile-overlay" id="mobile-overlay">
-    <button class="overlay-close" onclick="toggleOverlay(false)">×</button>
-    <div class="mobile-bio">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
-    <div class="bottom-contact-col" style="display: flex !important; font-size: 1.2rem;">
+    <div style="font-size:1.8rem; font-weight:500; line-height:1.2; margin-bottom:40px; padding: 100px 32px 0;">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+    <div class="bottom-contact-col" style="display: flex !important; font-size: 1.2rem; padding: 0 32px;">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a></div>
         <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank">Jelly</a></div>
@@ -160,27 +175,26 @@
   </div>
   
   <div class="middle-area">
-    <div class="meta-container"><div class="meta-title" id="meta-title"></div><div class="meta-sub" id="meta-sub"></div></div>
+    <div class="meta-container" id="meta-ui"><div class="meta-title" id="meta-title"></div><div class="meta-sub" id="meta-sub"></div></div>
     <div class="strip-outer" id="strip-outer"><div class="strip" id="strip"></div></div>
   </div>
 
   <div class="bottom-area">
-    <div class="about-text">Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.</div>
+    <div class="about-text" id="kinetic-bio"></div>
     <div class="bottom-right-group">
       <div class="bottom-contact-col">
         <div><div class="label">Instagram</div><a href="https://instagram.com/alexjohntait" target="_blank">@alexjohntait</a></div>
         <div><div class="label">Email</div><a href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a></div>
         <div><div class="label">Representation</div><a href="https://jelly.london" target="_blank">Jelly</a></div>
       </div>
-      <div class="bottom-logo"><img src="" alt="logo" id="site-logo"></div>
+      <div style="width:180px;"></div>
     </div>
   </div>
 </div>
 
 <div class="proj-page" id="proj-page">
-  <button class="proj-close" id="proj-close" onclick="document.getElementById('proj-page').classList.remove('open')">×</button>
   <div class="proj-container">
-    <div class="proj-header"><div class="proj-big-title" id="proj-big-title"></div></div>
+    <div class="proj-big-title" id="proj-big-title"></div>
     <div id="proj-flow"></div>
   </div>
 </div>
@@ -188,12 +202,38 @@
 <script>
 const AT_TOKEN='pat6oEno5GJwLCguu.377d0ed4b98c6be08dfd7438f816b0c2ba009e38655727443cfb12e67b083ee0';
 const AT_BASE='appjYUthm8ib2ctuH';
-const F={title:'Title',caption:'Caption',client:'Client',year:'Year',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
+const F={title:'Title',caption:'Caption',client:'Client',year:'Year',cat:'Category',hero:'Hero Image',mosaic:'Mosaic Images',bg:'Background',logo:'Site Logo',order:'Order'};
+
+const bioText = "Illustrator and motion designer with a simple style focused on expression and movement. Specialising in character design.";
 
 let allProjects=[], filtered=[], items=[], scrollX=0, velX=0, isDragging=false;
-const FRICTION=0.96, SNAP_FORCE=0.15;
+const FRICTION=0.94, SNAP_FORCE=0.18;
 
-function toggleOverlay(open) { document.getElementById('mobile-overlay').classList.toggle('open', open); }
+// KINETIC CURSOR
+const cursor = document.getElementById('cursor');
+window.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  const target = e.target;
+  const isClickable = target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('.strip-item-wrap') || target.classList.contains('top-cat') || target.closest('.hud-element');
+  cursor.classList.toggle('expanding', !!isClickable);
+});
+
+function buildKineticBio() {
+    const container = document.getElementById('kinetic-bio');
+    container.innerHTML = bioText.split(' ').map(word => `<span class="about-word">${word}</span>`).join(' ');
+}
+
+function resetSite() { closeLayers(); setFilter('All'); scrollX = 0; velX = 0; }
+function closeLayers() {
+    document.getElementById('proj-page').classList.remove('open');
+    document.getElementById('mobile-overlay').classList.remove('open');
+    document.getElementById('global-close').classList.remove('visible');
+}
+function toggleOverlay(open) { 
+    document.getElementById('mobile-overlay').classList.toggle('open', open);
+    document.getElementById('global-close').classList.toggle('visible', open);
+}
 
 async function fetchAll(){
   try {
@@ -205,12 +245,14 @@ async function fetchAll(){
       const d = await r.json(); recs = recs.concat(d.records || []); off = d.offset || '';
     } while(off);
     recs.sort((a,b) => (a.fields[F.order] || 999) - (b.fields[F.order] || 999));
-    for(const rec of recs){ if(rec.fields[F.logo]?.[0]?.url) document.getElementById('site-logo').src = rec.fields[F.logo][0].url; }
+    const logoRec = recs.find(r => r.fields[F.logo] && r.fields[F.logo][0]);
+    if(logoRec) document.getElementById('site-logo-img').src = logoRec.fields[F.logo][0].url;
     return recs.map(rec => ({
       title: rec.fields[F.title] || 'Untitled', 
       caption: rec.fields[F.caption] || '', 
       client: rec.fields[F.client] || 'Personal',
       year: rec.fields[F.year] || '2026', 
+      category: rec.fields[F.cat] || rec.fields[F.client] || 'All',
       bg: rec.fields[F.bg] || '#ffffff',
       heroAtt:(rec.fields[F.hero]||[])[0],
       atts:[...(rec.fields[F.hero]||[]), ...(rec.fields[F.mosaic]||[])]
@@ -220,9 +262,7 @@ async function fetchAll(){
 
 function media(att, cls){
   if(!att || !att.url) return '';
-  const url = att.url.toLowerCase();
-  const type = (att.type || '').toLowerCase();
-  const isVideo = type.includes('video') || url.endsWith('.mp4') || url.endsWith('.mov');
+  const isVideo = (att.type?.includes('video') || att.url.toLowerCase().endsWith('.mp4') || att.url.toLowerCase().endsWith('.mov'));
   if (isVideo) return `<video src="${att.url}" autoplay muted loop playsinline preload="auto" class="${cls}" style="background:transparent;"></video>`;
   return `<img src="${att.url}" class="${cls}" loading="eager">`;
 }
@@ -251,7 +291,9 @@ function update(){
   const strip = document.getElementById('strip');
   if(!isDragging && items.length > 0){
     scrollX += velX; velX *= FRICTION;
-    if(Math.abs(velX) < 2){
+    if(Math.abs(velX) < 0.05) velX = 0;
+
+    if(Math.abs(velX) < 2.5){
        let closestIdx = 0, minDiff = Infinity;
        items.forEach((item, i) => {
          const center = -scrollX + (window.innerWidth/2);
@@ -285,27 +327,46 @@ function update(){
   requestAnimationFrame(update);
 }
 
-const stripOuter = document.getElementById('strip-outer');
-let startX = 0;
+function setFilter(f){
+    const stripUI = document.getElementById('strip-outer');
+    const metaUI = document.getElementById('meta-ui');
+    stripUI.style.opacity = '0';
+    metaUI.style.opacity = '0';
+    setTimeout(() => {
+        document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.textContent === f));
+        filtered = (f === 'All') ? allProjects : allProjects.filter(p => 
+            p.category.toLowerCase().includes(f.toLowerCase()) || 
+            p.client.toLowerCase().includes(f.toLowerCase())
+        );
+        scrollX = 0; velX = 0;
+        build();
+        setTimeout(() => {
+            let initialX = 0; for(let i=0; i<filtered.length; i++) initialX += (items[i].offsetWidth);
+            scrollX = -initialX + (window.innerWidth/2) - (items[filtered.length].offsetWidth/2);
+            stripUI.style.opacity = '1';
+            metaUI.style.opacity = '1';
+        }, 100);
+    }, 400);
+}
 
+const stripOuter = document.getElementById('strip-outer');
+let touchStartX = 0;
 window.addEventListener('wheel', e => {
   if(document.getElementById('proj-page').classList.contains('open') || document.getElementById('mobile-overlay').classList.contains('open')) return;
   velX -= e.deltaY * 0.45;
 }, {passive: true});
 
-stripOuter.addEventListener('touchstart', e => {
-  isDragging = true; startX = e.touches[0].clientX; velX = 0;
-}, {passive: true});
-
+stripOuter.addEventListener('touchstart', e => { isDragging = true; touchStartX = e.touches[0].clientX; velX = 0; }, {passive: true});
 stripOuter.addEventListener('touchmove', e => {
-  if(document.getElementById('proj-page').classList.contains('open') || document.getElementById('mobile-overlay').classList.contains('open')) return;
-  const dx = (e.touches[0].clientX - startX) * 2.5; 
-  scrollX += dx; startX = e.touches[0].clientX;
+  if(document.getElementById('proj-page').classList.contains('open')) return;
+  const dx = (e.touches[0].clientX - touchStartX) * 2.5; 
+  scrollX += dx; touchStartX = e.touches[0].clientX;
   if(Math.abs(dx) > 5) e.preventDefault();
 }, {passive: false});
 
-window.addEventListener('touchend', () => isDragging = false);
-window.addEventListener('touchcancel', () => isDragging = false);
+const stopDrag = () => { isDragging = false; };
+window.addEventListener('touchend', stopDrag);
+window.addEventListener('touchcancel', stopDrag);
 
 function openProject(i){
   const p = filtered[i];
@@ -317,13 +378,17 @@ function openProject(i){
   flow.appendChild(narr);
   let rest = p.atts.slice(1);
   for(let j=0; j < rest.length; j += 2) {
-      if(rest[j+1]) {
+      if(rest[j+1] && window.innerWidth > 768) {
           const grid = document.createElement('div'); grid.className = 'proj-asset-grid';
           grid.appendChild(createAsset(rest[j], j+2)); grid.appendChild(createAsset(rest[j+1], j+3));
           flow.appendChild(grid);
-      } else { flow.appendChild(createAsset(rest[j], j+2)); }
+      } else { 
+          flow.appendChild(createAsset(rest[j], j+2)); 
+          if(rest[j+1]) flow.appendChild(createAsset(rest[j+1], j+3));
+      }
   }
   document.getElementById('proj-page').classList.add('open');
+  document.getElementById('global-close').classList.add('visible');
 }
 
 function createAsset(att, idx) {
@@ -336,11 +401,12 @@ function createAsset(att, idx) {
 }
 
 async function init(){ 
+  buildKineticBio();
   allProjects = await fetchAll(); 
   if (allProjects.length > 0) { 
     filtered = [...allProjects]; 
     const cats = ['All', 'Commercial', 'Editorial', 'Personal'];
-    document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" onclick="setFilter('${c}')">${c}</span>`).join('');
+    document.getElementById('top-cats').innerHTML = cats.map(c => `<span class="top-cat ${c==='All'?'active':''}" onclick=\"setFilter('${c}')\">${c}</span>`).join('');
     build(); 
     setTimeout(() => {
         let initialX = 0; for(let i=0; i<filtered.length; i++) initialX += (items[i].offsetWidth);
@@ -350,15 +416,6 @@ async function init(){
         update();
     }, 1200);
   }
-}
-function setFilter(f){
-    document.querySelectorAll('.top-cat').forEach(el => el.classList.toggle('active', el.textContent === f));
-    filtered = (f === 'All') ? allProjects : allProjects.filter(p => p.client.toLowerCase().includes(f.toLowerCase()));
-    scrollX = 0; velX = 0; build();
-    setTimeout(() => {
-        let initialX = 0; for(let i=0; i<filtered.length; i++) initialX += (items[i].offsetWidth);
-        scrollX = -initialX + (window.innerWidth/2) - (items[filtered.length].offsetWidth/2);
-    }, 50);
 }
 init();
 </script>
