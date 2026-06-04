@@ -151,19 +151,16 @@
       align-items: center;
       gap: 0;
     }
-    /* handwritten signature: drop the white JPEG bg with multiply.
-       In dark mode, invert to white ink and use screen to drop the (now black) bg. */
+    /* handwritten signature (transparent PNG). Nudged left so the ink,
+       not the file's whitespace, sits against the edge. Inverts to white in dark mode. */
     .wordmark .sig {
       height: clamp(26px, 3.4vw, 36px);
       width: auto;
       display: block;
-      mix-blend-mode: multiply;
+      margin-left: -5px;
       transition: transform 0.4s var(--spring);
     }
-    :root[data-theme="dark"] .wordmark .sig {
-      mix-blend-mode: screen;
-      filter: invert(1) contrast(1.3) brightness(1.05);
-    }
+    :root[data-theme="dark"] .wordmark .sig { filter: invert(1); }
     .wordmark:hover .sig { transform: rotate(-2deg) scale(1.03); }
     @media (prefers-reduced-motion: reduce) {
       .wordmark:hover .sig { transform: none; }
@@ -816,7 +813,7 @@
   <div class="glow" style="opacity:1; box-shadow: inset 0 0 110px 10px rgba(130, 211, 60, 0.2);" aria-hidden="true"></div>
 
   <header>
-    <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.jpg" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
+    <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
     <div class="header-right">
       <nav class="nav" aria-label="Primary">
         <a href="../index.html">Work</a>

@@ -99,7 +99,7 @@ ${JSON.stringify(jsonld, null, 2)}
   <div class="glow" style="opacity:1; box-shadow: inset 0 0 110px 10px ${glow};" aria-hidden="true"></div>
 
   <header>
-    <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.jpg" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
+    <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
     <div class="header-right">
       <nav class="nav" aria-label="Primary">
         <a href="../index.html">Work</a>
