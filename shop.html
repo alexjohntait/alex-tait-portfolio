@@ -109,7 +109,10 @@
       gap:24px;padding:18px var(--pad);background:color-mix(in srgb,var(--paper) 88%,transparent);
       backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line);}
     .wordmark{font-family:var(--display);font-weight:800;font-size:clamp(22px,3vw,30px);
-      letter-spacing:-.03em;line-height:1;color:var(--ink);text-decoration:none;}
+      letter-spacing:-.03em;line-height:1;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;}
+    .wordmark .sig{height:clamp(26px,3.4vw,36px);width:auto;display:block;mix-blend-mode:multiply;
+      transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
+    .wordmark:hover .sig{transform:rotate(-2deg) scale(1.03);}
     .header-right{display:flex;align-items:center;gap:clamp(16px,3vw,32px);}
     .nav{display:flex;gap:clamp(14px,2vw,26px);}
     .nav a{font-size:14px;font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink);
@@ -172,7 +175,7 @@
 <body>
 
 <header>
-  <a href="index.html" class="wordmark">Alex Tait</a>
+  <a href="index.html" class="wordmark"><img class="sig" src="/assets/signature.jpg" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
   <div class="header-right">
     <nav class="nav" aria-label="Primary">
       <a href="index.html">Work</a>

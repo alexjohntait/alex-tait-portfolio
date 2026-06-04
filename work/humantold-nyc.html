@@ -152,27 +152,25 @@
       color: var(--ink);
       text-decoration: none;
       display: inline-flex;
-      align-items: baseline;
+      align-items: center;
       gap: 0;
     }
-    /* playful per-letter hover ripple — letters bounce up in a wave */
-    .wordmark span {
-      display: inline-block;
-      transition: transform 0.45s var(--spring), color 0.45s var(--ease-out);
+    /* handwritten signature: drop the white JPEG bg with multiply.
+       In dark mode, invert to white ink and use screen to drop the (now black) bg. */
+    .wordmark .sig {
+      height: clamp(26px, 3.4vw, 36px);
+      width: auto;
+      display: block;
+      mix-blend-mode: multiply;
+      transition: transform 0.4s var(--spring);
     }
-    .wordmark:hover span { color: var(--red); }
-    .wordmark:hover span:nth-child(1) { transform: translateY(-9px) rotate(-8deg); transition-delay: 0s; }
-    .wordmark:hover span:nth-child(2) { transform: translateY(-9px) rotate(6deg);  transition-delay: 0.035s; }
-    .wordmark:hover span:nth-child(3) { transform: translateY(-9px) rotate(-6deg); transition-delay: 0.07s; }
-    .wordmark:hover span:nth-child(4) { transform: translateY(-9px) rotate(7deg);  transition-delay: 0.105s; }
-    .wordmark:hover span:nth-child(5) { transform: translateY(-9px);               transition-delay: 0.14s; }
-    .wordmark:hover span:nth-child(6) { transform: translateY(-9px) rotate(-7deg); transition-delay: 0.175s; }
-    .wordmark:hover span:nth-child(7) { transform: translateY(-9px) rotate(6deg);  transition-delay: 0.21s; }
-    .wordmark:hover span:nth-child(8) { transform: translateY(-9px) rotate(-6deg); transition-delay: 0.245s; }
-    .wordmark:hover span:nth-child(9) { transform: translateY(-9px) rotate(8deg);  transition-delay: 0.28s; }
+    :root[data-theme="dark"] .wordmark .sig {
+      mix-blend-mode: screen;
+      filter: invert(1);
+    }
+    .wordmark:hover .sig { transform: rotate(-2deg) scale(1.03); }
     @media (prefers-reduced-motion: reduce) {
-      .wordmark span { transition: color 0.2s; }
-      .wordmark:hover span { transform: none; }
+      .wordmark:hover .sig { transform: none; }
     }
 
     .header-right {
@@ -822,7 +820,7 @@
   <div class="glow" style="opacity:1; box-shadow: inset 0 0 110px 10px rgba(236, 72, 44, 0.2);" aria-hidden="true"></div>
 
   <header>
-    <a href="../index.html" class="wordmark">Alex Tait</a>
+    <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.jpg" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
     <div class="header-right">
       <nav class="nav" aria-label="Primary">
         <a href="../index.html">Work</a>
