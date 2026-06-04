@@ -811,6 +811,36 @@
         scroll-behavior: auto !important;
       }
     }
+
+    /* ── SITE FOOTER — quiet, persistent contact ─────────────────── */
+    .site-footer { border-top: 1px solid var(--line); padding: clamp(36px, 6vw, 60px) var(--pad);
+      margin-top: clamp(52px, 9vw, 110px); }
+    .foot-inner { display: grid; grid-template-columns: 1fr auto; gap: 30px 56px;
+      align-items: start; max-width: 1500px; margin: 0 auto; }
+    .foot-cta { display: flex; flex-direction: column; gap: 12px; }
+    .foot-status { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display);
+      font-weight: 700; font-size: clamp(19px, 2.4vw, 26px); letter-spacing: -.02em; line-height: 1.1; }
+    .foot-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); flex: none;
+      box-shadow: 0 0 0 0 rgba(2,179,75,.5); animation: footPulse 2.8s var(--ease-out) infinite; }
+    @keyframes footPulse { 0% { box-shadow: 0 0 0 0 rgba(2,179,75,.5); }
+      70% { box-shadow: 0 0 0 8px rgba(2,179,75,0); } 100% { box-shadow: 0 0 0 0 rgba(2,179,75,0); } }
+    .foot-mail { font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none;
+      width: fit-content; border-bottom: 1px solid var(--line); padding-bottom: 2px;
+      transition: border-color .2s var(--ease); }
+    .foot-mail:hover { border-color: var(--red); }
+    .foot-eyebrow { display: block; font-size: 11px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 9px; }
+    .foot-list { font-family: var(--display); font-weight: 600; font-size: clamp(15px, 1.8vw, 19px);
+      letter-spacing: -.01em; color: var(--ink); }
+    .foot-meta { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 16px;
+      flex-wrap: wrap; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line);
+      padding-top: 20px; margin-top: 6px; }
+    .foot-meta a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+    .foot-meta a:hover { border-color: var(--red); }
+    @media (max-width: 640px) {
+      .foot-inner { grid-template-columns: 1fr; gap: 26px; }
+      .foot-meta { flex-direction: column; gap: 6px; }
+    }
   </style>
 </head>
 <body>
@@ -850,6 +880,23 @@
       <a class="pnav" href="tiger.html" style="text-align:right;align-items:flex-end"><span class="pnav-dir">Next →</span><span class="pnav-title">Tiger</span></a>
     </nav>
   </article>
+
+  <footer class="site-footer">
+    <div class="foot-inner">
+      <div class="foot-cta">
+        <span class="foot-status"><span class="foot-dot" aria-hidden="true"></span>Available for commissions</span>
+        <a class="foot-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+      </div>
+      <div class="foot-clients">
+        <span class="foot-eyebrow">Selected clients</span>
+        <p class="foot-list">Apple · Google · Spotify · Adidas</p>
+      </div>
+      <div class="foot-meta">
+        <span>Represented by <a href="https://jelly.london" target="_blank" rel="noopener">Jelly</a> for commissions worldwide</span>
+        <span>© 2026 Alex Tait</span>
+      </div>
+    </div>
+  </footer>
 
   <script>
     // honour reduced motion (no SPA here): pause autoplay, show first frame

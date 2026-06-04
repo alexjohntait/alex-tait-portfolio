@@ -65,6 +65,9 @@ function injectData() {
     console.log('• Downloading hero + gallery media…');
     execFileSync('node', ['build-data.mjs', records], { stdio: 'inherit' });
 
+    console.log('• Optimising images (resize oversized files)…');
+    execFileSync('node', ['optimise.mjs'], { stdio: 'inherit' });
+
     injectData();
 
     console.log('• Rebuilding project pages + sitemap…');
@@ -73,6 +76,7 @@ function injectData() {
     // tidy temp files
     for (const f of ['_data.json', '_records.json']) { try { fs.unlinkSync(f); } catch {} }
     console.log('✓ Refresh complete — index.html, /work/*.html, /images and sitemap.xml are up to date.');
+    console.log('  Note: if you added/changed a VIDEO project, regenerate its grid poster in /images/posters/ (see make-posters note in MORNING-REPORT).');
   } catch (e) {
     console.error('✗ Refresh failed:', e.message);
     process.exit(1);

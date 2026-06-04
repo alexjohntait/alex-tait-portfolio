@@ -133,6 +133,23 @@ ${JSON.stringify(jsonld, null, 2)}
     </nav>
   </article>
 
+  <footer class="site-footer">
+    <div class="foot-inner">
+      <div class="foot-cta">
+        <span class="foot-status"><span class="foot-dot" aria-hidden="true"></span>Available for commissions</span>
+        <a class="foot-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+      </div>
+      <div class="foot-clients">
+        <span class="foot-eyebrow">Selected clients</span>
+        <p class="foot-list">Apple · Google · Spotify · Adidas</p>
+      </div>
+      <div class="foot-meta">
+        <span>Represented by <a href="https://jelly.london" target="_blank" rel="noopener">Jelly</a> for commissions worldwide</span>
+        <span>© 2026 Alex Tait</span>
+      </div>
+    </div>
+  </footer>
+
   <script>
     // honour reduced motion (no SPA here): pause autoplay, show first frame
     if (matchMedia('(prefers-reduced-motion: reduce)').matches)
