@@ -1,0 +1,12 @@
+{
+  "name": "Alex Tait — Illustrator & Motion Designer",
+  "short_name": "Alex Tait",
+  "description": "Bold, character-driven illustration and motion design. Bath & London, represented by Jelly.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff1d19",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ]
+}

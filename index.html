@@ -12,6 +12,9 @@
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="theme-color" content="#ff1d19" />
   <link rel="canonical" href="https://alexjohntait.com/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
@@ -1417,6 +1420,21 @@ window.addEventListener('keydown', e => {
   if (!e.key || e.key.length !== 1 || e.metaKey || e.ctrlKey) return;
   typeBuf = (typeBuf + e.key.toLowerCase()).slice(-4);
   if (typeBuf === 'alex') { typeBuf = ''; rainWork(); }
+});
+
+/* ── KEYBOARD NAV ────────────────────────────────────────────── */
+/* On a project: ← / → move between projects, Esc returns to the grid. */
+window.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const h = location.hash;
+  if (h.startsWith('#project/')) {
+    const idx = PROJECTS.findIndex(p => p.id === h.slice(9));
+    if (e.key === 'ArrowRight' && PROJECTS[idx + 1]) { e.preventDefault(); navigate('project', PROJECTS[idx + 1].id, null, 'next'); }
+    else if (e.key === 'ArrowLeft' && PROJECTS[idx - 1]) { e.preventDefault(); navigate('project', PROJECTS[idx - 1].id, null, 'prev'); }
+    else if (e.key === 'Escape') { e.preventDefault(); navigate('home'); }
+  } else if (h === '#about' && e.key === 'Escape') {
+    navigate('home');
+  }
 });
 
 /* ── ACCENT COLOUR TOGGLE (the dots) ─────────────────────────── */

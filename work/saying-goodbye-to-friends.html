@@ -9,6 +9,9 @@
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="theme-color" content="#ff1d19" />
   <link rel="canonical" href="https://alexjohntait.com/work/saying-goodbye-to-friends.html" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Alex Tait" />
   <meta property="og:title" content="Saying goodbye to friends — Alex Tait" />
@@ -861,6 +864,14 @@
     document.querySelectorAll('video').forEach(v => {
       const set = () => { if (v.videoWidth && v.videoHeight) v.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
       v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
+    });
+    // keyboard nav: ← / → between projects, Esc back to the grid
+    var _prev = 'jellyfish.html', _next = 'dreams.html';
+    addEventListener('keydown', function (e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === 'ArrowRight' && _next) location.href = _next;
+      else if (e.key === 'ArrowLeft' && _prev) location.href = _prev;
+      else if (e.key === 'Escape') location.href = '../index.html';
     });
   </script>
 </body>

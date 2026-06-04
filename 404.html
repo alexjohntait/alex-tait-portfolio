@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found — Alex Tait</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#ff1d19" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--paper:#fff;--ink:#16120f;--red:#ff1d19;--pink:#ff69b4;--green:#02b34b;--muted:#6b625c;--line:rgba(22,18,15,.12);
+      --display:'Bricolage Grotesque','Hanken Grotesk',sans-serif;--body:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
+      --ease-out:cubic-bezier(.22,1,.36,1);--ease:cubic-bezier(.25,.46,.45,.94);--pad:clamp(16px,4vw,40px);}
+    html,body{min-height:100%;}
+    body{font-family:var(--body);font-weight:500;background:var(--paper);color:var(--ink);
+      -webkit-font-smoothing:antialiased;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh;}
+    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:50;
+      box-shadow:inset 0 0 110px 10px rgba(255,29,25,.18);}
+    a{color:inherit;}
+    :focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:2px;}
+    header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:18px var(--pad);
+      border-bottom:1px solid var(--line);}
+    .wordmark{font-family:var(--display);font-weight:800;font-size:clamp(22px,3vw,30px);letter-spacing:-.03em;
+      line-height:1;text-decoration:none;color:var(--ink);}
+    .nav{display:flex;gap:clamp(14px,2vw,26px);}
+    .nav a{font-size:14px;font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink);
+      position:relative;padding:4px 0;min-height:44px;display:inline-flex;align-items:center;}
+    .nav a::after{content:'';position:absolute;left:0;bottom:9px;width:100%;height:2px;background:var(--red);
+      transform:scaleX(0);transform-origin:left;transition:transform .32s var(--ease-out);}
+    .nav a:hover::after{transform:scaleX(1);}
+    .dots{display:inline-flex;gap:7px;align-items:center;}
+    .dot{width:14px;height:14px;border-radius:50%;}
+    .dot:nth-child(1){background:var(--pink);} .dot:nth-child(2){background:var(--green);} .dot:nth-child(3){background:var(--red);}
+    main{flex:1;display:flex;flex-direction:column;justify-content:center;padding:clamp(40px,10vw,96px) var(--pad);max-width:60ch;}
+    .code{font-family:var(--display);font-weight:800;font-size:clamp(72px,22vw,200px);line-height:.86;letter-spacing:-.05em;}
+    .code .o{color:var(--red);display:inline-block;animation:wobble 3.4s var(--ease-out) infinite;}
+    @keyframes wobble{0%,72%,100%{transform:rotate(0) translateY(0);}80%{transform:rotate(-8deg) translateY(-6px);}88%{transform:rotate(6deg);}}
+    h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,40px);letter-spacing:-.03em;
+      line-height:1.05;margin:clamp(18px,3vw,28px) 0 12px;text-wrap:balance;}
+    p{font-size:clamp(15px,1.6vw,17px);font-weight:500;color:var(--muted);line-height:1.55;max-width:46ch;}
+    .home{margin-top:clamp(24px,4vw,36px);align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
+      font-weight:700;font-size:15px;letter-spacing:-.01em;background:var(--ink);color:var(--paper);
+      text-decoration:none;padding:13px 22px;border-radius:100px;min-height:44px;
+      transition:transform .18s var(--ease),background .2s var(--ease);}
+    .home:hover{transform:translateY(-2px);background:var(--red);}
+    .home:active{transform:scale(.97);}
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important;}}
+    @media (max-width:460px){.nav a:nth-child(2){display:inline-flex;}}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="wordmark">Alex Tait</a>
+    <div class="dots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+  </header>
+  <main>
+    <div class="code">4<span class="o">0</span>4</div>
+    <h1>This page wandered off.</h1>
+    <p>The link is broken or the work has moved. The rest of the studio is right where you left it.</p>
+    <a class="home" href="/">← Back to the work</a>
+  </main>
+</body>
+</html>
