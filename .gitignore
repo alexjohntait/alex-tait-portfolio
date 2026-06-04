@@ -1,0 +1,6 @@
+# temp build artifacts
+_*.json
+_*.js
+*.bak
+.DS_Store
+node_modules/

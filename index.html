@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ── SEO ─────────────────────────────────────────────────── -->
+  <title>Alex Tait — Illustrator &amp; Motion Designer, Bath &amp; London</title>
+  <meta name="description" content="Alex Tait is an illustrator and motion designer in Bath and London, represented by Jelly. Bold, character-driven commercial and editorial illustration and animation for brands and publications." />
+  <meta name="author" content="Alex Tait" />
+  <meta name="keywords" content="Alex Tait, illustrator, motion designer, animation, editorial illustration, commercial illustration, character design, Bath, London, Jelly London" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#ff1d19" />
+  <link rel="canonical" href="https://alexjohntait.com/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Alex Tait" />
+  <meta property="og:title" content="Alex Tait — Illustrator &amp; Motion Designer" />
+  <meta property="og:description" content="Bold, character-driven illustration and motion design for brands and publications. Based in Bath &amp; London, represented by Jelly." />
+  <meta property="og:url" content="https://alexjohntait.com/" />
+  <meta property="og:image" content="https://alexjohntait.com/images/app-store.jpg" />
+  <meta property="og:image:alt" content="Illustration by Alex Tait" />
+  <meta property="og:locale" content="en_GB" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Alex Tait — Illustrator &amp; Motion Designer" />
+  <meta name="twitter:description" content="Bold, character-driven illustration and motion design. Bath &amp; London, represented by Jelly." />
+  <meta name="twitter:image" content="https://alexjohntait.com/images/app-store.jpg" />
+
+  <!-- Structured data: the person + the practice -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Alex Tait",
+    "url": "https://alexjohntait.com/",
+    "image": "https://alexjohntait.com/images/app-store.jpg",
+    "jobTitle": "Illustrator & Motion Designer",
+    "email": "mailto:alex@alexjohntait.com",
+    "knowsAbout": ["Illustration", "Motion Design", "Animation", "Art Direction", "Editorial Illustration", "Character Design"],
+    "address": { "@type": "PostalAddress", "addressLocality": "Bath", "addressRegion": "London", "addressCountry": "GB" },
+    "worksFor": { "@type": "Organization", "name": "Jelly London", "url": "https://jelly.london" },
+    "sameAs": ["https://instagram.com/alexjohntait", "https://jelly.london"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Alex Tait",
+    "url": "https://alexjohntait.com/",
+    "author": { "@type": "Person", "name": "Alex Tait" },
+    "description": "Portfolio of illustrator and motion designer Alex Tait."
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper: #ffffff;
+      --ink:   #16120f;
+      --red:   #ff1d19;
+      --pink:  #ff69b4;
+      --green: #02b34b;
+      --muted: #6b625c;
+      --line:  rgba(22, 18, 15, 0.12);
+
+      --display: 'Bricolage Grotesque', 'Hanken Grotesk', sans-serif;
+      --body: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+
+      /* motion roles: entrances/exits, hovers, and rare playful springs */
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease:     cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      --pad: clamp(16px, 4vw, 40px);
+      --glow: 22%;
+    }
+
+    /* Dark mode (triggered by the pink accent) */
+    :root[data-theme="dark"] {
+      --paper: #141110;
+      --ink:   #f7f1ea;
+      --muted: #a79e96;
+      --line:  rgba(247, 241, 234, 0.16);
+      --glow:  34%;
+    }
+
+    html { scroll-behavior: smooth; }
+    :root { transition: --glow 0.4s; }
+    body, header, .filters button, .meta-row, .card-thumb {
+      transition: background-color 0.4s var(--ease-out), color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--body);
+      font-weight: 500;
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Subtle edge glow — two layers crossfade by opacity (GPU, jank-free)
+       so the colour can change without repainting a box-shadow each frame */
+    .glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.45s var(--ease-out);
+    }
+
+    .skip-link {
+      position: absolute; top: -999px; left: 16px;
+      background: var(--ink); color: var(--paper);
+      font-family: var(--body); font-size: 13px; font-weight: 600;
+      padding: 10px 16px; z-index: 200; text-decoration: none; border-radius: 2px;
+    }
+    .skip-link:focus { top: 12px; }
+
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 2px; }
+
+    /* ─────────────────────────── HEADER ─────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 18px var(--pad);
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      backdrop-filter: saturate(1.4) blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wordmark {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: clamp(22px, 3vw, 30px);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+    }
+    /* playful per-letter hover ripple — letters bounce up in a wave */
+    .wordmark span {
+      display: inline-block;
+      transition: transform 0.45s var(--spring), color 0.45s var(--ease-out);
+    }
+    .wordmark:hover span { color: var(--red); }
+    .wordmark:hover span:nth-child(1) { transform: translateY(-9px) rotate(-8deg); transition-delay: 0s; }
+    .wordmark:hover span:nth-child(2) { transform: translateY(-9px) rotate(6deg);  transition-delay: 0.035s; }
+    .wordmark:hover span:nth-child(3) { transform: translateY(-9px) rotate(-6deg); transition-delay: 0.07s; }
+    .wordmark:hover span:nth-child(4) { transform: translateY(-9px) rotate(7deg);  transition-delay: 0.105s; }
+    .wordmark:hover span:nth-child(5) { transform: translateY(-9px);               transition-delay: 0.14s; }
+    .wordmark:hover span:nth-child(6) { transform: translateY(-9px) rotate(-7deg); transition-delay: 0.175s; }
+    .wordmark:hover span:nth-child(7) { transform: translateY(-9px) rotate(6deg);  transition-delay: 0.21s; }
+    .wordmark:hover span:nth-child(8) { transform: translateY(-9px) rotate(-6deg); transition-delay: 0.245s; }
+    .wordmark:hover span:nth-child(9) { transform: translateY(-9px) rotate(8deg);  transition-delay: 0.28s; }
+    @media (prefers-reduced-motion: reduce) {
+      .wordmark span { transition: color 0.2s; }
+      .wordmark:hover span { transform: none; }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: clamp(16px, 3vw, 32px);
+    }
+
+    .nav {
+      display: flex;
+      gap: clamp(14px, 2vw, 26px);
+    }
+    .nav a {
+      font-family: var(--body);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      color: var(--ink);
+      position: relative;
+      /* taller hit area (44px) */
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 4px 0;
+    }
+    .nav a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 9px;
+      width: 100%; height: 2px;
+      background: var(--red);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.32s var(--ease-out);
+    }
+    .nav a:hover::after,
+    .nav a.current::after { transform: scaleX(1); }
+    .nav a.current { color: var(--red); }
+
+    .dots { display: inline-flex; align-items: center; gap: 13px; }
+    .dot {
+      width: 15px; height: 15px; border-radius: 50%;
+      border: none; padding: 0; cursor: pointer;
+      background: var(--c);
+      position: relative;
+      transition: transform 0.22s var(--spring), box-shadow 0.22s var(--ease);
+    }
+    /* invisible, non-overlapping hit area for touch (WCAG 2.5.5 spacing) */
+    .dot::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 26px; height: 26px;
+      transform: translate(-50%, -50%);
+    }
+    .dot:hover { transform: scale(1.3) translateY(-2px); }
+    .dot:active { transform: scale(1.05); }
+    .dot.active {
+      box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--c);
+    }
+    /* one-time playful entrance — bob in once on load, then rest */
+    @media (prefers-reduced-motion: no-preference) {
+      .dot { animation: dotIn 0.5s var(--spring) both; }
+      .dot:nth-child(1) { animation-delay: 0.15s; }
+      .dot:nth-child(2) { animation-delay: 0.24s; }
+      .dot:nth-child(3) { animation-delay: 0.33s; }
+    }
+    @keyframes dotIn {
+      0%   { transform: scale(0.4) translateY(-6px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* ─────────────────────────── VIEWS ─────────────────────────── */
+    main { display: block; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* Entrance is handled by the View Transition (route changes) and the
+       grid scroll-reveal (home). A self-animating .view conflicts with the
+       VT snapshot of the morph target, so it's intentionally omitted. */
+
+    /* ─────────────────────── CONTROL ROW (home) ─────────────────── */
+    .controls {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: clamp(24px, 5vw, 48px) var(--pad) 20px;
+    }
+
+    /* reserved height + line clamps so swapping titles/captions of any
+       length never reflows the grid below */
+    .controls-lead {
+      max-width: 42ch;
+      min-height: clamp(104px, 12vw, 158px);
+    }
+    .controls-lead h1 {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(28px, 5vw, 52px);
+      letter-spacing: -0.035em;
+      line-height: 0.98;
+      text-wrap: balance;
+      transition: opacity 0.18s var(--ease-out);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+    .controls-lead p {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      transition: opacity 0.18s var(--ease-out);
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+    .controls.fading .controls-lead h1,
+    .controls.fading .controls-lead p { opacity: 0; }
+
+    .filters {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .filters button {
+      font-family: var(--body);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--muted);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 100px;
+      /* 44px min touch target (WCAG 2.5.5) */
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.18s var(--ease);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .filters button:hover { color: var(--ink); transform: translateY(-2px); }
+    }
+    .filters button:active { transform: scale(0.96); }
+    .filters button.active {
+      color: var(--paper);
+      background: var(--ink);
+    }
+
+    /* ─────────────────── GRID (flowing masonry) ─────────────────── */
+    /* Each piece keeps its native ratio and flows into columns —
+       varied heights break the rigid 'square' grid. */
+    .grid {
+      column-width: clamp(220px, 24vw, 300px);
+      column-gap: clamp(14px, 2vw, 22px);
+      padding: 12px var(--pad) clamp(48px, 8vw, 96px);
+    }
+
+    .card {
+      cursor: pointer;
+      position: relative;
+      break-inside: avoid;
+      margin-bottom: clamp(20px, 2.6vw, 34px);
+      transition: transform 0.25s var(--ease);
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+    .card:active { transform: scale(0.98); }
+    @media (hover: hover) and (pointer: fine) {
+      .card:hover { transform: translateY(-5px); }
+    }
+
+    .card-thumb {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 6px;
+      /* aspect-ratio set per-card inline (from the file's true dimensions)
+         so columns pack correctly with no layout shift */
+    }
+    .card-thumb img,
+    .card-thumb video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s var(--ease);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .card:hover .card-thumb img,
+      .card:hover .card-thumb video { transform: scale(1.05); }
+    }
+    .card:focus-visible .card-thumb img,
+    .card:focus-visible .card-thumb video { transform: scale(1.05); }
+
+    /* corner index badge that pops on hover */
+    .card-index {
+      position: absolute;
+      top: 10px; left: 10px;
+      z-index: 2;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--paper);
+      mix-blend-mode: difference;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.3s var(--ease-out), transform 0.3s var(--spring);
+    }
+    .card:hover .card-index { opacity: 1; transform: translateY(0); }
+
+    .card-meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 2px 4px;
+    }
+    .card-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+    .card-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card.hidden { display: none; }
+
+    /* ─────────────────── PROJECT DETAIL (stage) ─────────────────── */
+    /* Big media on the left at its natural size; sticky info rail on the
+       right so title/meta/description stay in view however tall the art is. */
+    .project-stage {
+      display: grid;
+      grid-template-columns: minmax(0, 1.9fr) minmax(280px, 0.85fr);
+      gap: clamp(24px, 4vw, 60px);
+      padding: clamp(14px, 2vw, 22px) var(--pad) clamp(32px, 5vw, 56px);
+      align-items: start;
+    }
+
+    /* Single piece: shown whole at natural ratio, fitted to the viewport,
+       on the page's own white — honest negative space, no colour fill. */
+    .project-solo {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .project-solo img,
+    .project-solo video {
+      max-width: 100%;
+      max-height: calc(100svh - 168px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 8px;
+    }
+
+    /* Multiple pieces: hero + gallery flow together as a masonry, each at
+       its true ratio, so portraits get a neighbour instead of empty space. */
+    .project-masonry {
+      /* 2 columns for impact (work reads big), 1 on mobile */
+      columns: 2;
+      column-gap: clamp(16px, 1.8vw, 22px);
+    }
+    .project-masonry .m-item {
+      break-inside: avoid;
+      margin-bottom: clamp(16px, 1.8vw, 22px);
+      border-radius: 8px;
+      overflow: hidden;
+      display: block;
+    }
+    .project-masonry .m-item img,
+    .project-masonry .m-item video {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+      transition: transform 0.6s var(--ease-out);
+    }
+    .project-masonry .m-item:hover img,
+    .project-masonry .m-item:hover video { transform: scale(1.03); }
+    @media (max-width: 560px) {
+      .project-masonry { column-width: auto; columns: 1; }
+    }
+
+    .project-info {
+      position: sticky;
+      top: clamp(84px, 9vw, 104px);
+      display: flex;
+      flex-direction: column;
+    }
+    /* info rail composes itself in after the hero morph lands */
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes infoUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+      .project-info > * { animation: infoUp 0.4s var(--ease-out) both; }
+      .project-info > *:nth-child(1) { animation-delay: 0.10s; }
+      .project-info > *:nth-child(2) { animation-delay: 0.16s; }
+      .project-info > *:nth-child(3) { animation-delay: 0.22s; }
+      .project-info > *:nth-child(4) { animation-delay: 0.28s; }
+    }
+
+    .pview-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: clamp(16px, 2.5vw, 26px) var(--pad) 0;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--body);
+      font-size: 14px; font-weight: 600;
+      text-decoration: none; color: var(--ink);
+      min-height: 44px;
+      transition: gap 0.25s var(--ease-out), color 0.2s;
+    }
+    .back-link:hover { gap: 12px; color: var(--red); }
+    .pview-count {
+      font-family: var(--display);
+      font-size: 14px; font-weight: 700;
+      color: var(--muted);
+    }
+
+    .project-title {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: clamp(30px, 3.4vw, 46px);
+      letter-spacing: -0.04em;
+      line-height: 0.98;
+      text-wrap: balance;
+      margin-bottom: 22px;
+    }
+
+    .project-meta {
+      display: flex; flex-direction: column;
+      border-top: 2px solid var(--ink);
+      margin-bottom: 22px;
+    }
+    .meta-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .meta-label {
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      letter-spacing: -0.01em;
+    }
+    .meta-value {
+      font-family: var(--display);
+      font-size: 16px; font-weight: 700;
+      letter-spacing: -0.025em;
+      text-align: right;
+    }
+
+    .project-desc {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.62;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+    .project-desc p + p { margin-top: 0.9em; }
+
+    /* static labels — same role/treatment as the card category text */
+    .project-tags {
+      display: flex; flex-wrap: wrap; gap: 6px 14px;
+      margin-top: 20px;
+    }
+    .project-tag {
+      font-size: 13px; font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--muted);
+    }
+    .project-tag:not(:last-child)::after {
+      content: '·';
+      margin-left: 14px;
+      color: var(--line);
+    }
+
+    .project-nav {
+      display: flex;
+      border-top: 1px solid var(--line);
+      margin: 0 var(--pad);
+    }
+    .pnav {
+      flex: 1;
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 24px 0 clamp(40px, 6vw, 72px);
+      background: none; border: none; cursor: pointer;
+      font-family: var(--body); text-align: left;
+      transition: opacity 0.2s;
+    }
+    .pnav:last-child { text-align: right; align-items: flex-end; }
+    .pnav:hover { opacity: 0.55; }
+    .pnav:disabled { opacity: 0.2; cursor: default; }
+    .pnav-dir { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .pnav-title {
+      font-family: var(--display);
+      font-size: clamp(18px, 2.4vw, 26px);
+      font-weight: 700; letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+
+    /* ─────────────────────────── ABOUT ─────────────────────────── */
+    .about {
+      padding: clamp(32px, 7vw, 88px) var(--pad) clamp(48px, 8vw, 96px);
+      max-width: 1100px;
+    }
+    .about-headline {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: clamp(36px, 8vw, 104px);
+      letter-spacing: -0.045em;
+      line-height: 0.92;
+      text-wrap: balance;
+      margin-bottom: clamp(32px, 6vw, 64px);
+    }
+    .about-headline .accent { color: var(--red); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: clamp(28px, 6vw, 80px);
+      align-items: start;
+    }
+    .about-block { margin-bottom: 36px; }
+    .about-eyebrow {
+      display: block;
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      margin-bottom: 14px; letter-spacing: -0.01em;
+    }
+    .about-bio {
+      font-size: clamp(17px, 2vw, 22px);
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: -0.02em;
+      text-wrap: pretty;
+    }
+    .disciplines { list-style: none; }
+    .disciplines li {
+      font-family: var(--display);
+      font-size: clamp(20px, 2.6vw, 30px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      transition: color 0.2s var(--ease-out), transform 0.3s var(--spring);
+    }
+    .disciplines li:first-child { border-top: 1px solid var(--line); }
+    .disciplines li:hover { color: var(--red); transform: translateX(8px); }
+
+    .contact { list-style: none; }
+    .contact li {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .contact li:first-child { border-top: 1px solid var(--line); }
+    .contact-k { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+    .contact-v {
+      font-family: var(--display);
+      font-size: 18px; font-weight: 700; letter-spacing: -0.025em;
+      color: var(--ink); text-decoration: none;
+      transition: color 0.2s;
+    }
+    a.contact-v:hover { color: var(--red); }
+    .about-rep {
+      margin-top: 28px;
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      line-height: 1.55; text-wrap: pretty;
+    }
+
+    /* ─────────────────── SCROLL REVEAL + FILTER POP ─────────────── */
+    @keyframes cardPop {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* reveal class only added by JS when motion is allowed, so content
+       is always visible by default (progressive enhancement) */
+    .card.reveal { opacity: 0; transform: translateY(24px); }
+    .card.reveal.in {
+      opacity: 1; transform: none;
+      transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+    }
+    .card.pop { animation: cardPop 0.5s var(--ease-out) both; }
+
+    /* ─────────────────── CUSTOM CURSOR (fine pointers) ──────────── */
+    html.has-cursor, html.has-cursor * { cursor: none; }
+    .cursor { position: fixed; top: 0; left: 0; z-index: 300; pointer-events: none; opacity: 0; will-change: transform; }
+    .cursor.ready { opacity: 1; }
+    .cursor-dot {
+      position: absolute;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: var(--red);
+      transform: translate(-50%, -50%) scale(1);
+      transition: transform 0.28s var(--spring), opacity 0.2s var(--ease), background 0.3s var(--ease);
+    }
+    .cursor-pill {
+      position: absolute;
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0;
+      background: var(--ink); color: var(--paper);
+      font: 600 12px/1 var(--body); letter-spacing: -0.01em; white-space: nowrap;
+      padding: 9px 14px; border-radius: 100px;
+      transition: transform 0.28s var(--spring), opacity 0.2s var(--ease);
+    }
+    .cursor.is-pill .cursor-dot  { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    .cursor.is-pill .cursor-pill { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    .cursor.is-down .cursor-dot  { transform: translate(-50%, -50%) scale(0.55); }
+    .cursor.is-down.is-pill .cursor-pill { transform: translate(-50%, -50%) scale(0.92); }
+
+    /* ─────────────────── EASTER EGG: raining work ───────────────── */
+    .rain-item {
+      position: fixed; top: 0; z-index: 290;
+      border-radius: 10px; pointer-events: none;
+      will-change: transform, opacity;
+      box-shadow: 0 10px 34px rgba(0,0,0,0.20);
+      object-fit: cover;
+    }
+
+    /* ─────────────────── SHARED-ELEMENT (View Transitions) ──────── */
+    ::view-transition-group(hero-media) {
+      animation-duration: 0.5s;
+      animation-timing-function: var(--ease-out);
+    }
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 0.32s;
+      animation-timing-function: var(--ease);
+    }
+
+    /* directional prev/next: content slides toward the direction of travel */
+    @keyframes vtInRight  { from { opacity: 0; transform: translateX(36px); }  to { opacity: 1; transform: none; } }
+    @keyframes vtOutLeft  { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(-36px); } }
+    @keyframes vtInLeft   { from { opacity: 0; transform: translateX(-36px); } to { opacity: 1; transform: none; } }
+    @keyframes vtOutRight { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(36px); } }
+    html.vt-next::view-transition-new(root) { animation: vtInRight  0.4s var(--ease-out); }
+    html.vt-next::view-transition-old(root) { animation: vtOutLeft  0.32s var(--ease-out); }
+    html.vt-prev::view-transition-new(root) { animation: vtInLeft   0.4s var(--ease-out); }
+    html.vt-prev::view-transition-old(root) { animation: vtOutRight 0.32s var(--ease-out); }
+
+    /* ─────────────────────────── RESPONSIVE ─────────────────────── */
+    @media (max-width: 820px) {
+      /* stack the stage: media on top, info below (no sticky) */
+      .project-stage { grid-template-columns: 1fr; gap: 24px; }
+      .project-info { position: static; top: auto; }
+      .pview-bar { margin-bottom: 14px; }
+    }
+    @media (max-width: 720px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .controls { align-items: flex-start; }
+    }
+
+    /* ── MOBILE: designed for touch ──────────────────────────────── */
+    @media (max-width: 640px) {
+      /* tighter, balanced header that holds all three links + dots */
+      header { padding: 14px var(--pad); gap: 12px; }
+      .wordmark { font-size: 24px; }
+      .header-right { gap: 16px; }
+      .nav { gap: 15px; }
+      .nav a { font-size: 13px; }
+      .nav a::after { bottom: 7px; }
+      .dots { gap: 9px; }
+      .dot { width: 13px; height: 13px; }
+
+      /* no hover on touch, so the title never swaps — drop the reserve
+         that was leaving a dead gap, and tighten the top block */
+      .controls { padding: clamp(22px, 7vw, 34px) var(--pad) 12px; gap: 10px; }
+      .controls-lead { min-height: 0; max-width: none; }
+      .controls-lead h1 { font-size: clamp(34px, 12vw, 46px); -webkit-line-clamp: 3; }
+
+      /* filters become a full-bleed, swipeable strip (no awkward wrap) */
+      .filters {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 8px;
+        margin: 0 calc(var(--pad) * -1);
+        padding: 2px var(--pad) 4px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      .filters::-webkit-scrollbar { display: none; }
+      .filters button { flex: 0 0 auto; }
+
+      .grid { padding-top: 4px; }
+
+      /* project detail, tightened for small screens */
+      .pview-bar { padding-top: clamp(14px, 4vw, 22px); }
+      .project-title { font-size: clamp(30px, 9vw, 44px); }
+      .project-desc { font-size: 15px; }
+      .meta-value { font-size: 15px; }
+      .pnav-title { font-size: 16px; }
+
+      /* about, tightened */
+      .about-headline { font-size: clamp(34px, 11vw, 54px); }
+      .about-bio { font-size: 17px; }
+      .disciplines li { font-size: clamp(20px, 6vw, 26px); }
+    }
+
+    /* ── TABLET (portrait, ~641–820px) ──────────────────────────── */
+    @media (min-width: 641px) and (max-width: 820px) {
+      .controls { padding-bottom: 16px; }
+      .controls-lead { max-width: 32ch; }
+      .grid { column-width: clamp(210px, 30vw, 280px); gap: 16px; }
+      .about-headline { font-size: clamp(44px, 8vw, 72px); }
+      .project-title { font-size: clamp(34px, 5vw, 52px); }
+    }
+
+    /* Touch devices (phones + tablets) never hover-swap the title,
+       so drop the reserved height that would otherwise leave a gap. */
+    @media (hover: none) {
+      .controls-lead { min-height: 0; }
+    }
+
+    /* ── REDUCED MOTION — global safety net ──────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#" class="skip-link">Skip to content</a>
+
+<div class="glow" id="glow-a" aria-hidden="true"></div>
+<div class="glow" id="glow-b" aria-hidden="true"></div>
+
+<header>
+  <a href="#" class="wordmark" id="wordmark" aria-label="Alex Tait, home">
+    <span>A</span><span>l</span><span>e</span><span>x</span><span>&nbsp;</span><span>T</span><span>a</span><span>i</span><span>t</span>
+  </a>
+  <div class="header-right">
+    <nav class="nav" aria-label="Primary">
+      <a href="#" id="nav-work">Work</a>
+      <a href="#about" id="nav-about">About</a>
+      <a href="shop.html">Shop</a>
+    </nav>
+    <div class="dots" role="group" aria-label="Accent colour">
+      <button class="dot" style="--c:#ff69b4" data-accent="#ff69b4" data-theme="dark" aria-label="Pink accent, dark mode"></button>
+      <button class="dot" style="--c:#02b34b" data-accent="#02b34b" data-theme="light" aria-label="Green accent"></button>
+      <button class="dot active" style="--c:#ff1d19" data-accent="#ff1d19" data-theme="light" aria-label="Red accent" aria-pressed="true"></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HOME -->
+  <section class="view" id="view-home" aria-label="Selected work">
+    <div class="controls" id="controls">
+      <div class="controls-lead">
+        <h1 id="lead-title">Selected Work</h1>
+        <p id="lead-sub">Illustrator &amp; motion designer, Bath / London</p>
+      </div>
+      <div class="filters" id="filters" aria-label="Filter by category">
+        <button class="active" data-filter="all" aria-pressed="true">All</button>
+        <button data-filter="commercial" aria-pressed="false">Commercial</button>
+        <button data-filter="editorial" aria-pressed="false">Editorial</button>
+        <button data-filter="personal" aria-pressed="false">Personal</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- PROJECT -->
+  <section class="view" id="view-project" aria-label="Project detail"></section>
+
+  <!-- ABOUT -->
+  <section class="view" id="view-about" aria-label="About Alex Tait">
+    <div class="about">
+      <h1 class="about-headline">Surreal, spirited work <span class="accent">bursting with colour&nbsp;&amp; energy.</span></h1>
+      <div class="about-grid">
+        <div>
+          <div class="about-block">
+            <span class="about-eyebrow">About</span>
+            <p class="about-bio">Alex Tait is an illustrator and motion designer based between Bath and London, making bold, character-driven work for brands and publications. His commercial and editorial illustration carries a simple style focused on expression and movement, surreal and spirited, built on colour and energy.</p>
+            <p class="about-bio" style="font-size:15px;color:var(--muted);margin-top:16px;max-width:56ch;">His illustration and animation has been commissioned by Spotify, Apple, The Guardian, Adidas and Monocle, spanning broadcast, social, packaging and print. Represented by Jelly London for commissions worldwide.</p>
+          </div>
+          <div class="about-block">
+            <span class="about-eyebrow">Disciplines</span>
+            <ul class="disciplines">
+              <li>Illustration</li>
+              <li>Motion Design</li>
+              <li>Art Direction</li>
+              <li>Editorial</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="about-block">
+            <span class="about-eyebrow">Contact</span>
+            <ul class="contact">
+              <li><span class="contact-k">Instagram</span><a class="contact-v" href="https://instagram.com/alexjohntait" target="_blank" rel="noopener">@alexjohntait</a></li>
+              <li><span class="contact-k">Email</span><a class="contact-v" href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a></li>
+              <li><span class="contact-k">Agent</span><a class="contact-v" href="https://jelly.london" target="_blank" rel="noopener">jelly.london</a></li>
+              <li><span class="contact-k">Location</span><span class="contact-v">Bath / London</span></li>
+            </ul>
+            <p class="about-rep">Currently represented by Jelly London for commercial commissions worldwide.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ── DATA (from Airtable: Projects base) ──────────────────────── */
+const PROJECTS = [
+  {"id":"pepper","title":"Pepper","category":"personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#fe0056","desc":"","tags":""},
+  {"id":"app-store","title":"App Store","category":"commercial","year":"2023","client":"Apple","caption":"Series of Today Tab cards created for Apple's app store and podcast store. They were featured across multiple regions","bg":"#68c0ff","fg":"#000000","desc":"","tags":""},
+  {"id":"thinkartfully","title":"ThinkArtfully","category":"commercial","year":"2020","client":"ThinkArtfully","caption":"A series of looping animations for the production agency.","bg":"#f5f1eb","fg":"#000000","desc":"","tags":""},
+  {"id":"yoga-x-oceans","title":"Yoga X Oceans","category":"commercial","year":"2022","client":"Adidas","caption":"Interactive illustrations installed in the Adidas flagship Oxford Street store","bg":"#e2d8bf","fg":"#000000","desc":"","tags":""},
+  {"id":"type-1-of-a-kind","title":"Type 1 of a Kind","category":"commercial","year":"2025","client":"Personal","caption":"Self initiated sticker campaign for diabetics to use to communicate when burnout hits.","bg":"#f57e2e","fg":"#000000","desc":"","tags":""},
+  {"id":"offline-dating","title":"Offline Dating","category":"editorial","year":"2026","client":"Positive News","caption":"Briefed to create three images showing the different ways to date away from the apps.","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
+  {"id":"mantis","title":"Mantis","category":"personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#82d33c","desc":"","tags":""},
+  {"id":"cadooz","title":"Cadooz","category":"commercial","year":"2024","client":"Cadooz","caption":"Series of characters and illustrations for Cadooz rewards. These were featured across their website redesign","bg":"#ff4f03","fg":"#000000","desc":"","tags":""},
+  {"id":"hiit-workout","title":"HIIT Workout","category":"commercial","year":"2020","client":"Spotify","caption":"Interactive campaign - allowing users to work out to their favourite tracks. The animations were created in After Effects from vector files","bg":"#509bf6","fg":"#000000","desc":"To help people power through 2020, Spotify created a High Intensity Interval Training programme using exactly the right 30-second clips of tracks for you to go at the right speed. Guided by an animated character – illustrated by Alex Tait and animated by KITCHEN – users move through the exercises accompanied by the voices of Spotify’s podcast celebrities.","tags":"Illustration / Motion"},
+  {"id":"jellyfish","title":"Jellyfish","category":"personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#e45496","desc":"","tags":""},
+  {"id":"saying-goodbye-to-friends","title":"Saying goodbye to friends","category":"editorial","year":"2025","client":"The Telegraph","caption":"To accompany an article about breaking up with bad friendships. These were displayed as animated GIFS online to accompany the article as well as appearing in print.","bg":"#f6e7de","fg":"#000000","desc":"","tags":""},
+  {"id":"dreams","title":"Dreams","category":"personal","year":"2026","client":"Personal","caption":"Created using Procreate Dreams frame by frame.","bg":"#fcfcfe","fg":"#000000","desc":"","tags":""},
+  {"id":"alice-in-wonderland","title":"Alice in Wonderland","category":"commercial","year":"2018","client":"Hyundai Mall","caption":"Large inflatable as well as in building graphics for Hyundai Mall in South Korea","bg":"#f6d8d4","fg":"#000000","desc":"An immersive, large-scale experiential installation reimagining the world of Alice in Wonderland through a contemporary visual lens. The project focused on translating character-led drawings into expansive physical environments and digital backdrops, utilizing bold vector line work and a vibrant color palette suitable for giant wall wraps and interactive event spaces.","tags":""},
+  {"id":"humantold-nyc","title":"Humantold NYC","category":"commercial","year":"2024","client":"Humantold","caption":"Series of animations demonstrating the us of therapy. This was rolled out across the subway in NY.","bg":"#ec482c","fg":"#000000","desc":"","tags":""},
+  {"id":"event-guide","title":"Event Guide","category":"editorial","year":"2024","client":"Boundless Magazine","caption":"Series of illustrations showing the numerous events happening around the UK.","bg":"#d2c8d3","fg":"#000000","desc":"","tags":""},
+  {"id":"tiger","title":"Tiger","category":"personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#f68f01","desc":"","tags":""},
+  {"id":"clear","title":"CLEAR","category":"commercial","year":"2022","client":"CLEAR","caption":"Winter campaign for boarding - including motion, gifts and installations.","bg":"#f7b59b","fg":"#000000","desc":"","tags":""},
+  {"id":"kueski-pay","title":"Kueski Pay","category":"commercial","year":"2025","client":"Kueski","caption":"A set of images created for the rebranded Kueski Pay app and site. They comprised of a mix of hero imagery as well as drop ins. The client wanted to bring warmth and fun to the visuals","bg":"#ffc9da","fg":"#000000","desc":"Working with one of Latin America’s largest financial services providers, I was tasked with creating a range of illustrations for the Kueski website and app.\n\nTasked with refreshing the brand presences, Alex crafted illustrations that emphasise the role Kueski plays in the everyday lives of its users with a playful and colourful style.\n\nA series of brand illustrations and high-energy animation loops created for an international fintech digital campaign. Designed to establish an approachable and friendly user voice within mobile banking interfaces, the visual system relies on simple geometric character layouts and fluid, elastic proportions that scaled across app frameworks, digital billboards, and targeted social media channels.","tags":""},
+  {"id":"fruit-snacks","title":"Fruit Snacks","category":"commercial","year":"2023","client":"Mott's","caption":"Animation and box illustration for Motts Fruit Snacks. The campaign focused on encouraging reading amongst struggling communities","bg":"#4e55f8","fg":"#ffffff","desc":"","tags":""},
+  {"id":"give-it-time","title":"Give it Time","category":"personal","year":"2026","client":"Personal","caption":"Looping animations created using Procreate Dreams.","bg":"#e4c8bf","fg":"#000000","desc":"","tags":""},
+  {"id":"ao-driver-booklet","title":"AO Driver Booklet","category":"commercial","year":"2024","client":"AO","caption":"A series of illustrations created for AO to talk through the on boarding process with new drivers.","bg":"#afbfcf","fg":"#000000","desc":"","tags":""},
+  {"id":"ideafarm","title":"IdeaFarm","category":"commercial","year":"2020","client":"IdeaFarm","caption":"A selection of characters created to explain the many industries the brand works with.","bg":"#244aff","fg":"#000000","desc":"","tags":""},
+  {"id":"tap-on-tap-off","title":"Tap on / Tap off","category":"commercial","year":"2022","client":"First Bus","caption":"Series of illustrations showing the tap on tap off process. These were displayed on web and buses across the UK","bg":"#c3afd4","fg":"#000000","desc":"","tags":""},
+  {"id":"apo-discounter","title":"APO Discounter","category":"commercial","year":"2024","client":"APO","caption":"Animation advertising the new app available to download for APO users","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
+  {"id":"wallpaper-pack","title":"Wallpaper Pack","category":"personal","year":"2025","client":"Personal","caption":"A selection of dark and colourful wallpapers available to download for your device","bg":"#ffffff","fg":"#000000","desc":"","tags":""},
+  {"id":"tiller-and-lock","title":"Tiller & Lock","category":"commercial","year":"2023","client":"Tiller & Lock","caption":"Images created for a development site within London","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
+  {"id":"cooking-for-cats","title":"Cooking for cats","category":"personal","year":"2024","client":"Personal","caption":"","bg":"#f48893","fg":"#045ca5","desc":"","tags":""},
+  {"id":"urban-living","title":"Urban Living","category":"editorial","year":"2020","client":"Positive News","caption":"Set of images depicting inviting nature into urban spaces","bg":"#f57e2e","fg":"#f4dcae","desc":"","tags":""},
+  {"id":"window-display","title":"Window Display","category":"commercial","year":"2019","client":"Art of Ping Pong","caption":"Vinyl window installation for the Art of Ping Pong event.","bg":"#ffffff","fg":"#000000","desc":"","tags":""},
+  {"id":"special-edition-royal-wedding","title":"Special Edition Royal Wedding","category":"commercial","year":"2018","client":"Levis","caption":"T-Shirts created to celebrate the Royal Wedding for Levis","bg":"#ffffff","fg":"#000000","desc":"A limited-edition apparel design collaboration commissioned by Levi’s to celebrate the Royal Wedding. Merging traditional UK cultural iconography with a clean streetwear aesthetic, the graphic layouts were technically optimized as clean vector screen prints for premium denim, textiles, and limited-run collector garments.","tags":""},
+  {"id":"paws-for-thought","title":"Paws for Thought","category":"personal","year":"2023","client":"Personal","caption":"Self initiated London Underground campaign - reminding travellers to carry their dogs when using the service.","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
+  {"id":"eco-living","title":"Eco Living","category":"editorial","year":"2019","client":"Philadelphia Magazine","caption":"Environmental ways to approach the everyday parts of life.","bg":"#ffffff","fg":"#000000","desc":"","tags":""}
+];
+
+const projectMap = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
+
+/* ── LOCAL ASSETS (downloaded from Airtable; videos + gifs + stills) ── */
+const ASSETS = {"pepper":{"file":"pepper.mp4","kind":"video"},"app-store":{"file":"app-store.jpg","kind":"img"},"thinkartfully":{"file":"thinkartfully.gif","kind":"img"},"yoga-x-oceans":{"file":"yoga-x-oceans.png","kind":"img"},"type-1-of-a-kind":{"file":"type-1-of-a-kind.mp4","kind":"video"},"offline-dating":{"file":"offline-dating.png","kind":"img"},"mantis":{"file":"mantis.mp4","kind":"video"},"cadooz":{"file":"cadooz.jpg","kind":"img"},"hiit-workout":{"file":"hiit-workout.jpg","kind":"img"},"jellyfish":{"file":"jellyfish.mp4","kind":"video"},"saying-goodbye-to-friends":{"file":"saying-goodbye-to-friends.gif","kind":"img"},"dreams":{"file":"dreams.mp4","kind":"video"},"alice-in-wonderland":{"file":"alice-in-wonderland.jpg","kind":"img"},"humantold-nyc":{"file":"humantold-nyc.mp4","kind":"video"},"event-guide":{"file":"event-guide.png","kind":"img"},"tiger":{"file":"tiger.mp4","kind":"video"},"clear":{"file":"clear.mp4","kind":"video"},"kueski-pay":{"file":"kueski-pay.png","kind":"img"},"fruit-snacks":{"file":"fruit-snacks.mp4","kind":"video"},"give-it-time":{"file":"give-it-time.mp4","kind":"video"},"ao-driver-booklet":{"file":"ao-driver-booklet.png","kind":"img"},"ideafarm":{"file":"ideafarm.png","kind":"img"},"tap-on-tap-off":{"file":"tap-on-tap-off.png","kind":"img"},"apo-discounter":{"file":"apo-discounter.mp4","kind":"video"},"wallpaper-pack":{"file":"wallpaper-pack.jpg","kind":"img"},"tiller-and-lock":{"file":"tiller-and-lock.png","kind":"img"},"cooking-for-cats":{"file":"cooking-for-cats.png","kind":"img"},"urban-living":{"file":"urban-living.jpg","kind":"img"},"window-display":{"file":"window-display.png","kind":"img"},"special-edition-royal-wedding":{"file":"special-edition-royal-wedding.jpg","kind":"img"},"paws-for-thought":{"file":"paws-for-thought.jpg","kind":"img"},"eco-living":{"file":"eco-living.jpg","kind":"img"}};
+
+/* Gallery images per project (Airtable Mosaic Images) */
+const GALLERY = {"pepper":[{"file":"pepper-m1.mp4","kind":"video","w":0,"h":0},{"file":"pepper-m2.mp4","kind":"video","w":0,"h":0}],"app-store":[{"file":"app-store-m1.png","kind":"img","w":1920,"h":1080},{"file":"app-store-m2.png","kind":"img","w":1920,"h":1080}],"thinkartfully":[{"file":"thinkartfully-m1.gif","kind":"img","w":1080,"h":1080},{"file":"thinkartfully-m2.gif","kind":"img","w":1080,"h":1080},{"file":"thinkartfully-m3.gif","kind":"img","w":1080,"h":1080},{"file":"thinkartfully-m4.gif","kind":"img","w":1080,"h":1080}],"yoga-x-oceans":[{"file":"yoga-x-oceans-m1.jpg","kind":"img","w":2500,"h":1667},{"file":"yoga-x-oceans-m2.jpg","kind":"img","w":1440,"h":1440}],"type-1-of-a-kind":[{"file":"type-1-of-a-kind-m1.gif","kind":"img","w":500,"h":500},{"file":"type-1-of-a-kind-m2.gif","kind":"img","w":500,"h":500},{"file":"type-1-of-a-kind-m3.mp4","kind":"video","w":0,"h":0},{"file":"type-1-of-a-kind-m4.gif","kind":"img","w":500,"h":500},{"file":"type-1-of-a-kind-m5.gif","kind":"img","w":500,"h":500},{"file":"type-1-of-a-kind-m6.gif","kind":"img","w":500,"h":500},{"file":"type-1-of-a-kind-m7.gif","kind":"img","w":500,"h":500},{"file":"type-1-of-a-kind-m8.gif","kind":"img","w":500,"h":500}],"offline-dating":[{"file":"offline-dating-m1.png","kind":"img","w":4501,"h":5625},{"file":"offline-dating-m2.png","kind":"img","w":4501,"h":5625}],"cadooz":[{"file":"cadooz-m1.png","kind":"img","w":7681,"h":7680},{"file":"cadooz-m2.png","kind":"img","w":7680,"h":7681},{"file":"cadooz-m3.png","kind":"img","w":7681,"h":7681},{"file":"cadooz-m4.png","kind":"img","w":7680,"h":7680}],"hiit-workout":[{"file":"hiit-workout-m1.mp4","kind":"video","w":0,"h":0},{"file":"hiit-workout-m2.jpg","kind":"img","w":2000,"h":1500},{"file":"hiit-workout-m3.jpg","kind":"img","w":2500,"h":1974},{"file":"hiit-workout-m4.jpg","kind":"img","w":3000,"h":2000},{"file":"hiit-workout-m5.webp","kind":"img","w":2560,"h":1909}],"saying-goodbye-to-friends":[{"file":"saying-goodbye-to-friends-m1.gif","kind":"img","w":1000,"h":1000},{"file":"saying-goodbye-to-friends-m2.gif","kind":"img","w":1000,"h":1000},{"file":"saying-goodbye-to-friends-m3.gif","kind":"img","w":1920,"h":1080}],"alice-in-wonderland":[{"file":"alice-in-wonderland-m1.jpg","kind":"img","w":1000,"h":667},{"file":"alice-in-wonderland-m2.jpg","kind":"img","w":1000,"h":667}],"humantold-nyc":[{"file":"humantold-nyc-m1.mp4","kind":"video","w":0,"h":0},{"file":"humantold-nyc-m2.mp4","kind":"video","w":0,"h":0},{"file":"humantold-nyc-m3.jpg","kind":"img","w":2700,"h":1519},{"file":"humantold-nyc-m4.jpg","kind":"img","w":2500,"h":1406},{"file":"humantold-nyc-m5.png","kind":"img","w":2148,"h":1269},{"file":"humantold-nyc-m6.png","kind":"img","w":2149,"h":1269}],"event-guide":[{"file":"event-guide-m1.png","kind":"img","w":3094,"h":2321}],"clear":[{"file":"clear-m1.jpg","kind":"img","w":2880,"h":1800},{"file":"clear-m2.png","kind":"img","w":3902,"h":2000},{"file":"clear-m3.png","kind":"img","w":3902,"h":2000}],"kueski-pay":[{"file":"kueski-pay-m1.jpg","kind":"img","w":4500,"h":3000},{"file":"kueski-pay-m2.mp4","kind":"video","w":0,"h":0},{"file":"kueski-pay-m3.png","kind":"img","w":2503,"h":3505},{"file":"kueski-pay-m4.png","kind":"img","w":4500,"h":3000}],"fruit-snacks":[{"file":"fruit-snacks-m1.png","kind":"img","w":8193,"h":8124},{"file":"fruit-snacks-m2.jpg","kind":"img","w":2500,"h":1666},{"file":"fruit-snacks-m3.png","kind":"img","w":2500,"h":2100}],"ao-driver-booklet":[{"file":"ao-driver-booklet-m1.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m2.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m3.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m4.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m5.png","kind":"img","w":10251,"h":10251},{"file":"ao-driver-booklet-m6.png","kind":"img","w":10251,"h":10251}],"ideafarm":[{"file":"ideafarm-m1.gif","kind":"img","w":1920,"h":1040},{"file":"ideafarm-m2.gif","kind":"img","w":1920,"h":1034},{"file":"ideafarm-m3.gif","kind":"img","w":800,"h":450}],"tap-on-tap-off":[{"file":"tap-on-tap-off-m1.png","kind":"img","w":2500,"h":1768},{"file":"tap-on-tap-off-m2.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m3.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m4.png","kind":"img","w":3509,"h":2481},{"file":"tap-on-tap-off-m5.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m6.png","kind":"img","w":3509,"h":2481}],"wallpaper-pack":[{"file":"wallpaper-pack-m1.jpg","kind":"img","w":4500,"h":3000},{"file":"wallpaper-pack-m2.png","kind":"img","w":5120,"h":2880},{"file":"wallpaper-pack-m3.jpg","kind":"img","w":4500,"h":3000},{"file":"wallpaper-pack-m4.png","kind":"img","w":2048,"h":2732},{"file":"wallpaper-pack-m5.png","kind":"img","w":5120,"h":2880}],"tiller-and-lock":[{"file":"tiller-and-lock-m1.png","kind":"img","w":2627,"h":1494},{"file":"tiller-and-lock-m2.png","kind":"img","w":2627,"h":1494},{"file":"tiller-and-lock-m3.png","kind":"img","w":2627,"h":1493}],"urban-living":[{"file":"urban-living-m1.jpg","kind":"img","w":2553,"h":3261},{"file":"urban-living-m2.png","kind":"img","w":2466,"h":2484},{"file":"urban-living-m3.jpg","kind":"img","w":3000,"h":2250}],"window-display":[{"file":"window-display-m1.jpg","kind":"img","w":2560,"h":1600}],"special-edition-royal-wedding":[{"file":"special-edition-royal-wedding-m1.jpg","kind":"img","w":2500,"h":1667},{"file":"special-edition-royal-wedding-m2.jpg","kind":"img","w":2500,"h":2500},{"file":"special-edition-royal-wedding-m3.jpg","kind":"img","w":3000,"h":2000}],"eco-living":[{"file":"eco-living-m1.jpg","kind":"img","w":900,"h":900}]};
+
+/* Respect users who ask for reduced motion: don't autoplay video. */
+const REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── EDGE GLOW: tracks accent at rest, the work's colour on focus ── */
+let currentAccent = '#ff1d19';
+function hexRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  return [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)];
+}
+let glowLayers, glowFront = 0;
+function applyGlow(hex) {
+  if (!glowLayers) glowLayers = [document.getElementById('glow-a'), document.getElementById('glow-b')];
+  const [r, g, b] = hexRgb(hex);
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const rgba = `rgba(${r}, ${g}, ${b}, ${dark ? 0.34 : 0.22})`;
+  const back = glowLayers[glowFront ^ 1];   // paint the hidden layer, then crossfade
+  if (!back) return;
+  back.style.boxShadow = `inset 0 0 110px 10px ${rgba}`;
+  back.style.opacity = '1';
+  glowLayers[glowFront].style.opacity = '0';
+  glowFront ^= 1;
+}
+const colourfulness = hex => { const [r, g, b] = hexRgb(hex); return Math.max(r, g, b) - Math.min(r, g, b); };
+/* the more vivid of a project's bg/fg reads best as a glow */
+const pickVivid = (bg, fg) => (colourfulness(fg) > colourfulness(bg) ? fg : bg);
+
+function mediaTag(p, { alt = '', eager = false, hoverPlay = false } = {}) {
+  const a = ASSETS[p.id];
+  if (!a) return '';
+  const src = `images/${a.file}`;
+  if (a.kind === 'video') {
+    // hoverPlay (grid): rest on first frame, play on hover/focus — "motion on attention".
+    // otherwise (project page): autoplay, unless reduced motion.
+    const autoplay = !hoverPlay && !REDUCE_MOTION;
+    const motion = autoplay ? 'autoplay loop ' : 'loop ';
+    const preload = (eager || autoplay) ? 'auto' : 'metadata';
+    return `<video src="${src}#t=0.1" ${motion}muted playsinline preload="${preload}" aria-label="${alt}"></video>`;
+  }
+  return `<img src="${src}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}" onerror="this.style.display='none'" />`;
+}
+
+/* A single media item (used in the project masonry/solo), with its true
+   ratio reserved inline so columns pack with no layout shift. */
+function mediaItemTag(m, alt, eager) {
+  const src = `images/${m.file}`;
+  const ar = (m.w && m.h) ? ` style="aspect-ratio:${m.w} / ${m.h}"` : '';
+  if (m.kind === 'video') {
+    const motion = REDUCE_MOTION ? '' : 'autoplay loop ';
+    return `<video src="${src}#t=0.1" ${motion}muted playsinline preload="${eager ? 'auto' : 'metadata'}" aria-label="${alt}"${ar}></video>`;
+  }
+  return `<img src="${src}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}"${m.w && m.h ? ` width="${m.w}" height="${m.h}"` : ''}${ar} onerror="this.style.display='none'" />`;
+}
+
+/* Correct any video's box to its true ratio once metadata is known. */
+function fixVideoRatios(container) {
+  container.querySelectorAll('video').forEach(v => {
+    const set = () => { if (v.videoWidth && v.videoHeight) v.style.aspectRatio = `${v.videoWidth} / ${v.videoHeight}`; };
+    v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
+  });
+}
+
+/* ── DOM ─────────────────────────────────────────────────────── */
+const grid      = document.getElementById('grid');
+const viewHome  = document.getElementById('view-home');
+const viewProj  = document.getElementById('view-project');
+const viewAbout = document.getElementById('view-about');
+const controls  = document.getElementById('controls');
+const leadTitle = document.getElementById('lead-title');
+const leadSub   = document.getElementById('lead-sub');
+const filters   = document.getElementById('filters');
+const navWork   = document.getElementById('nav-work');
+const navAbout  = document.getElementById('nav-about');
+
+let activeFilter = 'all';
+let fadeTimer;
+
+const FILTER_LABELS = { all:'Selected Work', commercial:'Commercial', editorial:'Editorial', personal:'Personal' };
+const DEFAULT_SUB   = 'Illustrator & motion designer, Bath / London';
+
+/* ── BUILD GRID ──────────────────────────────────────────────── */
+function buildGrid() {
+  grid.innerHTML = '';
+  PROJECTS.forEach((p, i) => {
+    // real, crawlable link to the static project page; JS intercepts for the SPA
+    const card = document.createElement('a');
+    card.className = 'card';
+    card.href = `work/${p.id}.html`;
+    card.dataset.id = p.id;
+    card.dataset.category = p.category;
+    card.dataset.i = i;
+    card.setAttribute('data-cursor', 'View →');
+    card.setAttribute('aria-label', `${p.title}${p.caption ? ' — ' + p.caption : ''}`);
+    const cat = p.category.charAt(0).toUpperCase() + p.category.slice(1);
+    const a = ASSETS[p.id] || {};
+    const ratio = (a.w && a.h) ? `${a.w} / ${a.h}` : '4 / 3';
+    const vivid = pickVivid(p.bg, p.fg);
+    card.innerHTML = `
+      <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
+        <span class="card-index">${String(i+1).padStart(2,'0')}</span>
+        ${mediaTag(p, { alt: p.title, eager: i < 8, hoverPlay: true })}
+      </div>
+      <div class="card-meta">
+        <h2 class="card-title">${p.title}</h2>
+        <span class="card-tag" aria-hidden="true">${cat}</span>
+      </div>
+    `;
+    const vid = card.querySelector('video');
+    // motion on attention: play the piece while engaged, rest on first frame
+    const engage = () => {
+      setLead(p.title, p.caption || DEFAULT_SUB);
+      applyGlow(vivid);
+      if (vid && !REDUCE_MOTION) vid.play().catch(() => {});
+    };
+    const release = () => {
+      setLead(FILTER_LABELS[activeFilter], DEFAULT_SUB);
+      applyGlow(currentAccent);
+      if (vid && !REDUCE_MOTION) vid.pause();
+    };
+    card.addEventListener('click', e => {
+      // let modified clicks (new tab, etc.) follow the real href
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+      e.preventDefault();
+      navigate('project', p.id, card.querySelector('.card-thumb'));
+    });
+    card.addEventListener('mouseenter', engage);
+    card.addEventListener('mouseleave', release);
+    card.addEventListener('focus',      engage);
+    card.addEventListener('blur',       release);
+    card.addEventListener('keydown', e => {
+      // anchor handles Enter natively; add Space for parity
+      if (e.key === ' ') { e.preventDefault(); navigate('project', p.id, card.querySelector('.card-thumb')); }
+    });
+
+    // self-healing: correct the box to the media's true ratio once known
+    const thumb = card.querySelector('.card-thumb');
+    if (vid) {
+      const fix = () => { if (vid.videoWidth && vid.videoHeight) thumb.style.aspectRatio = `${vid.videoWidth} / ${vid.videoHeight}`; };
+      vid.readyState >= 1 ? fix() : vid.addEventListener('loadedmetadata', fix, { once: true });
+    } else {
+      const img = card.querySelector('img');
+      if (img) {
+        const fix = () => { if (img.naturalWidth && img.naturalHeight) thumb.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`; };
+        img.complete ? fix() : img.addEventListener('load', fix, { once: true });
+      }
+    }
+
+    grid.appendChild(card);
+  });
+  setupReveal();
+}
+
+/* ── SCROLL REVEAL ───────────────────────────────────────────── */
+let revealIO;
+function setupReveal() {
+  if (REDUCE_MOTION) return;
+  if (revealIO) revealIO.disconnect();
+  const cards = grid.querySelectorAll('.card');
+  cards.forEach(c => c.classList.add('reveal'));
+  revealIO = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const c = en.target;
+      c.style.transitionDelay = ((+c.dataset.i % 4) * 0.06) + 's';
+      c.classList.add('in');
+      revealIO.unobserve(c);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  cards.forEach(c => revealIO.observe(c));
+}
+
+/* ── LEAD (hover title swap) ─────────────────────────────────── */
+function setLead(title, sub, instant = false) {
+  if (instant) { leadTitle.textContent = title; leadSub.textContent = sub; return; }
+  controls.classList.add('fading');
+  clearTimeout(fadeTimer);
+  fadeTimer = setTimeout(() => {
+    leadTitle.textContent = title;
+    leadSub.textContent   = sub;
+    controls.classList.remove('fading');
+  }, 120);
+}
+
+/* ── FILTER (FLIP: surviving cards glide to new positions) ────── */
+function applyFilter(filter) {
+  const cards = [...grid.querySelectorAll('.card')];
+
+  // FIRST — record positions of currently-visible cards
+  const first = new Map();
+  cards.forEach(c => { if (!c.classList.contains('hidden')) first.set(c, c.getBoundingClientRect()); });
+
+  // mutate visibility
+  cards.forEach(c => {
+    const match = filter === 'all' || c.dataset.category === filter;
+    c.classList.toggle('hidden', !match);
+  });
+
+  if (REDUCE_MOTION) return;
+
+  // LAST + INVERT + PLAY
+  cards.forEach(c => {
+    if (c.classList.contains('hidden')) return;
+    c.classList.add('in');                       // keep it past the reveal baseline
+    const f = first.get(c);
+    if (f) {
+      const last = c.getBoundingClientRect();
+      const dx = f.left - last.left, dy = f.top - last.top;
+      if (dx || dy) {
+        c.style.transition = 'none';
+        c.style.transform = `translate(${dx}px, ${dy}px)`;
+        requestAnimationFrame(() => {
+          c.style.transition = 'transform 0.4s var(--ease-out)';
+          c.style.transform = '';
+        });
+        c.addEventListener('transitionend', () => { c.style.transition = ''; c.style.transform = ''; }, { once: true });
+      }
+    } else {
+      // newly revealed by this filter — pop in
+      c.style.animation = 'none'; void c.offsetWidth;
+      c.style.animation = 'cardPop 0.45s var(--ease-out) both';
+      c.addEventListener('animationend', () => { c.style.animation = ''; }, { once: true });
+    }
+  });
+}
+
+filters.querySelectorAll('button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.filter;
+    filters.querySelectorAll('button').forEach(b => {
+      const on = b === btn;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on);
+    });
+    setLead(FILTER_LABELS[activeFilter], DEFAULT_SUB, true);
+    applyFilter(activeFilter);
+  });
+});
+
+/* ── PROJECT DETAIL ──────────────────────────────────────────── */
+function renderProject(id) {
+  const p = projectMap[id];
+  if (!p) return;
+  const idx = PROJECTS.findIndex(q => q.id === id);
+  const prev = PROJECTS[idx - 1];
+  const next = PROJECTS[idx + 1];
+  const cat = p.category.charAt(0).toUpperCase() + p.category.slice(1);
+
+  applyGlow(pickVivid(p.bg, p.fg));   // the page wears this project's colour
+
+  // long description preferred; fall back to caption. Render paragraphs.
+  const copy = (p.desc || p.caption || 'An illustration and motion project.')
+    .split('\n').filter(s => s.trim()).map(s => `<p>${s.trim()}</p>`).join('');
+
+  // tags (e.g. "Illustration / Motion")
+  const tagList = (p.tags || '').split('/').map(t => t.trim()).filter(Boolean);
+  const tagsHtml = tagList.length
+    ? `<div class="project-tags">${tagList.map(t => `<span class="project-tag">${t}</span>`).join('')}</div>`
+    : '';
+
+  // unify hero + gallery into one media list
+  const hero = ASSETS[id] || {};
+  const media = [{ file: hero.file, kind: hero.kind, w: hero.w, h: hero.h }, ...(GALLERY[id] || [])]
+    .filter(m => m.file);
+
+  let mediaHtml;
+  if (media.length <= 1) {
+    // lone piece — whole, natural ratio, fitted to viewport, on white
+    mediaHtml = `<div class="project-solo" data-hero>${media.length ? mediaItemTag(media[0], p.title, true) : ''}</div>`;
+  } else {
+    // hero + gallery flow together; portraits get a neighbour, no empty colour
+    mediaHtml = `<div class="project-masonry">${
+      media.map((m, n) => {
+        const h = n === 0 ? ' data-hero' : '';
+        return `<figure class="m-item" data-cursor="${n + 1} / ${media.length}"${h}>${mediaItemTag(m, `${p.title} ${n + 1}`, n === 0)}</figure>`;
+      }).join('')
+    }</div>`;
+  }
+
+  viewProj.innerHTML = `
+    <div class="pview-bar">
+      <a href="#" class="back-link" id="back-btn"><span aria-hidden="true">←</span> All work</a>
+      <span class="pview-count">${String(idx+1).padStart(2,'0')} / ${String(PROJECTS.length).padStart(2,'0')}</span>
+    </div>
+    <div class="project-stage">
+      <div class="project-media-col">
+        ${mediaHtml}
+      </div>
+      <div class="project-info">
+        <h1 class="project-title">${p.title}</h1>
+        <div class="project-meta">
+          <div class="meta-row"><span class="meta-label">Client</span><span class="meta-value">${p.client}</span></div>
+          <div class="meta-row"><span class="meta-label">Category</span><span class="meta-value">${cat}</span></div>
+          <div class="meta-row"><span class="meta-label">Year</span><span class="meta-value">${p.year}</span></div>
+        </div>
+        <div class="project-desc">${copy}</div>
+        ${tagsHtml}
+      </div>
+    </div>
+    <div class="project-nav">
+      <button class="pnav" id="pn-prev" ${!prev?'disabled':''}>
+        <span class="pnav-dir">← Previous</span>
+        <span class="pnav-title">${prev?prev.title:''}</span>
+      </button>
+      <button class="pnav" id="pn-next" ${!next?'disabled':''}>
+        <span class="pnav-dir">Next →</span>
+        <span class="pnav-title">${next?next.title:''}</span>
+      </button>
+    </div>
+  `;
+  document.getElementById('back-btn').addEventListener('click', e => { e.preventDefault(); navigate('home'); });
+  if (prev) document.getElementById('pn-prev').addEventListener('click', () => navigate('project', prev.id, null, 'prev'));
+  if (next) document.getElementById('pn-next').addEventListener('click', () => navigate('project', next.id, null, 'next'));
+  fixVideoRatios(viewProj);
+}
+
+/* ── ROUTER ──────────────────────────────────────────────────── */
+function showView(view) {
+  [viewHome, viewProj, viewAbout].forEach(v => v.classList.remove('active'));
+  view.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function setNav(curr) {
+  navWork.classList.toggle('current', curr === 'home');
+  navAbout.classList.toggle('current', curr === 'about');
+}
+
+function doNavigate(view, param) {
+  if (view === 'home') {
+    history.pushState(null, '', '#');
+    setNav('home');
+    showView(viewHome);
+    applyGlow(currentAccent);   // back to the chosen accent
+    document.title = 'Alex Tait — Illustrator & Motion Designer';
+  } else if (view === 'project' && param && projectMap[param]) {
+    history.pushState(null, '', `#project/${param}`);
+    setNav('project');
+    renderProject(param);       // sets glow to the project's colour
+    showView(viewProj);
+    document.title = `${projectMap[param].title} — Alex Tait`;
+  } else if (view === 'about') {
+    history.pushState(null, '', '#about');
+    setNav('about');
+    showView(viewAbout);
+    applyGlow(currentAccent);
+    document.title = 'About — Alex Tait';
+  }
+}
+
+/* Click-to-expand: morph the clicked card into the project via the
+   View Transitions API (gracefully skips where unsupported / reduced). */
+let booted = false;
+function navigate(view, param, sourceEl, dir) {
+  // first route (initial load) has no prior state to capture — skip the transition
+  const canMorph = booted && !REDUCE_MOTION && typeof document.startViewTransition === 'function';
+  booted = true;
+  if (!canMorph) { doNavigate(view, param); return; }
+
+  const root = document.documentElement;
+  const clearNames = () => document.querySelectorAll('[style*="view-transition-name"]')
+    .forEach(el => { el.style.viewTransitionName = ''; });
+  const clearDir = () => root.classList.remove('vt-next', 'vt-prev');
+
+  clearNames();                                   // no stale names from a prior nav
+  clearDir();
+  if (dir) root.classList.add(dir === 'next' ? 'vt-next' : 'vt-prev');  // directional slide
+  if (sourceEl) sourceEl.style.viewTransitionName = 'hero-media';       // tagged in OLD snapshot
+
+  const t = document.startViewTransition(() => {
+    // OLD state is already captured here; rebuild and tag only the destination
+    if (sourceEl) sourceEl.style.viewTransitionName = '';
+    doNavigate(view, param);
+    if (view === 'project' && !dir) {
+      const dest = viewProj.querySelector('[data-hero]');
+      if (dest) dest.style.viewTransitionName = 'hero-media';
+    }
+  });
+  t.finished.catch(() => {}).finally(() => { clearNames(); clearDir(); });
+}
+
+function handleHash() {
+  const h = location.hash;
+  if (!h || h === '#')                navigate('home');
+  else if (h === '#about')            navigate('about');
+  else if (h.startsWith('#project/')) navigate('project', h.slice(9));
+  else navigate('home');
+}
+
+/* ── NAV LINKS ───────────────────────────────────────────────── */
+navWork.addEventListener('click',  e => { e.preventDefault(); navigate('home'); });
+navAbout.addEventListener('click', e => { e.preventDefault(); navigate('about'); });
+
+let logoClicks = 0, logoTimer;
+document.getElementById('wordmark').addEventListener('click', e => {
+  e.preventDefault();
+  navigate('home');
+  logoClicks++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(() => { logoClicks = 0; }, 1200);
+  if (logoClicks >= 5) { logoClicks = 0; rainWork(); }
+});
+
+/* ── CUSTOM CURSOR (#1, #10) — fine pointers, motion allowed ──── */
+(function initCursor() {
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!fine || REDUCE_MOTION) return;
+
+  const cursor = document.createElement('div');
+  cursor.className = 'cursor';
+  cursor.innerHTML = '<span class="cursor-dot"></span><span class="cursor-pill"></span>';
+  document.body.appendChild(cursor);
+  document.documentElement.classList.add('has-cursor');
+  const pill = cursor.querySelector('.cursor-pill');
+
+  let tx = innerWidth / 2, ty = innerHeight / 2, cx = tx, cy = ty;
+  (function loop() {
+    cx += (tx - cx) * 0.18;
+    cy += (ty - cy) * 0.18;
+    cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+    requestAnimationFrame(loop);
+  })();
+
+  window.addEventListener('mousemove', e => {
+    tx = e.clientX; ty = e.clientY;
+    cursor.classList.add('ready');
+    const t = e.target.closest && e.target.closest('[data-cursor]');
+    if (t) { pill.textContent = t.dataset.cursor; cursor.classList.add('is-pill'); }
+    else cursor.classList.remove('is-pill');
+  }, { passive: true });
+
+  window.addEventListener('mousedown', () => cursor.classList.add('is-down'));
+  window.addEventListener('mouseup',   () => cursor.classList.remove('is-down'));
+  document.addEventListener('mouseleave', () => cursor.classList.remove('ready'));
+})();
+
+/* ── EASTER EGG (#6) — type "alex" or click the logo 5× ──────── */
+function rainWork() {
+  if (REDUCE_MOTION) return;
+  const ids = Object.keys(ASSETS);
+  for (let i = 0; i < 16; i++) {
+    const a = ASSETS[ids[Math.floor(Math.random() * ids.length)]];
+    const el = document.createElement(a.kind === 'video' ? 'video' : 'img');
+    el.className = 'rain-item';
+    el.src = `images/${a.file}` + (a.kind === 'video' ? '#t=0.1' : '');
+    if (a.kind === 'video') { el.muted = true; el.playsInline = true; }
+    const size = 64 + Math.random() * 80;
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    document.body.appendChild(el);
+    const dur = 2200 + Math.random() * 1800;
+    const rot = Math.random() * 140 - 70;
+    el.animate([
+      { transform: 'translateY(-25vh) rotate(0deg)', opacity: 0 },
+      { transform: `translateY(8vh) rotate(${rot * 0.3}deg)`, opacity: 1, offset: 0.15 },
+      { transform: `translateY(118vh) rotate(${rot}deg)`, opacity: 1 }
+    ], { duration: dur, delay: Math.random() * 700, easing: 'cubic-bezier(0.3, 0, 0.5, 1)', fill: 'forwards' });
+    setTimeout(() => el.remove(), dur + 1500);
+  }
+}
+let typeBuf = '';
+window.addEventListener('keydown', e => {
+  if (!e.key || e.key.length !== 1 || e.metaKey || e.ctrlKey) return;
+  typeBuf = (typeBuf + e.key.toLowerCase()).slice(-4);
+  if (typeBuf === 'alex') { typeBuf = ''; rainWork(); }
+});
+
+/* ── ACCENT COLOUR TOGGLE (the dots) ─────────────────────────── */
+const dots = document.querySelectorAll('.dot');
+function setAccent(color, theme) {
+  const root = document.documentElement;
+  currentAccent = color;
+  root.style.setProperty('--red', color);
+  root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+  applyGlow(color);   // concrete rgba (color-mix doesn't recompute reliably on var change)
+  dots.forEach(d => {
+    const on = d.dataset.accent === color;
+    d.classList.toggle('active', on);
+    d.setAttribute('aria-pressed', on);
+  });
+  try { localStorage.setItem('accent', JSON.stringify({ color, theme: theme || 'light' })); } catch (e) {}
+}
+dots.forEach(d => d.addEventListener('click', () => setAccent(d.dataset.accent, d.dataset.theme)));
+let savedAccent = null;
+try { savedAccent = JSON.parse(localStorage.getItem('accent') || 'null'); } catch (e) {}
+if (savedAccent && savedAccent.color) setAccent(savedAccent.color, savedAccent.theme);
+else applyGlow(currentAccent);   // default red glow on first visit
+
+/* ── MOTION ON TOUCH ─────────────────────────────────────────── */
+/* No hover on touch, so play grid videos while they're on screen
+   (one or two at a time in the single column) and pause them off-screen. */
+function setupTouchVideo() {
+  if (REDUCE_MOTION || window.matchMedia('(hover: hover)').matches) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      const v = en.target;
+      if (en.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    });
+  }, { threshold: 0.4 });
+  grid.querySelectorAll('.card video').forEach(v => io.observe(v));
+}
+
+/* ── INIT ────────────────────────────────────────────────────── */
+buildGrid();
+setupTouchVideo();
+window.addEventListener('popstate', handleHash);
+handleHash();
+</script>
+
+</body>
+</html>
