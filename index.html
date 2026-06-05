@@ -396,6 +396,22 @@
     }
     .card:hover .card-index { opacity: 1; transform: translateY(0); }
 
+    .card-cs {
+      position: absolute;
+      top: 10px; right: 10px;
+      z-index: 2;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: var(--paper);
+      padding: 4px 8px;
+      border-radius: 100px;
+      box-shadow: 0 2px 8px rgba(22,18,15,.18);
+    }
+
     .card-meta {
       display: flex;
       align-items: baseline;
@@ -1133,6 +1149,9 @@ const FILTER_LABELS = { all:'Selected Work', animation:'Animation', advertising:
 const DEFAULT_SUB   = 'Illustrator & motion designer, Bath / London';
 const catLabel = c => FILTER_LABELS[c] || (c.charAt(0).toUpperCase() + c.slice(1));
 const catsOf   = p => String(p.category || '').split(',').map(s => s.trim()).filter(Boolean);
+// Bespoke case-study projects: open their standalone rich page instead of the
+// inline SPA view. Keep in sync with BESPOKE in build-pages.mjs.
+const BESPOKE  = new Set(['humantold-nyc']);
 
 /* ── BUILD GRID ──────────────────────────────────────────────── */
 function buildGrid() {
@@ -1154,6 +1173,7 @@ function buildGrid() {
     card.innerHTML = `
       <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
         <span class="card-index">${String(i+1).padStart(2,'0')}</span>
+        ${BESPOKE.has(p.id) ? '<span class="card-cs">Case study</span>' : ''}
         ${mediaTag(p, { alt: p.title, eager: i < 8, hoverPlay: true })}
       </div>
       <div class="card-meta">
@@ -1177,6 +1197,8 @@ function buildGrid() {
     card.addEventListener('click', e => {
       // let modified clicks (new tab, etc.) follow the real href
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+      // bespoke case studies: follow the real link to their standalone page
+      if (BESPOKE.has(p.id)) return;
       e.preventDefault();
       navigate('project', p.id, card.querySelector('.card-thumb'));
     });
@@ -1185,8 +1207,8 @@ function buildGrid() {
     card.addEventListener('focus',      engage);
     card.addEventListener('blur',       release);
     card.addEventListener('keydown', e => {
-      // anchor handles Enter natively; add Space for parity
-      if (e.key === ' ') { e.preventDefault(); navigate('project', p.id, card.querySelector('.card-thumb')); }
+      // anchor handles Enter natively; add Space for parity (bespoke pages just follow the link)
+      if (e.key === ' ' && !BESPOKE.has(p.id)) { e.preventDefault(); navigate('project', p.id, card.querySelector('.card-thumb')); }
     });
 
     // self-healing: correct the box to the media's true ratio once known
