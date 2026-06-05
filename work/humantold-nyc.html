@@ -852,21 +852,12 @@
     .cs-hero {
       position: relative;
       width: 100%;
-      aspect-ratio: 16 / 9;
       background: #ec482c;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-    }
-    .cs-hero-video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.3;
-      mix-blend-mode: multiply;
+      min-height: clamp(280px, 50vw, 480px);
     }
     .cs-hero-top,
     .cs-hero-bottom {
@@ -972,8 +963,6 @@
     .cs-process-item img,
     .cs-process-item video {
       width: 100%;
-      aspect-ratio: 4 / 5;
-      object-fit: cover;
       border-radius: 4px;
       display: block;
     }
@@ -1015,6 +1004,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       padding: 0 clamp(16px, 5vw, 48px);
+      max-width: 900px;
     }
     .cs-video-grid video {
       width: 100%;
@@ -1023,7 +1013,7 @@
     }
 
     @media (max-width: 640px) {
-      .cs-hero { aspect-ratio: 9 / 12; }
+      .cs-hero { min-height: clamp(240px, 70vw, 360px); }
       .cs-hero-meta { flex-wrap: wrap; gap: 10px; }
       .cs-media-pair { grid-template-columns: 1fr; }
       .cs-process-grid { grid-template-columns: 1fr 1fr 1fr; }
@@ -1050,7 +1040,6 @@
 
     <!-- ── HERO ────────────────────────────────── -->
     <section class="cs-hero">
-      <video class="cs-hero-video" src="../images/humantold-nyc.mp4#t=0.1" autoplay loop muted playsinline preload="metadata"></video>
       <div class="cs-hero-top">
         <a href="../index.html" class="back-link" style="color:#4a1b0c;"><span aria-hidden="true">←</span> All work</a>
         <span class="cs-label">Case study</span>
