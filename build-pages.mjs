@@ -6,6 +6,11 @@ import path from 'path';
 const SITE = 'https://alexjohntait.com';
 const html = fs.readFileSync('index.html', 'utf8');
 
+// Bespoke, hand-built case-study pages that must NEVER be regenerated/overwritten
+// by this script (or the scheduled "Rebuild from Airtable" Action). Add an id here
+// to protect its custom work/<id>.html. It still appears in the grid and sitemap.
+const BESPOKE = new Set(['humantold-nyc']);
+
 // ── pull data + styles out of the SPA ──────────────────────────
 const grab = (re, label) => { const m = html.match(re); if (!m) throw new Error('Could not find ' + label); return m[1]; };
 const PROJECTS = JSON.parse(grab(/const PROJECTS = (\[[\s\S]*?\n\]);/, 'PROJECTS'));
@@ -29,6 +34,7 @@ function media(m, alt, eager) {
 fs.mkdirSync('work', { recursive: true });
 
 PROJECTS.forEach((p, idx) => {
+  if (BESPOKE.has(p.id)) { console.log(`↩ skipping bespoke case study: work/${p.id}.html`); return; }
   const hero = ASSETS[p.id] || {};
   const list = [{ file: hero.file, kind: hero.kind, w: hero.w, h: hero.h }, ...(GALLERY[p.id] || [])].filter(m => m.file);
   const prev = PROJECTS[idx - 1], next = PROJECTS[idx + 1];
