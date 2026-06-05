@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Humantold NYC — Alex Tait, Illustrator &amp; Motion Designer</title>
-  <meta name="description" content="Out-of-home illustration and animation for Humantold, a mental health platform built for New Yorkers. The work rolled out across the subway — a deliberate choice for a campaign about accessing therapy in a city that moves fast and stops rarely. The characters were drawn from the specific texture…" />
+  <title>Humantold NYC — Case Study — Alex Tait</title>
+  <meta name="description" content="Case study: illustration and animation for Humantold's NYC subway campaign. How a cast of city-stressed characters made therapy feel reachable." />
   <meta name="author" content="Alex Tait" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="theme-color" content="#ff1d19" />
@@ -14,43 +14,29 @@
   <link rel="manifest" href="/site.webmanifest" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Alex Tait" />
-  <meta property="og:title" content="Humantold NYC — Alex Tait" />
-  <meta property="og:description" content="Out-of-home illustration and animation for Humantold, a mental health platform built for New Yorkers. The work rolled out across the subway — a deliberate choice for a campaign about accessing therapy in a city that moves fast and stops rarely. The characters were drawn from the specific texture…" />
+  <meta property="og:title" content="Humantold NYC — Case Study — Alex Tait" />
+  <meta property="og:description" content="How a cast of city-stressed characters made therapy feel reachable on the NYC subway." />
   <meta property="og:url" content="https://alexjohntait.com/work/humantold-nyc.html" />
-  <meta property="og:image" content="https://alexjohntait.com/images/humantold-nyc.mp4" />
+  <meta property="og:image" content="https://alexjohntait.com/images/humantold-nyc-m3.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Humantold NYC — Alex Tait" />
-  <meta name="twitter:description" content="Out-of-home illustration and animation for Humantold, a mental health platform built for New Yorkers. The work rolled out across the subway — a deliberate choice for a campaign about accessing therapy in a city that moves fast and stops rarely. The characters were drawn from the specific texture…" />
-  <meta name="twitter:image" content="https://alexjohntait.com/images/humantold-nyc.mp4" />
+  <meta name="twitter:title" content="Humantold NYC — Case Study — Alex Tait" />
+  <meta name="twitter:description" content="How a cast of city-stressed characters made therapy feel reachable on the NYC subway." />
+  <meta name="twitter:image" content="https://alexjohntait.com/images/humantold-nyc-m3.jpg" />
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "VisualArtwork",
   "name": "Humantold NYC",
-  "creator": {
-    "@type": "Person",
-    "name": "Alex Tait",
-    "url": "https://alexjohntait.com/"
-  },
+  "creator": { "@type": "Person", "name": "Alex Tait", "url": "https://alexjohntait.com/" },
   "artMedium": "Illustration, Motion design",
   "genre": "Advertising, Animation",
   "dateCreated": "2024",
-  "image": "https://alexjohntait.com/images/humantold-nyc.mp4",
-  "description": "Out-of-home illustration and animation for Humantold, a mental health platform built for New Yorkers. The work rolled out across the subway — a deliberate choice for a campaign about accessing therapy in a city that moves fast and stops rarely. The characters were drawn from the specific texture of city stress: construction noise, ghosting, the relentless pace of it. Designed to catch people in the brief stillness of a platform wait, and make the idea of talking to someone feel genuinely reachable.",
+  "image": "https://alexjohntait.com/images/humantold-nyc-m3.jpg",
+  "description": "Case study: illustration and animation for Humantold's NYC subway campaign.",
   "url": "https://alexjohntait.com/work/humantold-nyc.html",
-  "copyrightHolder": {
-    "@type": "Person",
-    "name": "Alex Tait"
-  },
-  "isPartOf": {
-    "@type": "WebSite",
-    "name": "Alex Tait",
-    "url": "https://alexjohntait.com/"
-  },
-  "commissioner": {
-    "@type": "Organization",
-    "name": "Humantold"
-  }
+  "copyrightHolder": { "@type": "Person", "name": "Alex Tait" },
+  "isPartOf": { "@type": "WebSite", "name": "Alex Tait", "url": "https://alexjohntait.com/" },
+  "commissioner": { "@type": "Organization", "name": "Humantold" }
 }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -860,7 +846,190 @@
       .foot-inner { grid-template-columns: 1fr; gap: 26px; }
       .foot-meta { flex-direction: column; gap: 6px; }
     }
-  </style>
+  
+
+    /* ── Case Study layout ────────────────────── */
+    .cs-hero {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #ec482c;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .cs-hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.3;
+      mix-blend-mode: multiply;
+    }
+    .cs-hero-top,
+    .cs-hero-bottom {
+      position: relative;
+      z-index: 2;
+      padding: clamp(16px, 3vw, 32px);
+    }
+    .cs-hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cs-label {
+      font-family: var(--display);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #4a1b0c;
+      background: rgba(255,255,255,0.85);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .cs-hero-title {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: clamp(28px, 6vw, 64px);
+      line-height: 0.92;
+      letter-spacing: -0.035em;
+      color: #fff;
+      text-wrap: balance;
+      margin-bottom: clamp(12px, 2vw, 20px);
+    }
+    .cs-hero-meta {
+      display: flex;
+      gap: clamp(14px, 3vw, 28px);
+      font-size: clamp(11px, 1.2vw, 13px);
+      color: #4a1b0c;
+    }
+    .cs-meta-label { opacity: 0.65; }
+    .cs-meta-value { display: block; margin-top: 2px; }
+
+    .cs-chapter {
+      padding: clamp(32px, 5vw, 64px) clamp(16px, 5vw, 48px);
+      max-width: 720px;
+    }
+    .cs-chapter-num {
+      font-family: var(--display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .cs-chapter-heading {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: clamp(18px, 2.5vw, 24px);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .cs-chapter p {
+      font-size: clamp(13px, 1.4vw, 15px);
+      line-height: 1.65;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .cs-full-media {
+      width: 100%;
+    }
+    .cs-full-media img,
+    .cs-full-media video {
+      width: 100%;
+      display: block;
+    }
+
+    .cs-media-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 0 clamp(16px, 5vw, 48px);
+    }
+    .cs-media-pair img,
+    .cs-media-pair video {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .cs-process {
+      padding: clamp(32px, 5vw, 64px) clamp(16px, 5vw, 48px);
+    }
+    .cs-process-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(8px, 1.5vw, 16px);
+      margin-top: 18px;
+    }
+    .cs-process-item img,
+    .cs-process-item video {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+    }
+    .cs-process-placeholder {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--ink) 8%, transparent);
+      border: 0.5px dashed color-mix(in srgb, var(--muted) 30%, transparent);
+    }
+    .cs-process-caption {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .cs-quote {
+      padding: clamp(28px, 4vw, 48px) clamp(16px, 5vw, 48px);
+      background: #ec482c;
+    }
+    .cs-quote blockquote {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(18px, 3vw, 28px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin: 0;
+      max-width: 640px;
+    }
+
+    .cs-video-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 0 clamp(16px, 5vw, 48px);
+    }
+    .cs-video-grid video {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .cs-hero { aspect-ratio: 9 / 12; }
+      .cs-hero-meta { flex-wrap: wrap; gap: 10px; }
+      .cs-media-pair { grid-template-columns: 1fr; }
+      .cs-process-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .cs-video-grid { grid-template-columns: 1fr; }
+    }
+</style>
 </head>
 <body>
   <div class="glow" style="opacity:1; box-shadow: inset 0 0 110px 10px rgba(236, 72, 44, 0.2);" aria-hidden="true"></div>
@@ -878,23 +1047,89 @@
   </header>
 
   <article>
-    <div class="pview-bar">
-      <a href="../index.html" class="back-link"><span aria-hidden="true">←</span> All work</a>
-      <span class="pview-count">02 / 32</span>
-    </div>
-    <div class="project-stage">
-      <div class="project-media-col"><div class="project-masonry"><figure class="m-item"><video src="../images/humantold-nyc.mp4#t=0.1" autoplay loop muted playsinline preload="auto" aria-label="Humantold NYC 1"></video></figure><figure class="m-item"><video src="../images/humantold-nyc-m1.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Humantold NYC 2"></video></figure><figure class="m-item"><video src="../images/humantold-nyc-m2.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Humantold NYC 3"></video></figure><figure class="m-item"><img src="../images/humantold-nyc-m3.jpg" alt="Humantold NYC 4" loading="lazy" width="2700" height="1519" style="aspect-ratio:2700 / 1519" /></figure><figure class="m-item"><img src="../images/humantold-nyc-m4.jpg" alt="Humantold NYC 5" loading="lazy" width="2500" height="1406" style="aspect-ratio:2500 / 1406" /></figure><figure class="m-item"><img src="../images/humantold-nyc-m5.png" alt="Humantold NYC 6" loading="lazy" width="2148" height="1269" style="aspect-ratio:2148 / 1269" /></figure><figure class="m-item"><img src="../images/humantold-nyc-m6.png" alt="Humantold NYC 7" loading="lazy" width="2149" height="1269" style="aspect-ratio:2149 / 1269" /></figure></div></div>
-      <div class="project-info">
-        <h1 class="project-title">Humantold NYC</h1>
-        <div class="project-meta">
-          <div class="meta-row"><span class="meta-label">Client</span><span class="meta-value">Humantold</span></div>
-          <div class="meta-row"><span class="meta-label">Category</span><span class="meta-value">Advertising, Animation</span></div>
-          <div class="meta-row"><span class="meta-label">Year</span><span class="meta-value">2024</span></div>
-        </div>
-        <div class="project-desc"><p>Out-of-home illustration and animation for Humantold, a mental health platform built for New Yorkers. The work rolled out across the subway — a deliberate choice for a campaign about accessing therapy in a city that moves fast and stops rarely. The characters were drawn from the specific texture of city stress: construction noise, ghosting, the relentless pace of it. Designed to catch people in the brief stillness of a platform wait, and make the idea of talking to someone feel genuinely reachable.</p></div>
-        
+
+    <!-- ── HERO ────────────────────────────────── -->
+    <section class="cs-hero">
+      <video class="cs-hero-video" src="../images/humantold-nyc.mp4#t=0.1" autoplay loop muted playsinline preload="metadata"></video>
+      <div class="cs-hero-top">
+        <a href="../index.html" class="back-link" style="color:#4a1b0c;"><span aria-hidden="true">←</span> All work</a>
+        <span class="cs-label">Case study</span>
       </div>
+      <div class="cs-hero-bottom">
+        <h1 class="cs-hero-title">Making therapy<br>feel reachable</h1>
+        <div class="cs-hero-meta">
+          <span><span class="cs-meta-label">Client</span><span class="cs-meta-value">Humantold</span></span>
+          <span><span class="cs-meta-label">Discipline</span><span class="cs-meta-value">Illustration &middot; Motion</span></span>
+          <span><span class="cs-meta-label">Year</span><span class="cs-meta-value">2024</span></span>
+          <span><span class="cs-meta-label">Role</span><span class="cs-meta-value">Character &middot; Animation</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 01 BRIEF ────────────────────────────── -->
+    <section class="cs-chapter">
+      <div class="cs-chapter-num">01 — The brief</div>
+      <h2 class="cs-chapter-heading">Humantold wanted warmth, and they wanted humour.</h2>
+      <p>The campaign was about the things that wear you down in a city — not the big subjects you associate with therapy, but the small, grinding ones. The roadworks going off outside your window. The stuff that feels too minor to mention and gets to you anyway.</p>
+    </section>
+
+    <!-- ── Hero illustrations ──────────────────── -->
+    <div class="cs-media-pair">
+      <img src="../images/humantold-nyc-m3.jpg" alt="Humantold NYC illustration — city scene" loading="lazy" width="2700" height="1519" />
+      <img src="../images/humantold-nyc-m4.jpg" alt="Humantold NYC illustration — character scene" loading="lazy" width="2500" height="1406" />
     </div>
+
+    <!-- ── 02 APPROACH ─────────────────────────── -->
+    <section class="cs-chapter">
+      <div class="cs-chapter-num">02 — The approach</div>
+      <h2 class="cs-chapter-heading">They came with a few scenarios already in mind, and we built the rest out together.</h2>
+      <p>The roadworkers were theirs. From there we explored ideas that would work as illustrations and carry the message hard enough to land on a wall someone walks past in a hurry. Each idea had to pass the same test: did it work visually, and did it hit. The ones that made it did both.</p>
+    </section>
+
+    <!-- ── Animation videos ────────────────────── -->
+    <div class="cs-video-grid">
+      <video src="../images/humantold-nyc-m1.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Humantold animation 1"></video>
+      <video src="../images/humantold-nyc-m2.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Humantold animation 2"></video>
+    </div>
+
+    <!-- ── 03 PROCESS ──────────────────────────── -->
+    <section class="cs-process">
+      <div class="cs-chapter-num">03 — Process</div>
+      <p style="font-size:clamp(13px,1.4vw,15px); line-height:1.65; color:var(--muted); max-width:640px; margin-bottom:20px;">Nothing went straight through. Two rounds on the sketches, two on the illustrations, two on the motion — so the final frames are the version that survived the most argument.</p>
+      <div class="cs-process-grid">
+        <div class="cs-process-item">
+          <img src="../images/humantold-nyc-sk1.png" alt="Humantold sketch — rough character pass" loading="lazy" width="2055" height="1158" />
+          <div class="cs-process-caption">Rough character pass</div>
+        </div>
+        <div class="cs-process-item">
+          <img src="../images/humantold-nyc-sk2.png" alt="Humantold sketch — colour study" loading="lazy" width="2055" height="1150" />
+          <div class="cs-process-caption">Colour + development</div>
+        </div>
+        <div class="cs-process-item">
+          <img src="../images/humantold-nyc-sk3.png" alt="Humantold sketch — final frame" loading="lazy" width="2055" height="1153" />
+          <div class="cs-process-caption">Final frame</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PULL QUOTE ──────────────────────────── -->
+    <section class="cs-quote">
+      <blockquote>&ldquo;The whole point was the small stuff. Not the things you&rsquo;d book a therapist for — the roadworks at 7am.&rdquo;</blockquote>
+    </section>
+
+    <!-- ── In-situ work ────────────────────────── -->
+    <div class="cs-media-pair" style="margin-top:0;">
+      <img src="../images/humantold-nyc-m5.png" alt="Humantold campaign in situ" loading="lazy" width="2148" height="1269" />
+      <img src="../images/humantold-nyc-m6.png" alt="Humantold campaign in situ" loading="lazy" width="2149" height="1269" />
+    </div>
+
+    <!-- ── 04 OUTCOME ──────────────────────────── -->
+    <section class="cs-chapter">
+      <div class="cs-chapter-num">04 — Outcome</div>
+      <p>The work ran across the subway for a few months, the characters sitting where people actually stop — on the platform, between trains. The animated cuts circulated online. Animation was shared between Alex and Jelly KITCHEN.</p>
+    </section>
+
+    <!-- ── PREV / NEXT ─────────────────────────── -->
     <nav class="project-nav" aria-label="More projects">
       <a class="pnav" href="app-store.html"><span class="pnav-dir">← Previous</span><span class="pnav-title">App Store</span></a>
       <a class="pnav" href="pepper.html" style="text-align:right;align-items:flex-end"><span class="pnav-dir">Next →</span><span class="pnav-title">Pepper</span></a>
@@ -909,25 +1144,22 @@
       </div>
       <div class="foot-clients">
         <span class="foot-eyebrow">Selected clients</span>
-        <p class="foot-list">Apple · Google · Spotify · Adidas</p>
+        <p class="foot-list">Apple &middot; Google &middot; Spotify &middot; Adidas</p>
       </div>
       <div class="foot-meta">
         <span>Represented by <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Jelly</a> for commissions worldwide</span>
-        <span>© 2026 Alex Tait</span>
+        <span>&copy; 2026 Alex Tait</span>
       </div>
     </div>
   </footer>
 
   <script>
-    // honour reduced motion (no SPA here): pause autoplay, show first frame
     if (matchMedia('(prefers-reduced-motion: reduce)').matches)
       document.querySelectorAll('video').forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
-    // correct video boxes to true ratio
     document.querySelectorAll('video').forEach(v => {
       const set = () => { if (v.videoWidth && v.videoHeight) v.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
       v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
     });
-    // keyboard nav: ← / → between projects, Esc back to the grid
     var _prev = 'app-store.html', _next = 'pepper.html';
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
