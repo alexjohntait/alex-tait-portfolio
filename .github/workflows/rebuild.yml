@@ -1,0 +1,99 @@
+name: Rebuild site from Airtable
+
+on:
+  # Run on every push to main (keeps manual deploys working)
+  push:
+    branches: [main]
+
+  # Run on a schedule — every 30 minutes
+  # This means any Airtable change is live within 30 mins, no manual push needed
+  schedule:
+    - cron: '*/30 * * * *'
+
+  # Allow triggering manually from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch data from Airtable
+        env:
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+        run: |
+          node - <<'EOF'
+          import https from 'https';
+          import fs from 'fs';
+
+          const TOKEN = process.env.AIRTABLE_TOKEN;
+          const BASE = 'appjYUthm8ib2ctuH';
+          const TABLE = 'tblY3AdUL6JNOnYcY';
+
+          const fields = [
+            'fldEq1h2Dvpqu6gGA', // Title
+            'fldherzZVbTojFCEB', // Caption
+            'fldTT0yzsQOScrNCq', // Year
+            'fld10mHi3s1snES9t', // Client
+            'fld0sdTSJl95rLi02', // Category
+            'fldJtYYG0Byex03OO', // Background
+            'fldawWxSodmzqJm4t', // Foreground
+            'fldbQ53CgEoQtoGxL', // Hero Image
+            'flddcHP9PNxhdrY1c', // Order
+            'fldVOA3gzhogpq3J9', // Detailed Description
+            'fld16EoU6LUXZE146', // Tags
+            'fldmuZKsubfHIkc6d', // Mosaic Images
+          ];
+
+          const fieldParams = fields.map(f => `fields[]=${f}`).join('&');
+          const url = `https://api.airtable.com/v0/${BASE}/${TABLE}?${fieldParams}&pageSize=100`;
+
+          const data = await new Promise((resolve, reject) => {
+            const req = https.get(url, {
+              headers: { Authorization: `Bearer ${TOKEN}` }
+            }, res => {
+              let body = '';
+              res.on('data', chunk => body += chunk);
+              res.on('end', () => resolve(JSON.parse(body)));
+            });
+            req.on('error', reject);
+          });
+
+          fs.writeFileSync('_airtable_raw.json', JSON.stringify(data, null, 2));
+          console.log(`Fetched ${data.records.length} records from Airtable`);
+          EOF
+
+      - name: Build data + download images
+        run: node build-data.mjs _airtable_raw.json
+
+      - name: Build HTML pages
+        run: node build-pages.mjs
+
+      - name: Clean up temp file
+        run: rm -f _airtable_raw.json
+
+      - name: Commit and push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "Nothing changed, skipping commit"
+          else
+            git commit -m "Rebuild from Airtable [skip ci]"
+            git push
+          fi
