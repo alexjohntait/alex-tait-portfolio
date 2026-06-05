@@ -390,6 +390,32 @@
     }
     .card:hover .card-index { opacity: 1; transform: translateY(0); }
 
+    .card-cs {
+      position: absolute;
+      top: 10px; right: 10px;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--red);
+      padding: 5px 11px;
+      border-radius: 100px;
+      box-shadow: 0 4px 14px rgba(255, 29, 25, 0.32);
+    }
+    .card-cs span { transition: transform 0.3s var(--ease-out); }
+    .card.is-cs:hover .card-cs span,
+    .card.is-cs:focus-visible .card-cs span { transform: translateX(3px); }
+    .card.is-cs .card-thumb { transition: box-shadow 0.35s var(--ease-out); }
+    .card.is-cs:hover .card-thumb,
+    .card.is-cs:focus-visible .card-thumb { box-shadow: inset 0 0 0 2.5px var(--red); }
+    @media (prefers-reduced-motion: reduce) { .card-cs span { transition: none; } }
+
     .card-meta {
       display: flex;
       align-items: baseline;
@@ -880,7 +906,7 @@
   <article>
     <div class="pview-bar">
       <a href="../index.html" class="back-link"><span aria-hidden="true">←</span> All work</a>
-      <span class="pview-count">10 / 32</span>
+      <span class="pview-count">10 / 31</span>
     </div>
     <div class="project-stage">
       <div class="project-media-col"><div class="project-masonry"><figure class="m-item"><video src="../images/clear.mp4#t=0.1" autoplay loop muted playsinline preload="auto" aria-label="CLEAR 1"></video></figure><figure class="m-item"><img src="../images/clear-m1.jpg" alt="CLEAR 2" loading="lazy" width="2880" height="1800" style="aspect-ratio:2880 / 1800" /></figure><figure class="m-item"><img src="../images/clear-m2.png" alt="CLEAR 3" loading="lazy" width="3902" height="2000" style="aspect-ratio:3902 / 2000" /></figure><figure class="m-item"><img src="../images/clear-m3.png" alt="CLEAR 4" loading="lazy" width="3902" height="2000" style="aspect-ratio:3902 / 2000" /></figure></div></div>
@@ -897,7 +923,7 @@
     </div>
     <nav class="project-nav" aria-label="More projects">
       <a class="pnav" href="fruit-snacks.html"><span class="pnav-dir">← Previous</span><span class="pnav-title">Fruit Snacks</span></a>
-      <a class="pnav" href="event-guide.html" style="text-align:right;align-items:flex-end"><span class="pnav-dir">Next →</span><span class="pnav-title">Event Guide</span></a>
+      <a class="pnav" href="alice-in-wonderland.html" style="text-align:right;align-items:flex-end"><span class="pnav-dir">Next →</span><span class="pnav-title">Alice in Wonderland</span></a>
     </nav>
   </article>
 
@@ -928,7 +954,7 @@
       v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
     });
     // keyboard nav: ← / → between projects, Esc back to the grid
-    var _prev = 'fruit-snacks.html', _next = 'event-guide.html';
+    var _prev = 'fruit-snacks.html', _next = 'alice-in-wonderland.html';
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === 'ArrowRight' && _next) location.href = _next;
