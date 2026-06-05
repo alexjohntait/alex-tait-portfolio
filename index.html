@@ -935,6 +935,7 @@
         <button data-filter="advertising" aria-pressed="false">Advertising</button>
         <button data-filter="editorial" aria-pressed="false">Editorial</button>
         <button data-filter="personal" aria-pressed="false">Personal</button>
+        <button data-filter="case-study" aria-pressed="false">Case studies</button>
       </div>
     </div>
     <div class="grid" id="grid"></div>
@@ -1155,7 +1156,7 @@ const navAbout  = document.getElementById('nav-about');
 let activeFilters = new Set();   // empty = show all
 let fadeTimer;
 
-const FILTER_LABELS = { all:'Selected Work', animation:'Animation', advertising:'Advertising', editorial:'Editorial', personal:'Personal' };
+const FILTER_LABELS = { all:'Selected Work', animation:'Animation', advertising:'Advertising', editorial:'Editorial', personal:'Personal', 'case-study':'Case studies' };
 const DEFAULT_SUB   = 'Illustrator & motion designer, Bath / London';
 const catLabel = c => FILTER_LABELS[c] || (c.charAt(0).toUpperCase() + c.slice(1));
 const catsOf   = p => String(p.category || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -1275,6 +1276,7 @@ function setLead(title, sub, instant = false) {
 /* Multi-select: a card shows if it matches ANY active filter (empty = all). */
 function cardMatches(c) {
   if (activeFilters.size === 0) return true;
+  if (activeFilters.has('case-study') && c.classList.contains('is-cs')) return true;
   const cats = String(c.dataset.category || '').split(',').map(s => s.trim());
   return cats.some(cat => activeFilters.has(cat));
 }
