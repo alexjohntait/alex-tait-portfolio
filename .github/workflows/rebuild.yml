@@ -41,6 +41,8 @@ jobs:
           import fs from 'fs';
 
           const TOKEN = process.env.AIRTABLE_TOKEN;
+          if (!TOKEN) { console.error('ERROR: AIRTABLE_TOKEN secret is not set. Add it at Settings > Secrets > Actions.'); process.exit(1); }
+
           const BASE = 'appjYUthm8ib2ctuH';
           const TABLE = 'tblY3AdUL6JNOnYcY';
 
@@ -72,6 +74,9 @@ jobs:
             });
             req.on('error', reject);
           });
+
+          if (data.error) { console.error('Airtable API error:', JSON.stringify(data.error)); process.exit(1); }
+          if (!data.records) { console.error('Unexpected Airtable response:', JSON.stringify(data)); process.exit(1); }
 
           fs.writeFileSync('_airtable_raw.json', JSON.stringify(data, null, 2));
           console.log(`Fetched ${data.records.length} records from Airtable`);
