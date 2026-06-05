@@ -33,7 +33,7 @@
     "url": "https://alexjohntait.com/"
   },
   "artMedium": "Illustration, Motion design",
-  "genre": "Personal",
+  "genre": "Animation",
   "dateCreated": "2026",
   "image": "https://alexjohntait.com/images/give-it-time.mp4",
   "description": "Looping animations created using Procreate Dreams.",
@@ -808,6 +808,25 @@
       }
     }
 
+    /* ── ABOUT REEL — click-to-play day-in-the-studio ────────────── */
+    .reel { position: relative; aspect-ratio: 9 / 16; max-width: 300px; border-radius: 14px;
+      overflow: hidden; background: #000; box-shadow: 0 12px 40px rgba(22,18,15,.16);
+      cursor: pointer; }
+    .reel-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .reel-play { position: absolute; inset: 0; margin: auto; width: 60px; height: 60px;
+      display: grid; place-items: center; border: none; border-radius: 50%;
+      background: rgba(255,255,255,.92); color: var(--ink); cursor: pointer;
+      padding-left: 3px; box-shadow: 0 6px 20px rgba(0,0,0,.28);
+      transition: transform .22s var(--ease-out), background .2s var(--ease); }
+    .reel-play:hover { transform: scale(1.08); background: #fff; }
+    .reel.playing .reel-play { opacity: 0; pointer-events: none; }
+    .reel-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 14px 12px;
+      font-size: 12px; font-weight: 600; color: #fff; letter-spacing: -.01em;
+      background: linear-gradient(transparent, rgba(0,0,0,.55)); pointer-events: none;
+      transition: opacity .3s var(--ease); }
+    .reel.playing .reel-cap { opacity: 0; }
+    @media (max-width: 640px) { .reel { max-width: 240px; margin: 0 auto; } }
+
     /* ── SITE FOOTER — quiet, persistent contact ─────────────────── */
     .site-footer { border-top: 1px solid var(--line); padding: clamp(36px, 6vw, 60px) var(--pad);
       margin-top: clamp(52px, 9vw, 110px); }
@@ -864,7 +883,7 @@
         <h1 class="project-title">Give it Time</h1>
         <div class="project-meta">
           <div class="meta-row"><span class="meta-label">Client</span><span class="meta-value">Personal</span></div>
-          <div class="meta-row"><span class="meta-label">Category</span><span class="meta-value">Personal</span></div>
+          <div class="meta-row"><span class="meta-label">Category</span><span class="meta-value">Animation</span></div>
           <div class="meta-row"><span class="meta-label">Year</span><span class="meta-value">2026</span></div>
         </div>
         <div class="project-desc"><p>Looping animations created using Procreate Dreams.</p></div>
