@@ -1085,8 +1085,8 @@ function mediaTag(p, { alt = '', eager = false, hoverPlay = false } = {}) {
     const autoplay = !hoverPlay && !REDUCE_MOTION;
     const motion = autoplay ? 'autoplay loop ' : 'loop ';
     if (hoverPlay) {
-      // Rest on a lightweight poster frame; don't fetch the video until engaged.
-      return `<video src="${src}#t=0.1" ${motion}muted playsinline preload="none" poster="images/posters/${p.id}.jpg" aria-label="${alt}"></video>`;
+      // Preload metadata so the browser knows dimensions and shows first frame immediately.
+      return `<video src="${src}#t=0.1" ${motion}muted playsinline preload="metadata" aria-label="${alt}"></video>`;
     }
     const preload = (eager || autoplay) ? 'auto' : 'metadata';
     return `<video src="${src}#t=0.1" ${motion}muted playsinline preload="${preload}" aria-label="${alt}"></video>`;
