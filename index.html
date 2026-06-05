@@ -463,9 +463,14 @@
     }
     .cs-banner-cta span { transition: transform 0.3s var(--ease-out); }
     .cs-banner:hover .cs-banner-cta span { transform: translateX(4px); }
+    /* desktop: the panel carries the label, so the floating badge stays hidden */
+    .cs-banner .card-cs { display: none; }
+    /* mobile: drop the panel, show the animation as a normal card with just the badge */
     @media (max-width: 560px) {
       .cs-banner { grid-template-columns: 1fr; height: auto; }
-      .cs-banner-media { aspect-ratio: 4 / 3; }
+      .cs-banner-panel { display: none; }
+      .cs-banner-media { aspect-ratio: 1 / 1; }
+      .cs-banner .card-cs { display: inline-flex; }
     }
     @media (prefers-reduced-motion: reduce) { .cs-banner-cta span { transition: none; } }
 
@@ -1215,7 +1220,10 @@ const CS_META  = { 'humantold-nyc': { title: 'Making therapy feel reachable', cl
 /* ── BUILD GRID ──────────────────────────────────────────────── */
 function buildGrid() {
   grid.innerHTML = '';
-  PROJECTS.forEach((p, i) => {
+  // Case studies render first so the banner leads the grid (nothing above it).
+  const ordered = [...PROJECTS.filter(p => BESPOKE.has(p.id)), ...PROJECTS.filter(p => !BESPOKE.has(p.id))];
+  let n = 0; // running number for normal cards (banners are skipped)
+  ordered.forEach((p, pos) => {
     // real, crawlable link to the static project page; JS intercepts for the SPA
     const isCase = BESPOKE.has(p.id);
     const card = document.createElement('a');
@@ -1223,7 +1231,7 @@ function buildGrid() {
     card.href = `work/${p.id}.html`;
     card.dataset.id = p.id;
     card.dataset.category = p.category;
-    card.dataset.i = i;
+    card.dataset.i = pos;
     card.setAttribute('data-cursor', isCase ? 'Read case study →' : 'View →');
     card.setAttribute('aria-label', `${p.title}${p.caption ? ' — ' + p.caption : ''}`);
     const cat = catLabel(catsOf(p)[0] || '');
@@ -1238,6 +1246,7 @@ function buildGrid() {
       card.style.setProperty('--cs-ink', cs.ink);
       card.innerHTML = `
         <div class="cs-banner-media" style="background-color:${p.bg}">
+          <span class="card-cs">Case study <span aria-hidden="true">&rarr;</span></span>
           ${mediaTag(p, { alt: p.title, hoverPlay: true })}
         </div>
         <div class="cs-banner-panel">
@@ -1249,14 +1258,15 @@ function buildGrid() {
     } else {
       card.innerHTML = `
         <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
-          <span class="card-index">${String(i+1).padStart(2,'0')}</span>
-          ${mediaTag(p, { alt: p.title, eager: i < 8, hoverPlay: true })}
+          <span class="card-index">${String(n+1).padStart(2,'0')}</span>
+          ${mediaTag(p, { alt: p.title, eager: n < 8, hoverPlay: true })}
         </div>
         <div class="card-meta">
           <h2 class="card-title">${p.title}</h2>
           <span class="card-tag" aria-hidden="true">${cat}</span>
         </div>
       `;
+      n++;
     }
     const vid = card.querySelector('video');
     // motion on attention: play the piece while engaged, rest on first frame
