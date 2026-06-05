@@ -1006,30 +1006,30 @@
 <script>
 /* ── DATA (from Airtable: Projects base) ──────────────────────── */
 const PROJECTS = [
-  {"id":"pepper","title":"Pepper","category":"animation","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#fe0056","desc":"","tags":""},
+  {"id":"pepper","title":"Pepper","category":"animation, personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#fe0056","desc":"","tags":""},
   {"id":"app-store","title":"App Store","category":"advertising","year":"2023","client":"Apple","caption":"Series of Today Tab cards created for Apple's app store and podcast store. They were featured across multiple regions","bg":"#68c0ff","fg":"#000000","desc":"","tags":""},
-  {"id":"thinkartfully","title":"ThinkArtfully","category":"advertising","year":"2020","client":"ThinkArtfully","caption":"A series of looping animations for the production agency.","bg":"#f5f1eb","fg":"#000000","desc":"","tags":""},
+  {"id":"thinkartfully","title":"ThinkArtfully","category":"advertising, animation","year":"2020","client":"ThinkArtfully","caption":"A series of looping animations for the production agency.","bg":"#f5f1eb","fg":"#000000","desc":"","tags":""},
   {"id":"yoga-x-oceans","title":"Yoga X Oceans","category":"advertising","year":"2022","client":"Adidas","caption":"Interactive illustrations installed in the Adidas flagship Oxford Street store","bg":"#e2d8bf","fg":"#000000","desc":"","tags":""},
-  {"id":"type-1-of-a-kind","title":"Type 1 of a Kind","category":"animation","year":"2025","client":"Personal","caption":"Self initiated sticker campaign for diabetics to use to communicate when burnout hits.","bg":"#f57e2e","fg":"#000000","desc":"","tags":""},
+  {"id":"type-1-of-a-kind","title":"Type 1 of a Kind","category":"animation, personal","year":"2025","client":"Personal","caption":"Self initiated sticker campaign for diabetics to use to communicate when burnout hits.","bg":"#f57e2e","fg":"#000000","desc":"","tags":""},
   {"id":"offline-dating","title":"Offline Dating","category":"editorial","year":"2026","client":"Positive News","caption":"Briefed to create three images showing the different ways to date away from the apps.","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
-  {"id":"mantis","title":"Mantis","category":"animation","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#82d33c","desc":"","tags":""},
+  {"id":"mantis","title":"Mantis","category":"animation, personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#82d33c","desc":"","tags":""},
   {"id":"cadooz","title":"Cadooz","category":"advertising","year":"2024","client":"Cadooz","caption":"Series of characters and illustrations for Cadooz rewards. These were featured across their website redesign","bg":"#ff4f03","fg":"#000000","desc":"","tags":""},
-  {"id":"hiit-workout","title":"HIIT Workout","category":"animation","year":"2020","client":"Spotify","caption":"Interactive campaign - allowing users to work out to their favourite tracks. The animations were created in After Effects from vector files","bg":"#509bf6","fg":"#000000","desc":"To help people power through 2020, Spotify created a High Intensity Interval Training programme using exactly the right 30-second clips of tracks for you to go at the right speed. Guided by an animated character – illustrated by Alex Tait and animated by KITCHEN – users move through the exercises accompanied by the voices of Spotify’s podcast celebrities.","tags":"Illustration / Motion"},
-  {"id":"jellyfish","title":"Jellyfish","category":"animation","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#e45496","desc":"","tags":""},
+  {"id":"hiit-workout","title":"HIIT Workout","category":"advertising, animation","year":"2020","client":"Spotify","caption":"Interactive campaign - allowing users to work out to their favourite tracks. The animations were created in After Effects from vector files","bg":"#509bf6","fg":"#000000","desc":"To help people power through 2020, Spotify created a High Intensity Interval Training programme using exactly the right 30-second clips of tracks for you to go at the right speed. Guided by an animated character – illustrated by Alex Tait and animated by KITCHEN – users move through the exercises accompanied by the voices of Spotify’s podcast celebrities.","tags":"Illustration / Motion"},
+  {"id":"jellyfish","title":"Jellyfish","category":"animation, personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#e45496","desc":"","tags":""},
   {"id":"saying-goodbye-to-friends","title":"Saying goodbye to friends","category":"editorial","year":"2025","client":"The Telegraph","caption":"To accompany an article about breaking up with bad friendships. These were displayed as animated GIFS online to accompany the article as well as appearing in print.","bg":"#f6e7de","fg":"#000000","desc":"","tags":""},
-  {"id":"dreams","title":"Dreams","category":"animation","year":"2026","client":"Personal","caption":"Created using Procreate Dreams frame by frame.","bg":"#fcfcfe","fg":"#000000","desc":"","tags":""},
+  {"id":"dreams","title":"Dreams","category":"animation, personal","year":"2026","client":"Personal","caption":"Created using Procreate Dreams frame by frame.","bg":"#fcfcfe","fg":"#000000","desc":"","tags":""},
   {"id":"alice-in-wonderland","title":"Alice in Wonderland","category":"advertising","year":"2018","client":"Hyundai Mall","caption":"Large inflatable as well as in building graphics for Hyundai Mall in South Korea","bg":"#f6d8d4","fg":"#000000","desc":"An immersive, large-scale experiential installation reimagining the world of Alice in Wonderland through a contemporary visual lens. The project focused on translating character-led drawings into expansive physical environments and digital backdrops, utilizing bold vector line work and a vibrant color palette suitable for giant wall wraps and interactive event spaces.","tags":""},
-  {"id":"humantold-nyc","title":"Humantold NYC","category":"animation","year":"2024","client":"Humantold","caption":"Series of animations demonstrating the us of therapy. This was rolled out across the subway in NY.","bg":"#ec482c","fg":"#000000","desc":"","tags":""},
+  {"id":"humantold-nyc","title":"Humantold NYC","category":"advertising, animation","year":"2024","client":"Humantold","caption":"Series of animations demonstrating the us of therapy. This was rolled out across the subway in NY.","bg":"#ec482c","fg":"#000000","desc":"","tags":""},
   {"id":"event-guide","title":"Event Guide","category":"editorial","year":"2024","client":"Boundless Magazine","caption":"Series of illustrations showing the numerous events happening around the UK.","bg":"#d2c8d3","fg":"#000000","desc":"","tags":""},
-  {"id":"tiger","title":"Tiger","category":"animation","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#f68f01","desc":"","tags":""},
-  {"id":"clear","title":"CLEAR","category":"animation","year":"2022","client":"CLEAR","caption":"Winter campaign for boarding - including motion, gifts and installations.","bg":"#f7b59b","fg":"#000000","desc":"","tags":""},
-  {"id":"kueski-pay","title":"Kueski Pay","category":"animation","year":"2025","client":"Kueski","caption":"A set of images created for the rebranded Kueski Pay app and site. They comprised of a mix of hero imagery as well as drop ins. The client wanted to bring warmth and fun to the visuals","bg":"#ffc9da","fg":"#000000","desc":"Working with one of Latin America’s largest financial services providers, I was tasked with creating a range of illustrations for the Kueski website and app.\n\nTasked with refreshing the brand presences, Alex crafted illustrations that emphasise the role Kueski plays in the everyday lives of its users with a playful and colourful style.\n\nA series of brand illustrations and high-energy animation loops created for an international fintech digital campaign. Designed to establish an approachable and friendly user voice within mobile banking interfaces, the visual system relies on simple geometric character layouts and fluid, elastic proportions that scaled across app frameworks, digital billboards, and targeted social media channels.","tags":""},
-  {"id":"fruit-snacks","title":"Fruit Snacks","category":"animation","year":"2023","client":"Mott's","caption":"Animation and box illustration for Motts Fruit Snacks. The campaign focused on encouraging reading amongst struggling communities","bg":"#4e55f8","fg":"#ffffff","desc":"","tags":""},
-  {"id":"give-it-time","title":"Give it Time","category":"animation","year":"2026","client":"Personal","caption":"Looping animations created using Procreate Dreams.","bg":"#e4c8bf","fg":"#000000","desc":"","tags":""},
+  {"id":"tiger","title":"Tiger","category":"animation, personal","year":"2026","client":"Personal","caption":"","bg":"#000000","fg":"#f68f01","desc":"","tags":""},
+  {"id":"clear","title":"CLEAR","category":"advertising, animation","year":"2022","client":"CLEAR","caption":"Winter campaign for boarding - including motion, gifts and installations.","bg":"#f7b59b","fg":"#000000","desc":"","tags":""},
+  {"id":"kueski-pay","title":"Kueski Pay","category":"advertising, animation","year":"2025","client":"Kueski","caption":"A set of images created for the rebranded Kueski Pay app and site. They comprised of a mix of hero imagery as well as drop ins. The client wanted to bring warmth and fun to the visuals","bg":"#ffc9da","fg":"#000000","desc":"Working with one of Latin America’s largest financial services providers, I was tasked with creating a range of illustrations for the Kueski website and app.\n\nTasked with refreshing the brand presences, Alex crafted illustrations that emphasise the role Kueski plays in the everyday lives of its users with a playful and colourful style.\n\nA series of brand illustrations and high-energy animation loops created for an international fintech digital campaign. Designed to establish an approachable and friendly user voice within mobile banking interfaces, the visual system relies on simple geometric character layouts and fluid, elastic proportions that scaled across app frameworks, digital billboards, and targeted social media channels.","tags":""},
+  {"id":"fruit-snacks","title":"Fruit Snacks","category":"advertising, animation","year":"2023","client":"Mott's","caption":"Animation and box illustration for Motts Fruit Snacks. The campaign focused on encouraging reading amongst struggling communities","bg":"#4e55f8","fg":"#ffffff","desc":"","tags":""},
+  {"id":"give-it-time","title":"Give it Time","category":"animation, personal","year":"2026","client":"Personal","caption":"Looping animations created using Procreate Dreams.","bg":"#e4c8bf","fg":"#000000","desc":"","tags":""},
   {"id":"ao-driver-booklet","title":"AO Driver Booklet","category":"advertising","year":"2024","client":"AO","caption":"A series of illustrations created for AO to talk through the on boarding process with new drivers.","bg":"#afbfcf","fg":"#000000","desc":"","tags":""},
   {"id":"ideafarm","title":"IdeaFarm","category":"advertising","year":"2020","client":"IdeaFarm","caption":"A selection of characters created to explain the many industries the brand works with.","bg":"#244aff","fg":"#000000","desc":"","tags":""},
   {"id":"tap-on-tap-off","title":"Tap on / Tap off","category":"advertising","year":"2022","client":"First Bus","caption":"Series of illustrations showing the tap on tap off process. These were displayed on web and buses across the UK","bg":"#c3afd4","fg":"#000000","desc":"","tags":""},
-  {"id":"apo-discounter","title":"APO Discounter","category":"animation","year":"2024","client":"APO","caption":"Animation advertising the new app available to download for APO users","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
+  {"id":"apo-discounter","title":"APO Discounter","category":"advertising, animation","year":"2024","client":"APO","caption":"Animation advertising the new app available to download for APO users","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
   {"id":"wallpaper-pack","title":"Wallpaper Pack","category":"personal","year":"2025","client":"Personal","caption":"A selection of dark and colourful wallpapers available to download for your device","bg":"#ffffff","fg":"#000000","desc":"","tags":""},
   {"id":"tiller-and-lock","title":"Tiller & Lock","category":"advertising","year":"2023","client":"Tiller & Lock","caption":"Images created for a development site within London","bg":"#fff9ed","fg":"#000000","desc":"","tags":""},
   {"id":"cooking-for-cats","title":"Cooking for cats","category":"personal","year":"2024","client":"Personal","caption":"","bg":"#f48893","fg":"#045ca5","desc":"","tags":""},
@@ -1126,11 +1126,13 @@ const filters   = document.getElementById('filters');
 const navWork   = document.getElementById('nav-work');
 const navAbout  = document.getElementById('nav-about');
 
-let activeFilter = 'all';
+let activeFilters = new Set();   // empty = show all
 let fadeTimer;
 
 const FILTER_LABELS = { all:'Selected Work', animation:'Animation', advertising:'Advertising', editorial:'Editorial', personal:'Personal' };
 const DEFAULT_SUB   = 'Illustrator & motion designer, Bath / London';
+const catLabel = c => FILTER_LABELS[c] || (c.charAt(0).toUpperCase() + c.slice(1));
+const catsOf   = p => String(p.category || '').split(',').map(s => s.trim()).filter(Boolean);
 
 /* ── BUILD GRID ──────────────────────────────────────────────── */
 function buildGrid() {
@@ -1145,7 +1147,7 @@ function buildGrid() {
     card.dataset.i = i;
     card.setAttribute('data-cursor', 'View →');
     card.setAttribute('aria-label', `${p.title}${p.caption ? ' — ' + p.caption : ''}`);
-    const cat = p.category.charAt(0).toUpperCase() + p.category.slice(1);
+    const cat = catLabel(catsOf(p)[0] || '');
     const a = ASSETS[p.id] || {};
     const ratio = (a.w && a.h) ? `${a.w} / ${a.h}` : '4 / 3';
     const vivid = pickVivid(p.bg, p.fg);
@@ -1167,7 +1169,8 @@ function buildGrid() {
       if (vid && !REDUCE_MOTION) vid.play().catch(() => {});
     };
     const release = () => {
-      setLead(FILTER_LABELS[activeFilter], DEFAULT_SUB);
+      const lead = activeFilters.size === 1 ? catLabel([...activeFilters][0]) : FILTER_LABELS.all;
+      setLead(lead, DEFAULT_SUB);
       applyGlow(currentAccent);
       if (vid && !REDUCE_MOTION) vid.pause();
     };
@@ -1236,7 +1239,13 @@ function setLead(title, sub, instant = false) {
 }
 
 /* ── FILTER (FLIP: surviving cards glide to new positions) ────── */
-function applyFilter(filter) {
+/* Multi-select: a card shows if it matches ANY active filter (empty = all). */
+function cardMatches(c) {
+  if (activeFilters.size === 0) return true;
+  const cats = String(c.dataset.category || '').split(',').map(s => s.trim());
+  return cats.some(cat => activeFilters.has(cat));
+}
+function applyFilter() {
   const cards = [...grid.querySelectorAll('.card')];
 
   // FIRST — record positions of currently-visible cards
@@ -1244,10 +1253,7 @@ function applyFilter(filter) {
   cards.forEach(c => { if (!c.classList.contains('hidden')) first.set(c, c.getBoundingClientRect()); });
 
   // mutate visibility
-  cards.forEach(c => {
-    const match = filter === 'all' || c.dataset.category === filter;
-    c.classList.toggle('hidden', !match);
-  });
+  cards.forEach(c => { c.classList.toggle('hidden', !cardMatches(c)); });
 
   if (REDUCE_MOTION) return;
 
@@ -1277,16 +1283,27 @@ function applyFilter(filter) {
   });
 }
 
+function syncFilterUI() {
+  filters.querySelectorAll('button').forEach(b => {
+    const f = b.dataset.filter;
+    const on = f === 'all' ? activeFilters.size === 0 : activeFilters.has(f);
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on);
+  });
+  // lead title: one filter → its name, otherwise the default
+  const lead = activeFilters.size === 1 ? catLabel([...activeFilters][0]) : FILTER_LABELS.all;
+  setLead(lead, DEFAULT_SUB, true);
+}
+
 filters.querySelectorAll('button').forEach(btn => {
   btn.addEventListener('click', () => {
-    activeFilter = btn.dataset.filter;
-    filters.querySelectorAll('button').forEach(b => {
-      const on = b === btn;
-      b.classList.toggle('active', on);
-      b.setAttribute('aria-pressed', on);
-    });
-    setLead(FILTER_LABELS[activeFilter], DEFAULT_SUB, true);
-    applyFilter(activeFilter);
+    const f = btn.dataset.filter;
+    if (f === 'all') activeFilters.clear();
+    else {
+      activeFilters.has(f) ? activeFilters.delete(f) : activeFilters.add(f);
+    }
+    syncFilterUI();
+    applyFilter();
   });
 });
 

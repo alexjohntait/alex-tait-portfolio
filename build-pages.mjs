@@ -32,7 +32,9 @@ PROJECTS.forEach((p, idx) => {
   const hero = ASSETS[p.id] || {};
   const list = [{ file: hero.file, kind: hero.kind, w: hero.w, h: hero.h }, ...(GALLERY[p.id] || [])].filter(m => m.file);
   const prev = PROJECTS[idx - 1], next = PROJECTS[idx + 1];
-  const cat = p.category.charAt(0).toUpperCase() + p.category.slice(1);
+  const catList = String(p.category || '').split(',').map(s => s.trim()).filter(Boolean)
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1));
+  const cat = catList.join(', ') || 'Illustration';
   const heroImg = `${SITE}/images/${hero.file}`;
   const desc = (p.desc || p.caption || `${p.title}: ${cat.toLowerCase()} illustration and motion work by Alex Tait.`).replace(/\s+/g, ' ').trim();
   const metaDesc = desc.length > 300 ? desc.slice(0, 297).trim() + '…' : desc;
