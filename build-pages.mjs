@@ -106,6 +106,7 @@ ${JSON.stringify(jsonld, null, 2)}
       <nav class="nav" aria-label="Primary">
         <a href="../index.html">Work</a>
         <a href="../index.html#about">About</a>
+        <a href="../shop.html">Shop</a>
       </nav>
       <div class="dots" aria-hidden="true"><span class="dot" style="background:#ff69b4"></span><span class="dot" style="background:#02b34b"></span><span class="dot" style="background:#ff1d19"></span></div>
     </div>
@@ -179,7 +180,7 @@ ${JSON.stringify(jsonld, null, 2)}
 // ── sitemap ────────────────────────────────────────────────────
 const urls = [
   { loc: SITE + '/', pri: '1.0', freq: 'monthly' },
-  // shop hidden for now — add back: { loc: SITE + '/shop.html', pri: '0.8', freq: 'weekly' },
+  { loc: SITE + '/shop.html', pri: '0.8', freq: 'weekly' },
   ...PROJECTS.map(p => ({ loc: `${SITE}/work/${p.id}.html`, pri: '0.7', freq: 'monthly' }))
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
