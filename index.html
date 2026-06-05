@@ -399,18 +399,28 @@
     .card-cs {
       position: absolute;
       top: 10px; right: 10px;
-      z-index: 2;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       font-family: var(--display);
       font-weight: 700;
-      font-size: 10px;
-      letter-spacing: 0.04em;
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--ink);
-      background: var(--paper);
-      padding: 4px 8px;
+      color: #fff;
+      background: var(--red);
+      padding: 5px 11px;
       border-radius: 100px;
-      box-shadow: 0 2px 8px rgba(22,18,15,.18);
+      box-shadow: 0 4px 14px rgba(255, 29, 25, 0.32);
     }
+    .card-cs span { transition: transform 0.3s var(--ease-out); }
+    .card.is-cs:hover .card-cs span,
+    .card.is-cs:focus-visible .card-cs span { transform: translateX(3px); }
+    .card.is-cs .card-thumb { transition: box-shadow 0.35s var(--ease-out); }
+    .card.is-cs:hover .card-thumb,
+    .card.is-cs:focus-visible .card-thumb { box-shadow: inset 0 0 0 2.5px var(--red); }
+    @media (prefers-reduced-motion: reduce) { .card-cs span { transition: none; } }
 
     .card-meta {
       display: flex;
@@ -1158,13 +1168,14 @@ function buildGrid() {
   grid.innerHTML = '';
   PROJECTS.forEach((p, i) => {
     // real, crawlable link to the static project page; JS intercepts for the SPA
+    const isCase = BESPOKE.has(p.id);
     const card = document.createElement('a');
-    card.className = 'card';
+    card.className = isCase ? 'card is-cs' : 'card';
     card.href = `work/${p.id}.html`;
     card.dataset.id = p.id;
     card.dataset.category = p.category;
     card.dataset.i = i;
-    card.setAttribute('data-cursor', 'View →');
+    card.setAttribute('data-cursor', isCase ? 'Read case study →' : 'View →');
     card.setAttribute('aria-label', `${p.title}${p.caption ? ' — ' + p.caption : ''}`);
     const cat = catLabel(catsOf(p)[0] || '');
     const a = ASSETS[p.id] || {};
@@ -1173,7 +1184,7 @@ function buildGrid() {
     card.innerHTML = `
       <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
         <span class="card-index">${String(i+1).padStart(2,'0')}</span>
-        ${BESPOKE.has(p.id) ? '<span class="card-cs">Case study</span>' : ''}
+        ${isCase ? '<span class="card-cs">Case study <span aria-hidden="true">&rarr;</span></span>' : ''}
         ${mediaTag(p, { alt: p.title, eager: i < 8, hoverPlay: true })}
       </div>
       <div class="card-meta">
