@@ -412,6 +412,58 @@
     .card.is-cs:focus-visible .card-thumb { box-shadow: inset 0 0 0 2.5px var(--red); }
     @media (prefers-reduced-motion: reduce) { .card-cs span { transition: none; } }
 
+    /* Featured case-study banner: spans all masonry columns, sits in flow */
+    .card.cs-banner {
+      column-span: all;
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      height: clamp(240px, 26vw, 360px);
+      overflow: hidden;
+      background: var(--cs-panel, var(--ink));
+    }
+    .cs-banner-media { position: relative; overflow: hidden; }
+    .cs-banner-media video,
+    .cs-banner-media img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.5s var(--ease);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .cs-banner:hover .cs-banner-media video,
+      .cs-banner:hover .cs-banner-media img { transform: scale(1.04); }
+    }
+    .cs-banner-panel {
+      background: var(--cs-panel, var(--ink));
+      color: #fff;
+      display: flex; flex-direction: column; justify-content: space-between;
+      gap: 14px;
+      padding: clamp(18px, 2vw, 34px);
+    }
+    .cs-banner-kicker {
+      font-family: var(--display); font-weight: 700; font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--cs-ink, #fff);
+    }
+    .cs-banner-title {
+      font-family: var(--display); font-weight: 800;
+      font-size: clamp(22px, 2.6vw, 40px); line-height: 1.0; letter-spacing: -0.03em;
+      color: #fff; text-wrap: balance; margin-top: auto;
+    }
+    .cs-banner-cta {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--body); font-weight: 700; font-size: 14px; color: #fff;
+    }
+    .cs-banner-cta span { transition: transform 0.3s var(--ease-out); }
+    .cs-banner:hover .cs-banner-cta span { transform: translateX(4px); }
+    /* desktop: the panel carries the label, so the floating badge stays hidden */
+    .cs-banner .card-cs { display: none; }
+    /* mobile: drop the panel, show the animation as a normal card with just the badge */
+    @media (max-width: 560px) {
+      .cs-banner { grid-template-columns: 1fr; height: auto; }
+      .cs-banner-panel { display: none; }
+      .cs-banner-media { aspect-ratio: 1 / 1; }
+      .cs-banner .card-cs { display: inline-flex; }
+    }
+    @media (prefers-reduced-motion: reduce) { .cs-banner-cta span { transition: none; } }
+
     .card-meta {
       display: flex;
       align-items: baseline;
