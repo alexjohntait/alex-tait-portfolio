@@ -531,6 +531,8 @@
       border-radius: 8px;
       overflow: hidden;
       display: block;
+      /* hold the space with a faint tint so art fades in instead of flashing white */
+      background: color-mix(in srgb, var(--ink) 6%, transparent);
     }
     .project-masonry .m-item img,
     .project-masonry .m-item video {
