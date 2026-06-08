@@ -422,31 +422,33 @@
     .card.is-cs:focus-visible .card-thumb { box-shadow: inset 0 0 0 2.5px var(--red); }
     @media (prefers-reduced-motion: reduce) { .card-cs span { transition: none; } }
 
-    /* Featured case-study banner: spans all masonry columns, sits in flow */
+    /* ── Featured case-study banner (own block above the masonry) ── */
+    .featured { padding: 0 var(--pad); }
     .card.cs-banner {
-      column-span: all;
       display: grid;
-      grid-template-columns: 1.55fr 1fr;
-      height: clamp(240px, 26vw, 360px);
+      grid-template-columns: 1.35fr 1fr;
+      height: clamp(260px, 28vw, 380px);
       overflow: hidden;
       background: var(--cs-panel, var(--ink));
+      margin: 12px 0 clamp(24px, 3vw, 40px);
     }
-    .cs-banner-media { position: relative; overflow: hidden; }
+    /* full square animation, letterboxed into the panel colour so there's no crop and no seam */
+    .cs-banner-media { position: relative; overflow: hidden; background: var(--cs-panel, var(--ink)); }
     .cs-banner-media video,
     .cs-banner-media img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
+      width: 100%; height: 100%; object-fit: contain; display: block;
       transition: transform 0.5s var(--ease);
     }
     @media (hover: hover) and (pointer: fine) {
       .cs-banner:hover .cs-banner-media video,
-      .cs-banner:hover .cs-banner-media img { transform: scale(1.04); }
+      .cs-banner:hover .cs-banner-media img { transform: scale(1.03); }
     }
     .cs-banner-panel {
       background: var(--cs-panel, var(--ink));
       color: #fff;
       display: flex; flex-direction: column; justify-content: space-between;
       gap: 14px;
-      padding: clamp(18px, 2vw, 34px);
+      padding: clamp(20px, 2.4vw, 40px);
     }
     .cs-banner-kicker {
       font-family: var(--display); font-weight: 700; font-size: 11px;
@@ -454,8 +456,8 @@
     }
     .cs-banner-title {
       font-family: var(--display); font-weight: 800;
-      font-size: clamp(22px, 2.6vw, 40px); line-height: 1.0; letter-spacing: -0.03em;
-      color: #fff; text-wrap: balance; margin-top: auto;
+      font-size: clamp(24px, 3vw, 46px); line-height: 1.0; letter-spacing: -0.03em;
+      color: #fff; text-wrap: balance; margin-top: auto; max-width: 18ch;
     }
     .cs-banner-cta {
       display: inline-flex; align-items: center; gap: 7px;
@@ -463,14 +465,15 @@
     }
     .cs-banner-cta span { transition: transform 0.3s var(--ease-out); }
     .cs-banner:hover .cs-banner-cta span { transform: translateX(4px); }
-    /* desktop: the panel carries the label, so the floating badge stays hidden */
-    .cs-banner .card-cs { display: none; }
-    /* mobile: drop the panel, show the animation as a normal card with just the badge */
-    @media (max-width: 560px) {
-      .cs-banner { grid-template-columns: 1fr; height: auto; }
+    /* mobile: a normal card — animation + a label below, no overlay sticker */
+    .cs-banner-foot { display: none; }
+    @media (max-width: 640px) {
+      .card.cs-banner { grid-template-columns: 1fr; height: auto; background: transparent; margin: 6px 0 clamp(20px, 2.6vw, 34px); }
       .cs-banner-panel { display: none; }
       .cs-banner-media { aspect-ratio: 1 / 1; }
-      .cs-banner .card-cs { display: inline-flex; }
+      .cs-banner-media video, .cs-banner-media img { object-fit: cover; }
+      .cs-banner-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 2px 4px; }
+      .cs-banner-foot .cs-tag { color: var(--red); font-weight: 700; white-space: nowrap; }
     }
     @media (prefers-reduced-motion: reduce) { .cs-banner-cta span { transition: none; } }
 
@@ -992,6 +995,7 @@
         <button data-filter="case-study" aria-pressed="false">Case studies</button>
       </div>
     </div>
+    <div class="featured" id="featured"></div>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -1196,6 +1200,7 @@ function fixVideoRatios(container) {
 
 /* ── DOM ─────────────────────────────────────────────────────── */
 const grid      = document.getElementById('grid');
+const featured  = document.getElementById('featured');
 const viewHome  = document.getElementById('view-home');
 const viewProj  = document.getElementById('view-project');
 const viewAbout = document.getElementById('view-about');
@@ -1222,6 +1227,7 @@ const CS_META  = { 'humantold-nyc': { title: 'Making therapy feel reachable', cl
 /* ── BUILD GRID ──────────────────────────────────────────────── */
 function buildGrid() {
   grid.innerHTML = '';
+  featured.innerHTML = '';
   // Case studies render first so the banner leads the grid (nothing above it).
   const ordered = [...PROJECTS.filter(p => BESPOKE.has(p.id)), ...PROJECTS.filter(p => !BESPOKE.has(p.id))];
   let n = 0; // running number for normal cards (banners are skipped)
@@ -1247,14 +1253,17 @@ function buildGrid() {
       card.style.setProperty('--cs-panel', cs.panel);
       card.style.setProperty('--cs-ink', cs.ink);
       card.innerHTML = `
-        <div class="cs-banner-media" style="background-color:${p.bg}">
-          <span class="card-cs">Case study <span aria-hidden="true">&rarr;</span></span>
+        <div class="cs-banner-media">
           ${mediaTag(p, { alt: p.title, hoverPlay: true })}
         </div>
         <div class="cs-banner-panel">
           <span class="cs-banner-kicker">${cs.client} &middot; Case study</span>
           <h2 class="cs-banner-title">${cs.title}</h2>
           <span class="cs-banner-cta">Read the case study <span aria-hidden="true">&rarr;</span></span>
+        </div>
+        <div class="cs-banner-foot">
+          <h2 class="card-title">${p.title}</h2>
+          <span class="card-tag cs-tag">Case study <span aria-hidden="true">&rarr;</span></span>
         </div>
       `;
     } else {
@@ -1314,7 +1323,7 @@ function buildGrid() {
       }
     }
 
-    grid.appendChild(card);
+    (isCase ? featured : grid).appendChild(card);
   });
   setupReveal();
 }
@@ -1359,7 +1368,7 @@ function cardMatches(c) {
   return cats.some(cat => activeFilters.has(cat));
 }
 function applyFilter() {
-  const cards = [...grid.querySelectorAll('.card')];
+  const cards = [...featured.querySelectorAll('.card'), ...grid.querySelectorAll('.card')];
 
   // FIRST — record positions of currently-visible cards
   const first = new Map();
