@@ -44,7 +44,7 @@ PROJECTS.forEach((p, idx) => {
   const heroImg = `${SITE}/images/${hero.file}`;
   const desc = (p.desc || p.caption || `${p.title}: ${cat.toLowerCase()} illustration and motion work by Alex Tait.`).replace(/\s+/g, ' ').trim();
   const metaDesc = desc.length > 300 ? desc.slice(0, 297).trim() + '…' : desc;
-  const glow = rgba(pickVivid(p.bg, p.fg), 0.2);
+  const glow = rgba(pickVivid(p.bg, p.fg), 0.15);
 
   const copyHtml = (p.desc || p.caption || `An illustration and motion project by Alex Tait.`)
     .split('\n').filter(s => s.trim()).map(s => `<p>${esc(s.trim())}</p>`).join('');
@@ -104,7 +104,7 @@ ${JSON.stringify(jsonld, null, 2)}
   <style>${CSS}</style>
 </head>
 <body>
-  <div class="glow" style="opacity:1; box-shadow: inset 0 0 110px 10px ${glow};" aria-hidden="true"></div>
+  <div class="glow" style="opacity:1; box-shadow: inset 0 0 64px 2px ${glow};" aria-hidden="true"></div>
 
   <header>
     <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>

@@ -1299,10 +1299,11 @@ function applyGlow(hex) {
   if (!glowLayers) glowLayers = [document.getElementById('glow-a'), document.getElementById('glow-b')];
   const [r, g, b] = hexRgb(hex);
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const rgba = `rgba(${r}, ${g}, ${b}, ${dark ? 0.34 : 0.22})`;
+  const rgba = `rgba(${r}, ${g}, ${b}, ${dark ? 0.26 : 0.16})`;
   const back = glowLayers[glowFront ^ 1];   // paint the hidden layer, then crossfade
   if (!back) return;
-  back.style.boxShadow = `inset 0 0 110px 10px ${rgba}`;
+  // tight to the edges: an accent, not a wash over the content
+  back.style.boxShadow = `inset 0 0 64px 2px ${rgba}`;
   back.style.opacity = '1';
   glowLayers[glowFront].style.opacity = '0';
   glowFront ^= 1;
