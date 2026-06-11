@@ -172,6 +172,16 @@
     }
     :root[data-theme="dark"] .wordmark .sig { filter: invert(1); }
     .wordmark:hover .sig { transform: rotate(-2deg) scale(1.03); }
+    /* the signature writes itself on: two strokes ("Alex", breath, "Tait") */
+    @media (prefers-reduced-motion: no-preference) {
+      .wordmark .sig { animation: sigDraw 1.1s cubic-bezier(0.45, 0, 0.3, 1) 0.1s both; }
+    }
+    @keyframes sigDraw {
+      0%   { clip-path: inset(-8% 104% -8% -4%); }
+      52%  { clip-path: inset(-8% 46%  -8% -4%); }
+      60%  { clip-path: inset(-8% 46%  -8% -4%); }
+      100% { clip-path: inset(-8% -4%  -8% -4%); }
+    }
     @media (prefers-reduced-motion: reduce) {
       .wordmark:hover .sig { transform: none; }
     }
@@ -235,16 +245,33 @@
     .dot.active {
       box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--c);
     }
-    /* one-time playful entrance — bob in once on load, then rest */
+    /* playful entrance, then an occasional idle blink — the dots are alive */
     @media (prefers-reduced-motion: no-preference) {
-      .dot { animation: dotIn 0.5s var(--spring) both; }
-      .dot:nth-child(1) { animation-delay: 0.15s; }
-      .dot:nth-child(2) { animation-delay: 0.24s; }
-      .dot:nth-child(3) { animation-delay: 0.33s; }
+      .dot {
+        animation: dotIn 0.5s var(--spring) both,
+                   dotBlink 11s ease-in-out infinite;
+      }
+      .dot:nth-child(1) { animation-delay: 0.15s, 4s; }
+      .dot:nth-child(2) { animation-delay: 0.24s, 7.5s; }
+      .dot:nth-child(3) { animation-delay: 0.33s, 10s; }
+      /* hover hands control back to the transition (scale-up) */
+      .dot:hover, .dot:focus-visible { animation: none; }
+      .dot.boing { animation: dotBoing 0.5s var(--spring); }
     }
     @keyframes dotIn {
       0%   { transform: scale(0.4) translateY(-6px); opacity: 0; }
       100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    @keyframes dotBlink {
+      0%, 95%, 100% { transform: none; }
+      96.6% { transform: scale(1.06, 0.55); }
+      98.2% { transform: scale(0.95, 1.14); }
+    }
+    @keyframes dotBoing {
+      0%   { transform: scale(1); }
+      35%  { transform: scale(1.45, 0.75); }
+      70%  { transform: scale(0.9, 1.2); }
+      100% { transform: scale(1); }
     }
 
     /* ─────────────────────────── VIEWS ─────────────────────────── */
@@ -355,6 +382,12 @@
     .card:active { transform: scale(0.98); }
     @media (hover: hover) and (pointer: fine) {
       .card:hover { transform: translateY(-5px); }
+      /* spotlight: the hovered piece lifts out, neighbours ease back */
+      .grid.spotlight .card:not(.spot) {
+        opacity: 0.78;
+        transform: scale(0.985);
+        transition: transform 0.35s var(--ease), opacity 0.35s var(--ease);
+      }
     }
 
     .card-thumb {
@@ -760,8 +793,29 @@
     .card.reveal.in {
       opacity: 1; transform: none;
       transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+      transition-delay: var(--rd, 0s);
     }
     .card.pop { animation: cardPop 0.5s var(--ease-out) both; }
+
+    /* ─────────────────── OPENING CURTAIN (first load only) ───────── */
+    /* body.boot is added by JS on a fresh landing at the home view and
+       removed once the entrance has played. Everything is visible without it. */
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      body.boot #lead-title { animation: riseIn 0.6s var(--ease-out) 0.20s both; }
+      body.boot #lead-sub   { animation: riseIn 0.6s var(--ease-out) 0.32s both; }
+      body.boot .filters button { animation: riseIn 0.45s var(--ease-out) both; }
+      body.boot .filters button:nth-child(1) { animation-delay: 0.38s; }
+      body.boot .filters button:nth-child(2) { animation-delay: 0.43s; }
+      body.boot .filters button:nth-child(3) { animation-delay: 0.48s; }
+      body.boot .filters button:nth-child(4) { animation-delay: 0.53s; }
+      body.boot .filters button:nth-child(5) { animation-delay: 0.58s; }
+      body.boot .filters button:nth-child(6) { animation-delay: 0.63s; }
+      body.boot .featured .cs-banner { animation: riseIn 0.7s var(--ease-out) 0.5s both; }
+    }
 
     /* ─────────────────── CUSTOM CURSOR (fine pointers) ──────────── */
     html.has-cursor, html.has-cursor * { cursor: none; }
@@ -1286,12 +1340,14 @@ function buildGrid() {
       setLead(p.title, p.caption || DEFAULT_SUB);
       applyGlow(vivid);
       if (vid && !REDUCE_MOTION) vid.play().catch(() => {});
+      if (!isCase) { grid.classList.add('spotlight'); card.classList.add('spot'); }
     };
     const release = () => {
       const lead = activeFilters.size === 1 ? catLabel([...activeFilters][0]) : FILTER_LABELS.all;
       setLead(lead, DEFAULT_SUB);
       applyGlow(currentAccent);
       if (vid && !REDUCE_MOTION) vid.pause();
+      if (!isCase) { grid.classList.remove('spotlight'); card.classList.remove('spot'); }
     };
     card.addEventListener('click', e => {
       // let modified clicks (new tab, etc.) follow the real href
@@ -1340,7 +1396,10 @@ function setupReveal() {
     entries.forEach(en => {
       if (!en.isIntersecting) return;
       const c = en.target;
-      c.style.transitionDelay = ((+c.dataset.i % 4) * 0.06) + 's';
+      // during the opening curtain, the first wave waits for the headline/filters
+      const base = document.body.classList.contains('boot') ? 0.6 : 0;
+      c.style.transitionDelay = (base + (+c.dataset.i % 4) * 0.06) + 's';
+      c.addEventListener('transitionend', () => { c.style.transitionDelay = ''; }, { once: true });
       c.classList.add('in');
       revealIO.unobserve(c);
     });
@@ -1689,7 +1748,13 @@ function setAccent(color, theme) {
   });
   try { localStorage.setItem('accent', JSON.stringify({ color, theme: theme || 'light' })); } catch (e) {}
 }
-dots.forEach(d => d.addEventListener('click', () => setAccent(d.dataset.accent, d.dataset.theme)));
+dots.forEach(d => d.addEventListener('click', () => {
+  setAccent(d.dataset.accent, d.dataset.theme);
+  // happy boing on pick
+  d.classList.remove('boing'); void d.offsetWidth;
+  d.classList.add('boing');
+  d.addEventListener('animationend', () => d.classList.remove('boing'), { once: true });
+}));
 let savedAccent = null;
 try { savedAccent = JSON.parse(localStorage.getItem('accent') || 'null'); } catch (e) {}
 if (savedAccent && savedAccent.color) setAccent(savedAccent.color, savedAccent.theme);
@@ -1711,10 +1776,15 @@ function setupTouchVideo() {
 }
 
 /* ── INIT ────────────────────────────────────────────────────── */
+// opening curtain: one directed entrance, only on a fresh landing at the grid
+if (!REDUCE_MOTION && (!location.hash || location.hash === '#')) {
+  document.body.classList.add('boot');
+  setTimeout(() => document.body.classList.remove('boot'), 1800);
+}
 buildGrid();
 setupTouchVideo();
 window.addEventListener('popstate', handleHash);
-handleHash(); 
+handleHash();
 </script>
 
 </body>
