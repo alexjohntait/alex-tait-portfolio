@@ -63,6 +63,8 @@
       --spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
 
       --pad: clamp(16px, 4vw, 40px);
+      --r-media: 10px;
+      --r-feature: 14px;
       --glow: 22%;
     }
 
@@ -113,6 +115,12 @@
 
     a { color: inherit; }
     :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 2px; }
+
+    ::selection { background: var(--red); color: #fff; }
+    html { -webkit-tap-highlight-color: transparent; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent; }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ink) 24%, transparent); border-radius: 100px; border: 3px solid var(--paper); }
+    ::-webkit-scrollbar-track { background: transparent; }
 
     /* ─────────────────────────── HEADER ─────────────────────────── */
     header {
@@ -697,7 +705,7 @@
     /* ─────────────────── EASTER EGG: raining work ───────────────── */
     .rain-item {
       position: fixed; top: 0; z-index: 290;
-      border-radius: 10px; pointer-events: none;
+      border-radius: var(--r-media); pointer-events: none;
       will-change: transform, opacity;
       box-shadow: 0 10px 34px rgba(0,0,0,0.20);
       object-fit: cover;
@@ -849,7 +857,7 @@
     }
 
     /* ── ABOUT REEL — click-to-play day-in-the-studio ────────────── */
-    .reel { position: relative; aspect-ratio: 9 / 16; max-width: 300px; border-radius: 14px;
+    .reel { position: relative; aspect-ratio: 9 / 16; max-width: 300px; border-radius: var(--r-feature);
       overflow: hidden; background: #000; box-shadow: 0 12px 40px rgba(22,18,15,.16);
       cursor: pointer; }
     .reel-video { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -940,7 +948,7 @@
       color: #4a1b0c;
       background: rgba(255,255,255,0.85);
       padding: 4px 10px;
-      border-radius: 4px;
+      border-radius: var(--r-media);
     }
     .cs-hero-title {
       font-family: var(--display);
@@ -1011,7 +1019,7 @@
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 4px;
+      border-radius: var(--r-media);
     }
 
     .cs-process {
@@ -1027,13 +1035,13 @@
     .cs-process-item video {
       width: 100%;
       height: auto;
-      border-radius: 4px;
+      border-radius: var(--r-media);
       display: block;
     }
     .cs-process-placeholder {
       width: 100%;
       aspect-ratio: 4 / 5;
-      border-radius: 4px;
+      border-radius: var(--r-media);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1074,7 +1082,7 @@
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 4px;
+      border-radius: var(--r-media);
     }
 
     @media (max-width: 760px) {

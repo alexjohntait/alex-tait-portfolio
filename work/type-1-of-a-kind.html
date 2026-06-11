@@ -73,6 +73,8 @@
       --spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
 
       --pad: clamp(16px, 4vw, 40px);
+      --r-media: 10px;   /* every in-flow artwork container */
+      --r-feature: 14px; /* large feature blocks (banner, reel) */
       --glow: 22%;
     }
 
@@ -123,6 +125,15 @@
 
     a { color: inherit; }
     :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 2px; }
+
+    /* selecting text picks up the visitor's accent — a tiny premium tell */
+    ::selection { background: var(--red); color: #fff; }
+    html { -webkit-tap-highlight-color: transparent; }
+    /* quiet, ink-tinted scrollbar */
+    html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--ink) 28%, transparent) transparent; }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ink) 24%, transparent); border-radius: 100px; border: 3px solid var(--paper); }
+    ::-webkit-scrollbar-track { background: transparent; }
 
     /* ─────────────────────────── HEADER ─────────────────────────── */
     header {
@@ -386,7 +397,7 @@
       position: relative;
       width: 100%;
       overflow: hidden;
-      border-radius: 6px;
+      border-radius: var(--r-media);
       /* aspect-ratio set per-card inline (from the file's true dimensions)
          so columns pack correctly with no layout shift */
     }
@@ -454,6 +465,7 @@
       grid-template-columns: 1.35fr 1fr;
       height: clamp(260px, 28vw, 380px);
       overflow: hidden;
+      border-radius: var(--r-feature);
       background: var(--cs-panel, var(--ink));
       margin: 12px 0 clamp(24px, 3vw, 40px);
     }
@@ -493,9 +505,9 @@
     /* mobile: a normal card — animation + a label below, no overlay sticker */
     .cs-banner-foot { display: none; }
     @media (max-width: 640px) {
-      .card.cs-banner { grid-template-columns: 1fr; height: auto; background: transparent; margin: 6px 0 clamp(20px, 2.6vw, 34px); }
+      .card.cs-banner { grid-template-columns: 1fr; height: auto; background: transparent; border-radius: 0; margin: 6px 0 clamp(20px, 2.6vw, 34px); }
       .cs-banner-panel { display: none; }
-      .cs-banner-media { aspect-ratio: 1 / 1; }
+      .cs-banner-media { aspect-ratio: 1 / 1; border-radius: var(--r-media); }
       .cs-banner-media video, .cs-banner-media img { object-fit: cover; }
       .cs-banner-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 2px 4px; }
       .cs-banner-foot .cs-tag { color: var(--red); font-weight: 700; white-space: nowrap; }
@@ -553,7 +565,7 @@
       height: auto;
       object-fit: contain;
       display: block;
-      border-radius: 8px;
+      border-radius: var(--r-media);
     }
 
     /* Multiple pieces: hero + gallery flow together as a masonry, each at
@@ -566,7 +578,7 @@
     .project-masonry .m-item {
       break-inside: avoid;
       margin-bottom: clamp(16px, 1.8vw, 22px);
-      border-radius: 8px;
+      border-radius: var(--r-media);
       overflow: hidden;
       display: block;
       /* hold the space with a faint tint so art fades in instead of flashing white */
@@ -834,10 +846,50 @@
     .cursor.is-down .cursor-dot  { transform: translate(-50%, -50%) scale(0.55); }
     .cursor.is-down.is-pill .cursor-pill { transform: translate(-50%, -50%) scale(0.92); }
 
+    /* ─────────────────── DOODLE MODE (easter egg) ───────────────── */
+    .doodle-canvas { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+    html.doodling .doodle-canvas { pointer-events: auto; touch-action: none; cursor: crosshair; }
+    html.has-cursor.doodling .doodle-canvas { cursor: none; }
+    /* the cursor dot fattens into a crayon tip while doodling */
+    html.doodling .cursor-dot { width: 17px; height: 17px; box-shadow: 0 0 0 2.5px var(--paper); }
+    .doodle-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: none; border: none; padding: 4px 0; cursor: pointer;
+      font: 600 13px var(--body); color: var(--muted); letter-spacing: -0.01em;
+    }
+    .doodle-btn svg { width: 15px; height: 15px; }
+    .doodle-btn:hover, .doodle-btn[aria-pressed="true"] { color: var(--red); }
+    .doodle-chip {
+      position: fixed; bottom: 18px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      z-index: 260; display: flex; gap: 8px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s var(--ease), transform 0.35s var(--ease-out);
+    }
+    html.doodling .doodle-chip { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
+    .doodle-chip button {
+      border: none; cursor: pointer; border-radius: 100px; padding: 9px 15px;
+      font: 700 12px var(--body); letter-spacing: -0.01em;
+      background: var(--ink); color: var(--paper);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    }
+    .doodle-chip .chip-hint {
+      background: var(--paper); color: var(--ink);
+      box-shadow: inset 0 0 0 1px var(--line), 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+    @keyframes canvasShake {
+      0%, 100% { transform: none; }
+      20% { transform: translate(-7px, 2px) rotate(-0.4deg); }
+      40% { transform: translate(6px, -3px) rotate(0.4deg); }
+      60% { transform: translate(-5px, -2px) rotate(-0.3deg); }
+      80% { transform: translate(4px, 2px) rotate(0.2deg); }
+    }
+    .doodle-canvas.shaking { animation: canvasShake 0.3s ease-in-out 2; }
+
     /* ─────────────────── EASTER EGG: raining work ───────────────── */
     .rain-item {
       position: fixed; top: 0; z-index: 290;
-      border-radius: 10px; pointer-events: none;
+      border-radius: var(--r-media); pointer-events: none;
       will-change: transform, opacity;
       box-shadow: 0 10px 34px rgba(0,0,0,0.20);
       object-fit: cover;
@@ -975,7 +1027,7 @@
     }
 
     /* ── ABOUT REEL — click-to-play day-in-the-studio ────────────── */
-    .reel { position: relative; aspect-ratio: 9 / 16; max-width: 300px; border-radius: 14px;
+    .reel { position: relative; aspect-ratio: 9 / 16; max-width: 300px; border-radius: var(--r-feature);
       overflow: hidden; background: #000; box-shadow: 0 12px 40px rgba(22,18,15,.16);
       cursor: pointer; }
     .reel-video { width: 100%; height: 100%; object-fit: cover; display: block; }
