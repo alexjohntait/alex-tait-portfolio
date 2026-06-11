@@ -111,6 +111,7 @@ ${JSON.stringify(jsonld, null, 2)}
     <div class="header-right">
       <nav class="nav" aria-label="Primary">
         <a href="../index.html">Work</a>
+        <a href="../index.html#case-studies" class="nav-cs-link">Case studies</a>
         <a href="../index.html#about">About</a>
         <a href="../shop.html">Shop</a>
       </nav>

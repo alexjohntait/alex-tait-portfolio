@@ -209,6 +209,11 @@
       display: flex;
       gap: clamp(14px, 2vw, 26px);
     }
+    .nav a { white-space: nowrap; }
+    /* small screens: the case-study banner leads the grid anyway */
+    @media (max-width: 560px) {
+      #nav-cs, .nav-cs-link { display: none; }
+    }
     .nav a {
       font-family: var(--body);
       font-size: 14px;
@@ -1108,6 +1113,7 @@
   <div class="header-right">
     <nav class="nav" aria-label="Primary">
       <a href="#" id="nav-work">Work</a>
+      <a href="#case-studies" id="nav-cs">Case studies</a>
       <a href="#about" id="nav-about">About</a>
       <a href="shop.html">Shop</a>
     </nav>
@@ -1134,7 +1140,6 @@
         <button data-filter="advertising" aria-pressed="false">Advertising</button>
         <button data-filter="editorial" aria-pressed="false">Editorial</button>
         <button data-filter="personal" aria-pressed="false">Personal</button>
-        <button data-filter="case-study" aria-pressed="false">Case studies</button>
       </div>
     </div>
     <div class="featured" id="featured"></div>
@@ -1356,6 +1361,7 @@ const leadTitle = document.getElementById('lead-title');
 const leadSub   = document.getElementById('lead-sub');
 const filters   = document.getElementById('filters');
 const navWork   = document.getElementById('nav-work');
+const navCS     = document.getElementById('nav-cs');
 const navAbout  = document.getElementById('nav-about');
 
 let activeFilters = new Set();   // empty = show all
@@ -1576,6 +1582,8 @@ filters.querySelectorAll('button').forEach(btn => {
     else {
       activeFilters.has(f) ? activeFilters.delete(f) : activeFilters.add(f);
     }
+    // manual filtering leaves the case-studies route; nav reflects the grid
+    if (location.hash === '#case-studies') { history.replaceState(null, '', '#'); setNav('home'); }
     syncFilterUI();
     applyFilter();
   });
@@ -1667,6 +1675,7 @@ function showView(view) {
 
 function setNav(curr) {
   navWork.classList.toggle('current', curr === 'home');
+  navCS.classList.toggle('current', curr === 'cs');
   navAbout.classList.toggle('current', curr === 'about');
 }
 
@@ -1689,6 +1698,17 @@ function doNavigate(view, param) {
     showView(viewAbout);
     applyGlow(currentAccent);
     document.title = 'About — Alex Tait';
+  } else if (view === 'cs') {
+    // the grid, pre-filtered to case studies
+    history.pushState(null, '', '#case-studies');
+    setNav('cs');
+    showView(viewHome);
+    applyGlow(currentAccent);
+    activeFilters.clear();
+    activeFilters.add('case-study');
+    syncFilterUI();
+    applyFilter();
+    document.title = 'Case Studies — Alex Tait';
   }
 }
 
@@ -1727,12 +1747,19 @@ function handleHash() {
   const h = location.hash;
   if (!h || h === '#')                navigate('home');
   else if (h === '#about')            navigate('about');
+  else if (h === '#case-studies')     navigate('cs');
   else if (h.startsWith('#project/')) navigate('project', h.slice(9));
   else navigate('home');
 }
 
 /* ── NAV LINKS ───────────────────────────────────────────────── */
-navWork.addEventListener('click',  e => { e.preventDefault(); navigate('home'); });
+navWork.addEventListener('click', e => {
+  e.preventDefault();
+  // Work always means everything: clear any case-study pre-filter
+  if (activeFilters.size) { activeFilters.clear(); syncFilterUI(); applyFilter(); }
+  navigate('home');
+});
+navCS.addEventListener('click',    e => { e.preventDefault(); navigate('cs'); });
 navAbout.addEventListener('click', e => { e.preventDefault(); navigate('about'); });
 
 let logoClicks = 0, logoTimer;

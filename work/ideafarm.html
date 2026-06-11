@@ -201,6 +201,11 @@
       display: flex;
       gap: clamp(14px, 2vw, 26px);
     }
+    .nav a { white-space: nowrap; }
+    /* small screens: the case-study banner leads the grid anyway */
+    @media (max-width: 560px) {
+      #nav-cs, .nav-cs-link { display: none; }
+    }
     .nav a {
       font-family: var(--body);
       font-size: 14px;
@@ -1093,6 +1098,7 @@
     <div class="header-right">
       <nav class="nav" aria-label="Primary">
         <a href="../index.html">Work</a>
+        <a href="../index.html#case-studies" class="nav-cs-link">Case studies</a>
         <a href="../index.html#about">About</a>
         <a href="../shop.html">Shop</a>
       </nav>
