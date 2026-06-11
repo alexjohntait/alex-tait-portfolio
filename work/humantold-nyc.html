@@ -798,6 +798,35 @@
       .controls-lead { min-height: 0; }
     }
 
+    /* ── CINEMATIC PAGE-TO-PAGE (cross-document view transitions) ──
+       The header stays planted; the grid banner's artwork morphs into
+       this page's hero. Browsers without support just navigate. */
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+    }
+    header { view-transition-name: site-header; }
+    .cs-hero-media { view-transition-name: cs-hero; }
+    @keyframes pageRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    @keyframes pageSink { from { opacity: 1; } to { opacity: 0; } }
+    ::view-transition-new(root) { animation: pageRise 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+    ::view-transition-old(root) { animation: pageSink 0.26s ease; }
+    ::view-transition-group(cs-hero) {
+      animation-duration: 0.55s;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    ::view-transition-group(site-header) { animation-duration: 0.01s; }
+    @media (prefers-reduced-motion: reduce) {
+      ::view-transition-group(*),
+      ::view-transition-old(*),
+      ::view-transition-new(*) { animation: none !important; }
+    }
+
+    /* sign-off: the signature writes itself when the footer scrolls into view */
+    .foot-sig { height: 30px; width: auto; align-self: flex-start; margin-top: 10px; opacity: 0.9; }
+    :root[data-theme="dark"] .foot-sig { filter: invert(1); }
+    .foot-sig.ready { clip-path: inset(-8% 104% -8% -4%); }
+    .foot-sig.ready.write { animation: sigDraw 1.2s cubic-bezier(0.45, 0, 0.3, 1) 0.15s both; }
+
     /* ── SCROLL DIRECTION — sections rise in as you read ─────────── */
     /* .rv is added by JS only (motion permitting), so everything is
        visible by default; .in releases each element with its own delay */
@@ -1174,6 +1203,7 @@
       <div class="foot-cta">
         <span class="foot-status"><span class="foot-dot" aria-hidden="true"></span>Available for commissions</span>
         <a class="foot-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+        <img class="foot-sig" src="/assets/signature.png" alt="" aria-hidden="true" loading="lazy" />
       </div>
       <div class="foot-clients">
         <span class="foot-eyebrow">Selected clients</span>
@@ -1200,6 +1230,17 @@
       else if (e.key === 'ArrowLeft' && _prev) location.href = _prev;
       else if (e.key === 'Escape') location.href = '../index.html';
     });
+
+    // footer sign-off: the signature writes itself when it scrolls into view
+    (function () {
+      var fs = document.querySelector('.foot-sig');
+      if (!fs || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+      fs.classList.add('ready');
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { fs.classList.add('write'); io.disconnect(); } });
+      }, { threshold: 0.4 });
+      io.observe(fs);
+    })();
 
     // scroll direction: chapters, media and sketches rise in as you read
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {

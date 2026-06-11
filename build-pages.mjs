@@ -147,6 +147,7 @@ ${JSON.stringify(jsonld, null, 2)}
       <div class="foot-cta">
         <span class="foot-status"><span class="foot-dot" aria-hidden="true"></span>Available for commissions</span>
         <a class="foot-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+        <img class="foot-sig" src="/assets/signature.png" alt="" aria-hidden="true" loading="lazy" />
       </div>
       <div class="foot-clients">
         <span class="foot-eyebrow">Selected clients</span>
@@ -168,6 +169,16 @@ ${JSON.stringify(jsonld, null, 2)}
       const set = () => { if (v.videoWidth && v.videoHeight) v.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
       v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
     });
+    // footer sign-off: the signature writes itself when it scrolls into view
+    (function () {
+      var fs = document.querySelector('.foot-sig');
+      if (!fs || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+      fs.classList.add('ready');
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { fs.classList.add('write'); io.disconnect(); } });
+      }, { threshold: 0.4 });
+      io.observe(fs);
+    })();
     // keyboard nav: ← / → between projects, Esc back to the grid
     var _prev = ${prev ? `'${prev.id}.html'` : 'null'}, _next = ${next ? `'${next.id}.html'` : 'null'};
     addEventListener('keydown', function (e) {
