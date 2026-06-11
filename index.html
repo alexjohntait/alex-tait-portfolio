@@ -844,6 +844,46 @@
     .cursor.is-down .cursor-dot  { transform: translate(-50%, -50%) scale(0.55); }
     .cursor.is-down.is-pill .cursor-pill { transform: translate(-50%, -50%) scale(0.92); }
 
+    /* ─────────────────── DOODLE MODE (easter egg) ───────────────── */
+    .doodle-canvas { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+    html.doodling .doodle-canvas { pointer-events: auto; touch-action: none; cursor: crosshair; }
+    html.has-cursor.doodling .doodle-canvas { cursor: none; }
+    /* the cursor dot fattens into a crayon tip while doodling */
+    html.doodling .cursor-dot { width: 17px; height: 17px; box-shadow: 0 0 0 2.5px var(--paper); }
+    .doodle-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: none; border: none; padding: 4px 0; cursor: pointer;
+      font: 600 13px var(--body); color: var(--muted); letter-spacing: -0.01em;
+    }
+    .doodle-btn svg { width: 15px; height: 15px; }
+    .doodle-btn:hover, .doodle-btn[aria-pressed="true"] { color: var(--red); }
+    .doodle-chip {
+      position: fixed; bottom: 18px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      z-index: 260; display: flex; gap: 8px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s var(--ease), transform 0.35s var(--ease-out);
+    }
+    html.doodling .doodle-chip { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
+    .doodle-chip button {
+      border: none; cursor: pointer; border-radius: 100px; padding: 9px 15px;
+      font: 700 12px var(--body); letter-spacing: -0.01em;
+      background: var(--ink); color: var(--paper);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    }
+    .doodle-chip .chip-hint {
+      background: var(--paper); color: var(--ink);
+      box-shadow: inset 0 0 0 1px var(--line), 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+    @keyframes canvasShake {
+      0%, 100% { transform: none; }
+      20% { transform: translate(-7px, 2px) rotate(-0.4deg); }
+      40% { transform: translate(6px, -3px) rotate(0.4deg); }
+      60% { transform: translate(-5px, -2px) rotate(-0.3deg); }
+      80% { transform: translate(4px, 2px) rotate(0.2deg); }
+    }
+    .doodle-canvas.shaking { animation: canvasShake 0.3s ease-in-out 2; }
+
     /* ─────────────────── EASTER EGG: raining work ───────────────── */
     .rain-item {
       position: fixed; top: 0; z-index: 290;
@@ -1152,6 +1192,10 @@
     </div>
     <div class="foot-meta">
       <span>Represented by <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Jelly</a> for commissions worldwide</span>
+      <button class="doodle-btn" type="button" aria-pressed="false" title="Doodle mode (D)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21c3-1 2.5-3 5-5L18.5 5.5a2.12 2.12 0 0 1 3 3L11 19c-2.5 2.5-4 2-8 2z"/><path d="M15 7l2 2"/></svg>
+        Doodle
+      </button>
       <span>© 2026 Alex Tait</span>
     </div>
   </div>
@@ -1808,6 +1852,153 @@ function setupTouchVideo() {
   }, { threshold: 0.4 });
   grid.querySelectorAll('.card video').forEach(v => io.observe(v));
 }
+
+/* ── DOODLE MODE (easter egg: draw on the site in your accent) ── */
+(() => {
+  const btn = document.querySelector('.doodle-btn');
+  if (!btn) return;
+
+  const cv = document.createElement('canvas');
+  cv.className = 'doodle-canvas';
+  cv.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(cv);
+  const chip = document.createElement('div');
+  chip.className = 'doodle-chip';
+  chip.innerHTML = '<button type="button" class="chip-done">Done &#10005;</button><button type="button" class="chip-hint">shake to erase</button>';
+  document.body.appendChild(chip);
+
+  const ctx = cv.getContext('2d');
+  let on = false, drawing = false, strokes = [], stroke = null;
+  let last = null, fade = 1, greeted = false;
+
+  function size() {
+    const d = Math.min(devicePixelRatio || 1, 2);
+    cv.width = innerWidth * d; cv.height = innerHeight * d;
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    paint();
+  }
+  function paint() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctx.globalAlpha = fade;
+    ctx.lineCap = ctx.lineJoin = 'round';
+    for (const s of strokes) {
+      ctx.strokeStyle = s.c;
+      for (let i = 1; i < s.p.length; i++) seg(s.p[i - 1], s.p[i]);
+    }
+    ctx.globalAlpha = 1;
+  }
+  function seg(a, b) {
+    ctx.lineWidth = (a.w + b.w) / 2;
+    ctx.beginPath();
+    ctx.moveTo(a.x - scrollX, a.y - scrollY);
+    ctx.lineTo(b.x - scrollX, b.y - scrollY);
+    ctx.stroke();
+  }
+  // crayon feel: slow drags go fat, fast flicks go thin
+  function width(x, y, t) {
+    if (!last) return 7;
+    const v = Math.hypot(x - last.x, y - last.y) / Math.max(t - last.t, 1); // px/ms
+    return Math.max(2.5, Math.min(10, 9 - v * 4));
+  }
+
+  cv.addEventListener('pointerdown', e => {
+    if (!on || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+    drawing = true;
+    last = null;
+    const w = width(e.clientX, e.clientY, e.timeStamp);
+    stroke = { c: currentAccent, p: [{ x: e.clientX + scrollX, y: e.clientY + scrollY, w }] };
+    strokes.push(stroke);
+    last = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!on) return;
+    if (drawing && stroke) {
+      const co = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+      const evs = co.length ? co : [e];
+      ctx.strokeStyle = stroke.c;
+      ctx.lineCap = ctx.lineJoin = 'round';
+      for (const ev of evs) {
+        const w = width(ev.clientX, ev.clientY, ev.timeStamp);
+        const pt = { x: ev.clientX + scrollX, y: ev.clientY + scrollY, w };
+        seg(stroke.p[stroke.p.length - 1], pt);
+        stroke.p.push(pt);
+        last = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp };
+      }
+    } else {
+      detectShake(e);
+    }
+  });
+  const stop = () => { drawing = false; stroke = null; last = null; };
+  cv.addEventListener('pointerup', stop);
+  cv.addEventListener('pointercancel', stop);
+
+  // desktop shake: wiggle the cursor fast (button up) and the drawing crumbles
+  let flips = [], lastDx = 0;
+  function detectShake(e) {
+    if (!strokes.length || e.movementX === undefined) return;
+    const dx = e.movementX;
+    if (Math.abs(dx) > 14 && Math.sign(dx) !== Math.sign(lastDx) && lastDx !== 0) {
+      const now = performance.now();
+      flips = flips.filter(t => now - t < 550);
+      flips.push(now);
+      if (flips.length >= 5) { flips = []; erase(); }
+    }
+    if (dx !== 0) lastDx = dx;
+  }
+  // phone shake (Android fires without permission; iOS users have the chip)
+  let lastMag = 0;
+  function onMotion(e) {
+    const a = e.acceleration || {};
+    const mag = Math.hypot(a.x || 0, a.y || 0, a.z || 0);
+    if (mag > 18 && lastMag <= 18 && strokes.length) erase();
+    lastMag = mag;
+  }
+
+  function erase() {
+    if (!strokes.length) return;
+    if (REDUCE_MOTION) { strokes = []; paint(); return; }
+    cv.classList.add('shaking');
+    setTimeout(() => {
+      const t0 = performance.now();
+      const tick = now => {
+        fade = Math.max(0, 1 - (now - t0) / 320);
+        paint();
+        if (fade > 0) requestAnimationFrame(tick);
+        else { strokes = []; fade = 1; paint(); cv.classList.remove('shaking'); }
+      };
+      requestAnimationFrame(tick);
+    }, 450);
+  }
+
+  function toggle(force) {
+    on = force !== undefined ? force : !on;
+    document.documentElement.classList.toggle('doodling', on);
+    btn.setAttribute('aria-pressed', String(on));
+    if (on) {
+      size();
+      addEventListener('devicemotion', onMotion);
+      if (!greeted) {
+        greeted = true;
+        console.log('%c🖍 doodle mode — like your masterpiece? screenshot it before it\'s gone.',
+          'font: 600 13px sans-serif; color: #ff1d19;');
+      }
+    } else {
+      removeEventListener('devicemotion', onMotion);
+    }
+  }
+
+  btn.addEventListener('click', () => toggle());
+  chip.querySelector('.chip-done').addEventListener('click', () => toggle(false));
+  chip.querySelector('.chip-hint').addEventListener('click', erase);
+  addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if ((e.key === 'd' || e.key === 'D') && !e.repeat) toggle();
+    else if (e.key === 'Escape' && on) { toggle(false); e.stopPropagation(); }
+  }, true);
+  addEventListener('resize', () => { if (on || strokes.length) size(); });
+  addEventListener('scroll', () => { if (strokes.length) paint(); }, { passive: true });
+})();
 
 /* ── INIT ────────────────────────────────────────────────────── */
 // opening curtain: one directed entrance, only on a fresh landing at the grid
