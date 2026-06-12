@@ -365,6 +365,14 @@
       cursor: pointer;
       transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.18s var(--ease);
     }
+    /* shuffle: re-deal the deck */
+    .filters .shuffle { padding: 8px 12px; }
+    .filters .shuffle svg { width: 15px; height: 15px; display: block; }
+    .filters .shuffle:hover { color: var(--red); }
+    @media (prefers-reduced-motion: no-preference) {
+      .filters .shuffle.spun svg { animation: shuffleSpin 0.5s var(--ease-out); }
+    }
+    @keyframes shuffleSpin { from { transform: rotate(-180deg) scale(0.8); } to { transform: rotate(0) scale(1); } }
     @media (hover: hover) and (pointer: fine) {
       .filters button:hover { color: var(--ink); transform: translateY(-2px); }
     }
@@ -470,18 +478,31 @@
     @media (prefers-reduced-motion: reduce) { .card-cs span { transition: none; } }
 
     /* ── Featured case-study banner (own block above the masonry) ── */
-    .featured { padding: 0 var(--pad); }
-    .card.cs-banner {
+    .featured {
+      padding: 0 var(--pad);
+      margin: 12px 0 clamp(24px, 3vw, 40px);
       display: grid;
-      grid-template-columns: 1.35fr 1fr;
-      height: clamp(260px, 28vw, 380px);
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+      gap: clamp(14px, 2vw, 22px);
+    }
+    /* no featured items (e.g. filtered out) — drop the reserved space */
+    .featured:not(:has(.card:not(.hidden))) { margin: 0; }
+    /* case studies sit side by side as feature tiles: art on top, panel below.
+       auto-fit: one case study spans full width, two split, hidden ones drop out */
+    .card.cs-banner {
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       border-radius: var(--r-feature);
       background: var(--cs-panel, var(--ink));
-      margin: 12px 0 clamp(24px, 3vw, 40px);
+      margin: 0;
     }
-    /* full square animation, letterboxed into the panel colour so there's no crop and no seam */
-    .cs-banner-media { position: relative; overflow: hidden; background: var(--cs-panel, var(--ink)); }
+    /* the full artwork, letterboxed into the panel colour: no crop, no seam */
+    .cs-banner-media {
+      position: relative; overflow: hidden; flex: none;
+      aspect-ratio: 16 / 9;
+      background: var(--cs-panel, var(--ink));
+    }
     .cs-banner-media video,
     .cs-banner-media img {
       width: 100%; height: 100%; object-fit: contain; display: block;
@@ -494,9 +515,9 @@
     .cs-banner-panel {
       background: var(--cs-panel, var(--ink));
       color: #fff;
-      display: flex; flex-direction: column; justify-content: space-between;
-      gap: 14px;
-      padding: clamp(20px, 2.4vw, 40px);
+      display: flex; flex-direction: column;
+      gap: 10px;
+      padding: clamp(18px, 2vw, 28px);
     }
     .cs-banner-kicker {
       font-family: var(--display); font-weight: 700; font-size: 11px;
@@ -504,27 +525,26 @@
     }
     .cs-banner-title {
       font-family: var(--display); font-weight: 800;
-      font-size: clamp(24px, 3vw, 46px); line-height: 1.0; letter-spacing: -0.03em;
-      color: #fff; text-wrap: balance; margin-top: auto; max-width: 18ch;
+      font-size: clamp(22px, 2.3vw, 34px); line-height: 1.02; letter-spacing: -0.03em;
+      color: #fff; text-wrap: balance; max-width: 22ch;
     }
     .cs-banner-cta {
-      display: inline-flex; align-items: center; gap: 7px;
+      display: inline-flex; align-items: center; gap: 7px; margin-top: 2px;
       font-family: var(--body); font-weight: 700; font-size: 14px; color: #fff;
     }
     .cs-banner-cta span { transition: transform 0.3s var(--ease-out); }
     .cs-banner:hover .cs-banner-cta span { transform: translateX(4px); }
-    /* alternate banners flip (panel left, art right) for rhythm */
-    .featured .cs-banner:nth-child(even) { grid-template-columns: 1fr 1.35fr; }
-    .featured .cs-banner:nth-child(even) .cs-banner-media { order: 2; }
-    /* mobile: a normal card — animation + a label below, no overlay sticker */
+    /* mobile: a normal card — the full artwork + a label below, no overlay sticker */
     .cs-banner-foot { display: none; }
     @media (max-width: 640px) {
-      .card.cs-banner { grid-template-columns: 1fr; height: auto; background: transparent; border-radius: 0; margin: 6px 0 clamp(20px, 2.6vw, 34px); }
       .cs-banner-panel { display: none; }
-      .cs-banner-media { aspect-ratio: 1 / 1; border-radius: var(--r-media); }
-      .cs-banner-media video, .cs-banner-media img { object-fit: cover; }
-      .cs-banner-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 10px 2px 4px; }
-      .cs-banner-foot .cs-tag { color: var(--red); font-weight: 700; white-space: nowrap; }
+      .cs-banner-media { aspect-ratio: 4 / 3; }
+      .cs-banner-foot {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 10px; padding: 10px 12px 12px;
+      }
+      .cs-banner-foot .card-title { color: #fff; }
+      .cs-banner-foot .cs-tag { color: #fff; font-weight: 700; white-space: nowrap; opacity: 0.85; }
     }
     @media (prefers-reduced-motion: reduce) { .cs-banner-cta span { transition: none; } }
 
@@ -1121,7 +1141,7 @@
   <article>
     <div class="pview-bar">
       <a href="../index.html" class="back-link"><span aria-hidden="true">←</span> All work</a>
-      <span class="pview-count">26 / 31</span>
+      <span class="pview-count">24 / 29</span>
     </div>
     <div class="project-stage">
       <div class="project-media-col"><div class="project-masonry"><figure class="m-item"><img src="../images/eco-living.jpg" alt="Eco Living 1" loading="eager" /></figure><figure class="m-item"><img src="../images/eco-living-m1.jpg" alt="Eco Living 2" loading="lazy" width="900" height="900" style="aspect-ratio:900 / 900" /></figure></div></div>
@@ -1137,7 +1157,7 @@
       </div>
     </div>
     <nav class="project-nav" aria-label="More projects">
-      <a class="pnav" href="tiller-and-lock.html"><span class="pnav-dir">← Previous</span><span class="pnav-title">Tiller &amp; Lock</span></a>
+      <a class="pnav" href="give-it-time.html"><span class="pnav-dir">← Previous</span><span class="pnav-title">Give it Time</span></a>
       <a class="pnav" href="paws-for-thought.html" style="text-align:right;align-items:flex-end"><span class="pnav-dir">Next →</span><span class="pnav-title">Paws for Thought</span></a>
     </nav>
   </article>
@@ -1180,7 +1200,7 @@
       io.observe(fs);
     })();
     // keyboard nav: ← / → between projects, Esc back to the grid
-    var _prev = 'tiller-and-lock.html', _next = 'paws-for-thought.html';
+    var _prev = 'give-it-time.html', _next = 'paws-for-thought.html';
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === 'ArrowRight' && _next) location.href = _next;
