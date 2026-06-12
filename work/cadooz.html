@@ -513,6 +513,9 @@
     }
     .cs-banner-cta span { transition: transform 0.3s var(--ease-out); }
     .cs-banner:hover .cs-banner-cta span { transform: translateX(4px); }
+    /* alternate banners flip (panel left, art right) for rhythm */
+    .featured .cs-banner:nth-child(even) { grid-template-columns: 1fr 1.35fr; }
+    .featured .cs-banner:nth-child(even) .cs-banner-media { order: 2; }
     /* mobile: a normal card — animation + a label below, no overlay sticker */
     .cs-banner-foot { display: none; }
     @media (max-width: 640px) {
@@ -925,13 +928,15 @@
       @view-transition { navigation: auto; }
     }
     header { view-transition-name: site-header; }
-    .cs-banner-media { view-transition-name: cs-hero; }
+    /* each banner gets its own morph name (set inline in buildGrid):
+       duplicate view-transition-names would cancel the transition */
     @keyframes pageRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
     @keyframes pageSink { from { opacity: 1; } to { opacity: 0; } }
     /* cross-doc only: html has no vt-next/vt-prev class during MPA swaps */
     html:not(.vt-next):not(.vt-prev)::view-transition-new(root) { animation: pageRise 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
     html:not(.vt-next):not(.vt-prev)::view-transition-old(root) { animation: pageSink 0.26s ease; }
-    ::view-transition-group(cs-hero) {
+    ::view-transition-group(cs-humantold-nyc),
+    ::view-transition-group(cs-hiit-workout) {
       animation-duration: 0.55s;
       animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     }

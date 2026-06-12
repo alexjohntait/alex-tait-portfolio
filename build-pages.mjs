@@ -9,7 +9,7 @@ const html = fs.readFileSync('index.html', 'utf8');
 // Bespoke, hand-built case-study pages that must NEVER be regenerated/overwritten
 // by this script (or the scheduled "Rebuild from Airtable" Action). Add an id here
 // to protect its custom work/<id>.html. It still appears in the grid and sitemap.
-const BESPOKE = new Set(['humantold-nyc']);
+const BESPOKE = new Set(['humantold-nyc', 'hiit-workout']);
 
 // ── pull data + styles out of the SPA ──────────────────────────
 const grab = (re, label) => { const m = html.match(re); if (!m) throw new Error('Could not find ' + label); return m[1]; };

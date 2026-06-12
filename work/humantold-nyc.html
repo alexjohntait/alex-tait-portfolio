@@ -813,12 +813,12 @@
       @view-transition { navigation: auto; }
     }
     header { view-transition-name: site-header; }
-    .cs-hero-media { view-transition-name: cs-hero; }
+    .cs-hero-media { view-transition-name: cs-humantold-nyc; }
     @keyframes pageRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
     @keyframes pageSink { from { opacity: 1; } to { opacity: 0; } }
     ::view-transition-new(root) { animation: pageRise 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
     ::view-transition-old(root) { animation: pageSink 0.26s ease; }
-    ::view-transition-group(cs-hero) {
+    ::view-transition-group(cs-humantold-nyc) {
       animation-duration: 0.55s;
       animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     }

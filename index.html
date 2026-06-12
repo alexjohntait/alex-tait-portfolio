@@ -521,6 +521,9 @@
     }
     .cs-banner-cta span { transition: transform 0.3s var(--ease-out); }
     .cs-banner:hover .cs-banner-cta span { transform: translateX(4px); }
+    /* alternate banners flip (panel left, art right) for rhythm */
+    .featured .cs-banner:nth-child(even) { grid-template-columns: 1fr 1.35fr; }
+    .featured .cs-banner:nth-child(even) .cs-banner-media { order: 2; }
     /* mobile: a normal card — animation + a label below, no overlay sticker */
     .cs-banner-foot { display: none; }
     @media (max-width: 640px) {
@@ -933,13 +936,15 @@
       @view-transition { navigation: auto; }
     }
     header { view-transition-name: site-header; }
-    .cs-banner-media { view-transition-name: cs-hero; }
+    /* each banner gets its own morph name (set inline in buildGrid):
+       duplicate view-transition-names would cancel the transition */
     @keyframes pageRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
     @keyframes pageSink { from { opacity: 1; } to { opacity: 0; } }
     /* cross-doc only: html has no vt-next/vt-prev class during MPA swaps */
     html:not(.vt-next):not(.vt-prev)::view-transition-new(root) { animation: pageRise 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
     html:not(.vt-next):not(.vt-prev)::view-transition-old(root) { animation: pageSink 0.26s ease; }
-    ::view-transition-group(cs-hero) {
+    ::view-transition-group(cs-humantold-nyc),
+    ::view-transition-group(cs-hiit-workout) {
       animation-duration: 0.55s;
       animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     }
@@ -1381,9 +1386,12 @@ const catLabel = c => FILTER_LABELS[c] || (c.charAt(0).toUpperCase() + c.slice(1
 const catsOf   = p => String(p.category || '').split(',').map(s => s.trim()).filter(Boolean);
 // Bespoke case-study projects: open their standalone rich page instead of the
 // inline SPA view. Keep in sync with BESPOKE in build-pages.mjs.
-const BESPOKE  = new Set(['humantold-nyc']);
+const BESPOKE  = new Set(['humantold-nyc', 'hiit-workout']);
 // Featured banner copy for case studies (title shown on the panel + panel colour).
-const CS_META  = { 'humantold-nyc': { title: 'Making therapy feel reachable', client: 'Humantold', panel: '#ec482c', ink: '#4a1b0c' } };
+const CS_META  = {
+  'humantold-nyc': { title: 'Making therapy feel reachable', client: 'Humantold', panel: '#ec482c', ink: '#4a1b0c' },
+  'hiit-workout':  { title: 'A coach timed to the beat', client: 'Spotify', panel: '#509bf6', ink: '#0a2a5e' }
+};
 
 /* ── BUILD GRID ──────────────────────────────────────────────── */
 function buildGrid() {
@@ -1427,6 +1435,8 @@ function buildGrid() {
           <span class="card-tag cs-tag">Case study <span aria-hidden="true">&rarr;</span></span>
         </div>
       `;
+      // unique cross-document morph target (matches the page's hero name)
+      card.querySelector('.cs-banner-media').style.viewTransitionName = 'cs-' + p.id;
     } else {
       card.innerHTML = `
         <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
