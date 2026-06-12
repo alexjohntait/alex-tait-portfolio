@@ -19,6 +19,16 @@ const GALLERY  = JSON.parse(grab(/const GALLERY = (\{[\s\S]*?\});/, 'GALLERY'));
 const CSS      = grab(/<style>([\s\S]*?)<\/style>/, 'CSS');
 
 const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// contrast-aware ink for the project's colour band (WCAG relative luminance)
+const heroInk = bg => {
+  let hex = bg.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const [r, g, b] = [0, 2, 4].map(i => {
+    let v = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.45 ? '#16120f' : '#fff';
+};
 const colourfulness = hex => { hex = hex.replace('#',''); const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16); return Math.max(r,g,b)-Math.min(r,g,b); };
 const pickVivid = (bg, fg) => (colourfulness(fg) > colourfulness(bg) ? fg : bg);
 const rgba = (hex, a) => { hex = hex.replace('#',''); return `rgba(${parseInt(hex.slice(0,2),16)}, ${parseInt(hex.slice(2,4),16)}, ${parseInt(hex.slice(4,6),16)}, ${a})`; };
@@ -46,15 +56,24 @@ PROJECTS.forEach((p, idx) => {
   const metaDesc = desc.length > 300 ? desc.slice(0, 297).trim() + '…' : desc;
   const glow = rgba(pickVivid(p.bg, p.fg), 0.15);
 
-  const copyHtml = (p.desc || p.caption || `An illustration and motion project by Alex Tait.`)
-    .split('\n').filter(s => s.trim()).map(s => `<p>${esc(s.trim())}</p>`).join('');
+  // long description preferred; fall back to caption; omit when neither exists
+  const copySrc = (p.desc || p.caption || '').trim();
+  const copyHtml = copySrc
+    ? `<div class="pv-desc">${copySrc.split('\n').filter(s => s.trim()).map(s => `<p>${esc(s.trim())}</p>`).join('')}</div>`
+    : '';
 
-  const tagList = (p.tags || '').split('/').map(t => t.trim()).filter(Boolean);
-  const tagsHtml = tagList.length ? `<div class="project-tags">${tagList.map(t => `<span class="project-tag">${esc(t)}</span>`).join('')}</div>` : '';
-
-  const mediaHtml = list.length <= 1
-    ? `<div class="project-solo">${list.length ? media(list[0], p.title, true) : ''}</div>`
-    : `<div class="project-masonry">${list.map((m, n) => `<figure class="m-item">${media(m, `${p.title} ${n + 1}`, n === 0)}</figure>`).join('')}</div>`;
+  // hero leads; the rest flows as a full-width masonry
+  const heroHtml = list.length
+    ? `<figure class="pv-heromedia">${media(list[0], p.title, true)}</figure>`
+    : '';
+  const rest = list.slice(1);
+  const galleryHtml = rest.length
+    ? `<div class="project-masonry pv-gallery">${rest.map((m, n) => `<figure class="m-item">${media(m, `${p.title} ${n + 2}`, false)}</figure>`).join('')}</div>`
+    : '';
+  const metaLine = p.client === 'Personal'
+    ? `${catList.map(esc).join(' &middot; ')} &middot; ${esc(p.year)}`
+    : `${esc(p.client)} &middot; ${catList.map(esc).join(' &middot; ')} &middot; ${esc(p.year)}`;
+  const ink = heroInk(p.bg);
 
   const jsonld = {
     "@context": "https://schema.org", "@type": "VisualArtwork",
@@ -120,23 +139,19 @@ ${JSON.stringify(jsonld, null, 2)}
   </header>
 
   <article>
-    <div class="pview-bar">
-      <a href="../index.html" class="back-link"><span aria-hidden="true">←</span> All work</a>
-      <span class="pview-count">${String(idx + 1).padStart(2, '0')} / ${String(PROJECTS.length).padStart(2, '0')}</span>
-    </div>
-    <div class="project-stage">
-      <div class="project-media-col">${mediaHtml}</div>
-      <div class="project-info">
-        <h1 class="project-title">${esc(p.title)}</h1>
-        <div class="project-meta">
-          <div class="meta-row"><span class="meta-label">Client</span><span class="meta-value">${esc(p.client)}</span></div>
-          <div class="meta-row"><span class="meta-label">Category</span><span class="meta-value">${esc(cat)}</span></div>
-          <div class="meta-row"><span class="meta-label">Year</span><span class="meta-value">${esc(p.year)}</span></div>
-        </div>
-        <div class="project-desc">${copyHtml}</div>
-        ${tagsHtml}
+    <div class="pv-hero" style="background:${p.bg}; color:${ink};">
+      <div class="pv-bar">
+        <a href="../index.html" class="back-link"><span aria-hidden="true">←</span> All work</a>
+        <span class="pview-count">${String(idx + 1).padStart(2, '0')} / ${String(PROJECTS.length).padStart(2, '0')}</span>
       </div>
+      <h1 class="pv-title">${esc(p.title)}</h1>
+      <p class="pv-meta">${metaLine}</p>
     </div>
+    <div class="pv-lead">
+      ${heroHtml}
+      ${copyHtml}
+    </div>
+    ${galleryHtml}
     <nav class="project-nav" aria-label="More projects">
       ${prev ? `<a class="pnav" href="${prev.id}.html"><span class="pnav-dir">← Previous</span><span class="pnav-title">${esc(prev.title)}</span></a>` : `<span class="pnav" style="opacity:.2"></span>`}
       ${next ? `<a class="pnav" href="${next.id}.html" style="text-align:right;align-items:flex-end"><span class="pnav-dir">Next →</span><span class="pnav-title">${esc(next.title)}</span></a>` : `<span class="pnav"></span>`}
