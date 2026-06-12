@@ -82,6 +82,10 @@
     .wordmark .sig{height:clamp(26px,3.4vw,36px);width:auto;display:block;margin-left:-5px;
       transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
     .wordmark:hover .sig{transform:rotate(-2deg) scale(1.03);}
+    @media (prefers-reduced-motion:no-preference){.wordmark .sig{animation:sigDraw 1.1s cubic-bezier(.45,0,.3,1) .1s both;}}
+    @keyframes sigDraw{0%{clip-path:inset(-8% 104% -8% -4%);}52%{clip-path:inset(-8% 46% -8% -4%);}60%{clip-path:inset(-8% 46% -8% -4%);}100%{clip-path:inset(-8% -4% -8% -4%);}}
+    .nav a{white-space:nowrap;}
+    @media (max-width:560px){.nav-cs-link{display:none;}}
     .header-right{display:flex;align-items:center;gap:clamp(16px,3vw,32px);}
     .nav{display:flex;gap:clamp(14px,2vw,26px);}
     .nav a{font-size:14px;font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink);
@@ -148,6 +152,7 @@
   <div class="header-right">
     <nav class="nav" aria-label="Primary">
       <a href="index.html">Work</a>
+      <a href="index.html#case-studies" class="nav-cs-link">Case studies</a>
       <a href="index.html#about">About</a>
       <a href="shop.html" class="current" aria-current="page">Shop</a>
     </nav>

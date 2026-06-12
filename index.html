@@ -134,6 +134,8 @@
       padding: 10px 16px; z-index: 200; text-decoration: none; border-radius: 2px;
     }
     .skip-link:focus { top: 12px; }
+    /* skip-link target: receive focus without drawing a ring around the grid */
+    #grid:focus { outline: none; }
 
     a { color: inherit; }
     :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 2px; }
@@ -1002,6 +1004,11 @@
       }
       .filters::-webkit-scrollbar { display: none; }
       .filters button { flex: 0 0 auto; }
+      /* right-edge fade hints that the strip scrolls */
+      .filters {
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+      }
 
       .grid { padding-top: 4px; }
 
@@ -1100,7 +1107,7 @@
 </head>
 <body>
 
-<a href="#" class="skip-link">Skip to content</a>
+<a href="#grid" class="skip-link">Skip to content</a>
 
 <div class="glow" id="glow-a" aria-hidden="true"></div>
 <div class="glow" id="glow-b" aria-hidden="true"></div>
@@ -1143,7 +1150,7 @@
       </div>
     </div>
     <div class="featured" id="featured"></div>
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid" tabindex="-1"></div>
   </section>
 
   <!-- PROJECT -->
@@ -1848,7 +1855,8 @@ window.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' && PROJECTS[idx + 1]) { e.preventDefault(); navigate('project', PROJECTS[idx + 1].id, null, 'next'); }
     else if (e.key === 'ArrowLeft' && PROJECTS[idx - 1]) { e.preventDefault(); navigate('project', PROJECTS[idx - 1].id, null, 'prev'); }
     else if (e.key === 'Escape') { e.preventDefault(); navigate('home'); }
-  } else if (h === '#about' && e.key === 'Escape') {
+  } else if ((h === '#about' || h === '#case-studies') && e.key === 'Escape') {
+    if (activeFilters.size) { activeFilters.clear(); syncFilterUI(); applyFilter(); }
     navigate('home');
   }
 });

@@ -122,6 +122,8 @@
       padding: 10px 16px; z-index: 200; text-decoration: none; border-radius: 2px;
     }
     .skip-link:focus { top: 12px; }
+    /* skip-link target: receive focus without drawing a ring around the grid */
+    #grid:focus { outline: none; }
 
     a { color: inherit; }
     :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; border-radius: 2px; }
@@ -990,6 +992,11 @@
       }
       .filters::-webkit-scrollbar { display: none; }
       .filters button { flex: 0 0 auto; }
+      /* right-edge fade hints that the strip scrolls */
+      .filters {
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+      }
 
       .grid { padding-top: 4px; }
 
