@@ -2,7 +2,9 @@ name: Rebuild site from Airtable
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    # every 6 hours: Airtable edits go live the same working day without
+    # racing manual pushes every half hour (use "Run workflow" for instant)
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
