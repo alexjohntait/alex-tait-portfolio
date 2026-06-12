@@ -373,6 +373,14 @@
       cursor: pointer;
       transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.18s var(--ease);
     }
+    /* shuffle: re-deal the deck */
+    .filters .shuffle { padding: 8px 12px; }
+    .filters .shuffle svg { width: 15px; height: 15px; display: block; }
+    .filters .shuffle:hover { color: var(--red); }
+    @media (prefers-reduced-motion: no-preference) {
+      .filters .shuffle.spun svg { animation: shuffleSpin 0.5s var(--ease-out); }
+    }
+    @keyframes shuffleSpin { from { transform: rotate(-180deg) scale(0.8); } to { transform: rotate(0) scale(1); } }
     @media (hover: hover) and (pointer: fine) {
       .filters button:hover { color: var(--ink); transform: translateY(-2px); }
     }
@@ -1152,6 +1160,9 @@
         <button data-filter="advertising" aria-pressed="false">Advertising</button>
         <button data-filter="editorial" aria-pressed="false">Editorial</button>
         <button data-filter="personal" aria-pressed="false">Personal</button>
+        <button class="shuffle" id="shuffle" aria-label="Shuffle the grid" title="Shuffle the grid">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+        </button>
       </div>
     </div>
     <div class="featured" id="featured"></div>
@@ -1582,7 +1593,7 @@ function applyFilter() {
 }
 
 function syncFilterUI() {
-  filters.querySelectorAll('button').forEach(b => {
+  filters.querySelectorAll('button[data-filter]').forEach(b => {
     const f = b.dataset.filter;
     const on = f === 'all' ? activeFilters.size === 0 : activeFilters.has(f);
     b.classList.toggle('active', on);
@@ -1593,7 +1604,7 @@ function syncFilterUI() {
   setLead(lead, DEFAULT_SUB, true);
 }
 
-filters.querySelectorAll('button').forEach(btn => {
+filters.querySelectorAll('button[data-filter]').forEach(btn => {
   btn.addEventListener('click', () => {
     const f = btn.dataset.filter;
     if (f === 'all') activeFilters.clear();
@@ -1604,6 +1615,40 @@ filters.querySelectorAll('button').forEach(btn => {
     if (location.hash === '#case-studies') { history.replaceState(null, '', '#'); setNav('home'); }
     syncFilterUI();
     applyFilter();
+  });
+});
+
+/* ── SHUFFLE — re-deal the grid like a deck of cards (FLIP) ───── */
+document.getElementById('shuffle')?.addEventListener('click', function () {
+  this.classList.remove('spun'); void this.offsetWidth; this.classList.add('spun');
+  const cards = [...grid.children];
+  // FIRST
+  const first = new Map();
+  cards.forEach(c => { if (!c.classList.contains('hidden')) first.set(c, c.getBoundingClientRect()); });
+  // shuffle (Fisher–Yates) and re-append
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  cards.forEach(c => grid.appendChild(c));
+  if (REDUCE_MOTION) return;
+  // LAST + INVERT + PLAY, with a touch of card-toss rotation
+  let n = 0;
+  cards.forEach(c => {
+    const f = first.get(c);
+    if (!f) return;
+    const last = c.getBoundingClientRect();
+    const dx = f.left - last.left, dy = f.top - last.top;
+    if (!dx && !dy) return;
+    const tilt = (Math.random() * 6 - 3).toFixed(1);
+    c.style.transition = 'none';
+    c.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg)`;
+    const delay = (n++ % 6) * 0.03;
+    requestAnimationFrame(() => {
+      c.style.transition = `transform 0.5s var(--ease-out) ${delay}s`;
+      c.style.transform = '';
+    });
+    c.addEventListener('transitionend', () => { c.style.transition = ''; c.style.transform = ''; }, { once: true });
   });
 });
 
