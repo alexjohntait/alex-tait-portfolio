@@ -563,22 +563,27 @@
 
     /* rotating circular-text seal — the project's name + discipline curve
        around the tile and spin in on attention */
+    /* the ring orbits the tile: it overflows the thumb (so it must NOT be
+       clipped — lives on .card, not inside the overflow-hidden thumb) and
+       is sized to the tile diagonal in sizeSeal() */
     .card-seal {
       position: absolute; inset: 0; z-index: 3;
       display: grid; place-items: center;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.35s var(--ease);
+      transition: opacity 0.4s var(--ease);
     }
     .card-seal svg {
-      width: clamp(110px, 16vw, 150px); height: auto;
-      animation: sealSpin 9s linear infinite;
+      display: block; overflow: visible;
+      animation: sealSpin 16s linear infinite;
       animation-play-state: paused;
     }
     .card-seal-text {
       font-family: var(--display); font-weight: 700;
-      font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+      font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase;
       fill: #fff; mix-blend-mode: difference;
     }
+    /* lift the hovered card so its orbiting ring draws above neighbours */
+    .card:hover, .card:focus-within { z-index: 5; }
     @media (hover: hover) and (pointer: fine) {
       .card:hover .card-seal { opacity: 1; }
       .card:hover .card-seal svg { animation-play-state: running; }
@@ -1387,6 +1392,24 @@ const CS_META  = {
   'hiit-workout':  { title: 'A coach timed to the beat', client: 'Spotify', panel: '#509bf6', ink: '#0a2a5e' }
 };
 
+/* Size a card's orbiting name-ring to its tile: diameter = the tile's
+   diagonal (+a little) so the text rides around the corners; the path is
+   rebuilt at the real size and font-size stays constant (viewBox maps 1:1). */
+function sizeSeal(card) {
+  const thumb = card.querySelector('.card-thumb');
+  const svg = card.querySelector('.card-seal svg');
+  if (!thumb || !svg) return;
+  const r = thumb.getBoundingClientRect();
+  if (!r.width) return;
+  const d = Math.round(Math.hypot(r.width, r.height) + 20);
+  const c = d / 2, rad = c - 14;
+  svg.setAttribute('viewBox', `0 0 ${d} ${d}`);
+  svg.style.width = d + 'px';
+  svg.style.height = d + 'px';
+  svg.querySelector('path').setAttribute('d',
+    `M${c},${c} m-${rad},0 a${rad},${rad} 0 1,1 ${rad * 2},0 a${rad},${rad} 0 1,1 -${rad * 2},0`);
+}
+
 /* ── BUILD GRID ──────────────────────────────────────────────── */
 function buildGrid() {
   grid.innerHTML = '';
@@ -1432,22 +1455,21 @@ function buildGrid() {
       // unique cross-document morph target (matches the page's hero name)
       card.querySelector('.cs-banner-media').style.viewTransitionName = 'cs-' + p.id;
     } else {
-      // rotating circular-text seal: name + discipline curve around the tile,
-      // spinning in on hover. enough repeats to wrap the ring; extra is clipped.
-      const ring = `${p.title}  &middot;  ${cat}  &middot;  `.repeat(3);
+      // rotating name-ring that ORBITS the tile (sized to the tile diagonal in
+      // sizeSeal, so the text rides around the corners). repeated enough to fill
+      // the largest ring; the path is rebuilt to the real size on hover.
+      const ring = `${p.title}  &middot;  ${cat}  &middot;  `.repeat(6);
       card.innerHTML = `
         <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
-          <span class="card-index">${String(n+1).padStart(2,'0')}</span>
           ${mediaTag(p, { alt: p.title, eager: n < 8, hoverPlay: true })}
-          <div class="card-seal" aria-hidden="true">
-            <svg viewBox="0 0 120 120">
-              <defs><path id="seal-${p.id}" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0"/></defs>
-              <text class="card-seal-text"><textPath href="#seal-${p.id}" startOffset="0">${ring}</textPath></text>
-            </svg>
-          </div>
         </div>
-        <h2 class="card-title sr-only">${p.title}</h2>
-      `;
+        <div class="card-seal" aria-hidden="true">
+          <svg viewBox="0 0 120 120">
+            <defs><path id="seal-${p.id}" d="M60,60 m-50,0 a50,50 0 1,1 100,0 a50,50 0 1,1 -100,0"/></defs>
+            <text class="card-seal-text"><textPath href="#seal-${p.id}" startOffset="0">${ring}</textPath></text>
+          </svg>
+        </div>
+        <h2 class="card-title sr-only">${p.title}</h2>`;
       n++;
     }
     const vid = card.querySelector('video');
@@ -1456,7 +1478,10 @@ function buildGrid() {
       setLead(p.title, p.caption || DEFAULT_SUB);
       applyGlow(vivid);
       if (vid && !REDUCE_MOTION) vid.play().catch(() => {});
-      if (!isCase) { grid.classList.add('spotlight'); card.classList.add('spot'); }
+      if (!isCase) {
+        grid.classList.add('spotlight'); card.classList.add('spot');
+        sizeSeal(card);   // size the name-ring to the tile so it orbits the edges
+      }
     };
     const release = () => {
       const lead = activeFilters.size === 1 ? catLabel([...activeFilters][0]) : FILTER_LABELS.all;
