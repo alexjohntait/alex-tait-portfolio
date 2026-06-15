@@ -395,7 +395,7 @@
        varied heights break the rigid 'square' grid. */
     .grid {
       column-width: clamp(220px, 24vw, 300px);
-      column-gap: clamp(14px, 2vw, 22px);
+      column-gap: clamp(22px, 3vw, 40px);
       padding: 12px var(--pad) clamp(48px, 8vw, 96px);
     }
 
@@ -403,7 +403,7 @@
       cursor: pointer;
       position: relative;
       break-inside: avoid;
-      margin-bottom: clamp(20px, 2.6vw, 34px);
+      margin-bottom: clamp(30px, 3.6vw, 52px);
       transition: transform 0.25s var(--ease);
       display: block;
       color: inherit;
@@ -556,13 +556,42 @@
     }
     @media (prefers-reduced-motion: reduce) { .cs-banner-cta span { transition: none; } }
 
-    .card-meta {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 2px 4px;
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
     }
+
+    /* rotating circular-text seal — the project's name + discipline curve
+       around the tile and spin in on attention */
+    .card-seal {
+      position: absolute; inset: 0; z-index: 3;
+      display: grid; place-items: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s var(--ease);
+    }
+    .card-seal svg {
+      width: clamp(110px, 16vw, 150px); height: auto;
+      animation: sealSpin 9s linear infinite;
+      animation-play-state: paused;
+    }
+    .card-seal-text {
+      font-family: var(--display); font-weight: 700;
+      font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+      fill: #fff; mix-blend-mode: difference;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .card:hover .card-seal { opacity: 1; }
+      .card:hover .card-seal svg { animation-play-state: running; }
+    }
+    .card:focus-visible .card-seal { opacity: 1; }
+    .card:focus-visible .card-seal svg { animation-play-state: running; }
+    @keyframes sealSpin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .card-seal svg { animation: none; }
+    }
+    /* touch: no hover, so the seal would never show — keep it hidden there */
+    @media (hover: none) { .card-seal { display: none; } }
+
     .card-title {
       font-family: var(--display);
       font-size: 16px;
@@ -1403,15 +1432,21 @@ function buildGrid() {
       // unique cross-document morph target (matches the page's hero name)
       card.querySelector('.cs-banner-media').style.viewTransitionName = 'cs-' + p.id;
     } else {
+      // rotating circular-text seal: name + discipline curve around the tile,
+      // spinning in on hover. enough repeats to wrap the ring; extra is clipped.
+      const ring = `${p.title}  &middot;  ${cat}  &middot;  `.repeat(3);
       card.innerHTML = `
         <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
           <span class="card-index">${String(n+1).padStart(2,'0')}</span>
           ${mediaTag(p, { alt: p.title, eager: n < 8, hoverPlay: true })}
+          <div class="card-seal" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <defs><path id="seal-${p.id}" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0"/></defs>
+              <text class="card-seal-text"><textPath href="#seal-${p.id}" startOffset="0">${ring}</textPath></text>
+            </svg>
+          </div>
         </div>
-        <div class="card-meta">
-          <h2 class="card-title">${p.title}</h2>
-          <span class="card-tag" aria-hidden="true">${cat}</span>
-        </div>
+        <h2 class="card-title sr-only">${p.title}</h2>
       `;
       n++;
     }
