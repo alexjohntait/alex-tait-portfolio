@@ -574,7 +574,7 @@
     .card-frame-text {
       font-family: var(--display); font-weight: 700;
       font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;
-      fill: #fff; mix-blend-mode: difference;
+      fill: var(--ink);   /* text rides outside the tile on the page bg, so it just uses ink (flips in dark mode) */
     }
     .card:hover, .card:focus-within { z-index: 5; }
     @media (hover: hover) and (pointer: fine) { .card:hover .card-frame { opacity: 1; } }
@@ -1390,8 +1390,8 @@ function sizeFrame(card) {
   const W = Math.round(r.width), H = Math.round(r.height);
   const svg = frame.querySelector('svg');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const rad = 13, i = 12;                         // path inset + corner radius (hugs the frame)
-  const x0 = i, x1 = W - i, y0 = i, y1 = H - i;
+  const out = 9, rad = 10 + out;                  // path sits just OUTSIDE the tile, concentric corners
+  const x0 = -out, x1 = W + out, y0 = -out, y1 = H + out;
   const d = `M${x0 + rad},${y0} H${x1 - rad} A${rad},${rad} 0 0 1 ${x1},${y0 + rad}`
           + ` V${y1 - rad} A${rad},${rad} 0 0 1 ${x1 - rad},${y1}`
           + ` H${x0 + rad} A${rad},${rad} 0 0 1 ${x0},${y1 - rad}`
