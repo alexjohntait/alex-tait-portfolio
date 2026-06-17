@@ -417,6 +417,9 @@
       width: 100%;
       overflow: hidden;
       border-radius: var(--r-media);
+      /* scroll-velocity skew: --sk is driven per-frame on the grid while
+         scrolling (each tile leans about its own centre, settles to 0) */
+      transform: skewY(var(--sk, 0deg));
       /* aspect-ratio set per-card inline (from the file's true dimensions)
          so columns pack correctly with no layout shift */
     }
@@ -566,7 +569,7 @@
     .card-frame-text {
       font-family: var(--display); font-weight: 700;
       font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;
-      fill: #fff; mix-blend-mode: difference;
+      fill: var(--ink);   /* text rides outside the tile on the page bg, so it just uses ink (flips in dark mode) */
     }
     .card:hover, .card:focus-within { z-index: 5; }
     @media (hover: hover) and (pointer: fine) { .card:hover .card-frame { opacity: 1; } }
