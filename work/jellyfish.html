@@ -551,39 +551,24 @@
 
     /* rotating circular-text seal — the project's name + discipline curve
        around the tile and spin in on attention */
-    /* the ring orbits the tile: it overflows the thumb (so it must NOT be
-       clipped — lives on .card, not inside the overflow-hidden thumb) and
-       is sized to the tile diagonal in sizeSeal() */
-    .card-seal {
+    /* name + discipline wrap tightly around the tile frame, scrolling on hover.
+       sits on .card (over the thumb), path + marquee built in sizeFrame() */
+    .card-frame {
       position: absolute; inset: 0; z-index: 3;
-      display: grid; place-items: center;
       opacity: 0; pointer-events: none;
       transition: opacity 0.4s var(--ease);
     }
-    .card-seal svg {
-      display: block; overflow: visible;
-      animation: sealSpin 16s linear infinite;
-      animation-play-state: paused;
-    }
-    .card-seal-text {
+    .card-frame-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .card-frame-text {
       font-family: var(--display); font-weight: 700;
-      font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase;
+      font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;
       fill: #fff; mix-blend-mode: difference;
     }
-    /* lift the hovered card so its orbiting ring draws above neighbours */
     .card:hover, .card:focus-within { z-index: 5; }
-    @media (hover: hover) and (pointer: fine) {
-      .card:hover .card-seal { opacity: 1; }
-      .card:hover .card-seal svg { animation-play-state: running; }
-    }
-    .card:focus-visible .card-seal { opacity: 1; }
-    .card:focus-visible .card-seal svg { animation-play-state: running; }
-    @keyframes sealSpin { to { transform: rotate(360deg); } }
-    @media (prefers-reduced-motion: reduce) {
-      .card-seal svg { animation: none; }
-    }
-    /* touch: no hover, so the seal would never show — keep it hidden there */
-    @media (hover: none) { .card-seal { display: none; } }
+    @media (hover: hover) and (pointer: fine) { .card:hover .card-frame { opacity: 1; } }
+    .card:focus-within .card-frame { opacity: 1; }
+    /* touch: no hover to trigger it — keep it hidden */
+    @media (hover: none) { .card-frame { display: none; } }
 
     .card-title {
       font-family: var(--display);
