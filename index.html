@@ -425,6 +425,9 @@
       width: 100%;
       overflow: hidden;
       border-radius: var(--r-media);
+      /* scroll-velocity skew: --sk is driven per-frame on the grid while
+         scrolling (each tile leans about its own centre, settles to 0) */
+      transform: skewY(var(--sk, 0deg));
       /* aspect-ratio set per-card inline (from the file's true dimensions)
          so columns pack correctly with no layout shift */
     }
@@ -2163,6 +2166,28 @@ if (!REDUCE_MOTION && (!location.hash || location.hash === '#')) {
 })();
 buildGrid();
 setupTouchVideo();
+
+/* ── SCROLL-VELOCITY SKEW — the grid leans with scroll, gives it weight ── */
+(() => {
+  if (REDUCE_MOTION) return;
+  const roots = [grid, featured].filter(Boolean);
+  let lastY = window.scrollY, sk = 0, idle = 0, running = false;
+  const frame = () => {
+    const y = window.scrollY;
+    const vel = y - lastY; lastY = y;
+    const target = Math.max(-4, Math.min(4, vel * 0.18));   // clamp the lean
+    sk += (target - sk) * 0.12;                              // ease toward it / back to 0
+    roots.forEach(r => r.style.setProperty('--sk', sk.toFixed(3) + 'deg'));
+    if (Math.abs(sk) < 0.03 && Math.abs(vel) < 0.4) {
+      if (++idle > 10) { roots.forEach(r => r.style.setProperty('--sk', '0deg')); running = false; return; }
+    } else idle = 0;
+    requestAnimationFrame(frame);
+  };
+  addEventListener('scroll', () => {
+    if (!running) { running = true; lastY = window.scrollY; idle = 0; requestAnimationFrame(frame); }
+  }, { passive: true });
+})();
+
 window.addEventListener('popstate', handleHash);
 handleHash();
 </script>
