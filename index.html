@@ -559,32 +559,13 @@
     }
     @media (prefers-reduced-motion: reduce) { .cs-banner-cta span { transition: none; } }
 
-    .sr-only {
-      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    .card-meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 2px 4px;
     }
-
-    /* rotating circular-text seal — the project's name + discipline curve
-       around the tile and spin in on attention */
-    /* name + discipline wrap tightly around the tile frame, scrolling on hover.
-       sits on .card (over the thumb), path + marquee built in sizeFrame() */
-    .card-frame {
-      position: absolute; inset: 0; z-index: 3;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.4s var(--ease);
-    }
-    .card-frame-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-    .card-frame-text {
-      font-family: var(--display); font-weight: 700;
-      font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;
-      fill: var(--ink);   /* text rides outside the tile on the page bg, so it just uses ink (flips in dark mode) */
-    }
-    .card:hover, .card:focus-within { z-index: 5; }
-    @media (hover: hover) and (pointer: fine) { .card:hover .card-frame { opacity: 1; } }
-    .card:focus-within .card-frame { opacity: 1; }
-    /* touch: no hover to trigger it — keep it hidden */
-    @media (hover: none) { .card-frame { display: none; } }
-
     .card-title {
       font-family: var(--display);
       font-size: 16px;
@@ -1380,54 +1361,6 @@ const CS_META  = {
   'hiit-workout':  { title: 'A coach timed to the beat', client: 'Spotify', panel: '#509bf6', ink: '#0a2a5e' }
 };
 
-/* Wrap the name+discipline tightly around the tile's frame: build a
-   rounded-rectangle path on the border at the real tile size, fill it with
-   enough repeats to overflow, and set a seamless marquee (scroll by exactly
-   one unit, so identical repeats loop without a seam). Runs on hover. */
-function sizeFrame(card) {
-  const thumb = card.querySelector('.card-thumb');
-  const frame = card.querySelector('.card-frame');
-  if (!thumb || !frame) return;
-  const r = thumb.getBoundingClientRect();
-  if (!r.width) return;
-  const W = Math.round(r.width), H = Math.round(r.height);
-  const svg = frame.querySelector('svg');
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const out = 9, rad = 10 + out;                  // path sits just OUTSIDE the tile, concentric corners
-  const x0 = -out, x1 = W + out, y0 = -out, y1 = H + out;
-  const d = `M${x0 + rad},${y0} H${x1 - rad} A${rad},${rad} 0 0 1 ${x1},${y0 + rad}`
-          + ` V${y1 - rad} A${rad},${rad} 0 0 1 ${x1 - rad},${y1}`
-          + ` H${x0 + rad} A${rad},${rad} 0 0 1 ${x0},${y1 - rad}`
-          + ` V${y0 + rad} A${rad},${rad} 0 0 1 ${x0 + rad},${y0} Z`;
-  const path = svg.querySelector('path');
-  path.setAttribute('d', d);
-
-  const tp = svg.querySelector('textPath');
-  const unit = frame.dataset.unit.replace(/&middot;/g, '·');
-  // measure one unit's length once (font is constant), cache on the card
-  let unitLen = +card.dataset.unitLen;
-  if (!unitLen) {
-    const probe = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    probe.setAttribute('class', 'card-frame-text');
-    probe.textContent = unit;
-    svg.appendChild(probe);
-    unitLen = probe.getComputedTextLength();
-    probe.remove();
-    card.dataset.unitLen = unitLen;
-  }
-  const pathLen = path.getTotalLength();
-  const repeats = Math.ceil((pathLen + unitLen) / unitLen) + 1;
-  let tn = [...tp.childNodes].find(n => n.nodeType === 3);
-  if (!tn) { tn = document.createTextNode(''); tp.insertBefore(tn, tp.firstChild); }
-  tn.nodeValue = unit.repeat(repeats);
-
-  const an = tp.querySelector('animate');
-  an.setAttribute('from', '0');
-  an.setAttribute('to', String(-unitLen));        // shift one unit → seamless loop
-  an.setAttribute('dur', Math.max(6, unitLen / 34).toFixed(1) + 's');  // constant ~34px/s
-  if (!REDUCE_MOTION) { try { an.beginElement(); } catch (_) {} }
-}
-
 /* ── BUILD GRID ──────────────────────────────────────────────── */
 function buildGrid() {
   grid.innerHTML = '';
@@ -1473,21 +1406,15 @@ function buildGrid() {
       // unique cross-document morph target (matches the page's hero name)
       card.querySelector('.cs-banner-media').style.viewTransitionName = 'cs-' + p.id;
     } else {
-      // name + discipline wrap tightly AROUND the tile's frame: text on a
-      // rounded-rectangle path tracing the border, scrolling like a ticker on
-      // hover. the path + repeats + marquee are built to the real size in
-      // sizeFrame(); a text node holds the string so the <animate> survives.
       card.innerHTML = `
         <div class="card-thumb" style="background-color:${p.bg}; aspect-ratio:${ratio}">
+          <span class="card-index">${String(n+1).padStart(2,'0')}</span>
           ${mediaTag(p, { alt: p.title, eager: n < 8, hoverPlay: true })}
         </div>
-        <div class="card-frame" aria-hidden="true" data-unit="${p.title}  &middot;  ${cat}  &middot;  ">
-          <svg class="card-frame-svg" preserveAspectRatio="none">
-            <defs><path id="fr-${p.id}"/></defs>
-            <text class="card-frame-text"><textPath href="#fr-${p.id}" startOffset="0"> <animate attributeName="startOffset" begin="indefinite" repeatCount="indefinite" calcMode="linear"/></textPath></text>
-          </svg>
-        </div>
-        <h2 class="card-title sr-only">${p.title}</h2>`;
+        <div class="card-meta">
+          <h2 class="card-title">${p.title}</h2>
+          <span class="card-tag" aria-hidden="true">${cat}</span>
+        </div>`;
       n++;
     }
     const vid = card.querySelector('video');
@@ -1496,16 +1423,9 @@ function buildGrid() {
       setLead(p.title, p.caption || DEFAULT_SUB);
       applyGlow(vivid);
       if (vid && !REDUCE_MOTION) vid.play().catch(() => {});
-      if (!isCase) {
-        grid.classList.add('spotlight'); card.classList.add('spot');
-        sizeFrame(card);   // wrap the name tightly around the tile frame + start the marquee
-      }
+      if (!isCase) { grid.classList.add('spotlight'); card.classList.add('spot'); }
     };
     const release = () => {
-      if (!isCase) {
-        const an = card.querySelector('.card-frame animate');
-        if (an) { try { an.endElement(); } catch (_) {} }
-      }
       const lead = activeFilters.size === 1 ? catLabel([...activeFilters][0]) : FILTER_LABELS.all;
       setLead(lead, DEFAULT_SUB);
       applyGlow(currentAccent);
