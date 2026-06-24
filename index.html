@@ -306,19 +306,14 @@
 
     /* ─────────────────────── CONTROL ROW (home) ─────────────────── */
     .controls {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 24px;
-      flex-wrap: wrap;
-      padding: clamp(24px, 5vw, 48px) var(--pad) 20px;
+      padding: clamp(24px, 5vw, 48px) var(--pad) 0;
     }
 
     /* reserved height + line clamps so swapping titles/captions of any
-       length never reflows the grid below */
+       length never reflows the filters/grid below */
     .controls-lead {
       max-width: 42ch;
-      min-height: clamp(104px, 12vw, 158px);
+      min-height: clamp(88px, 9vw, 118px);
     }
     .controls-lead h1 {
       font-family: var(--display);
@@ -351,11 +346,16 @@
     .controls.fading .controls-lead h1,
     .controls.fading .controls-lead p { opacity: 0; }
 
+    /* own toolbar row below the heading (left-aligned), clearly separated
+       from the top nav so the two don't read as parallel menus */
     .filters {
       display: flex;
+      align-items: center;
       gap: 4px;
       flex-wrap: wrap;
+      padding: clamp(10px, 1.5vw, 16px) var(--pad) clamp(20px, 3vw, 28px);
     }
+    .filters .shuffle { margin-left: auto; }
     .filters button {
       font-family: var(--body);
       font-size: 14px;
@@ -979,6 +979,7 @@
       }
       .filters::-webkit-scrollbar { display: none; }
       .filters button { flex: 0 0 auto; }
+      .filters .shuffle { margin-left: 0; }   /* in the scroll strip, sit after Personal (no auto push) */
       /* right-edge fade hints that the strip scrolls */
       .filters {
         -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
@@ -1114,15 +1115,15 @@
         <h1 id="lead-title">Selected Work</h1>
         <p id="lead-sub">Illustrator &amp; motion designer, Bath / London</p>
       </div>
-      <div class="filters" id="filters" aria-label="Filter by category">
-        <button class="active" data-filter="all" aria-pressed="true">All</button>
-        <button data-filter="advertising" aria-pressed="false">Advertising</button>
-        <button data-filter="editorial" aria-pressed="false">Editorial</button>
-        <button data-filter="personal" aria-pressed="false">Personal</button>
-        <button class="shuffle" id="shuffle" aria-label="Shuffle the grid" title="Shuffle the grid">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
-        </button>
-      </div>
+    </div>
+    <div class="filters" id="filters" role="toolbar" aria-label="Filter by category">
+      <button class="active" data-filter="all" aria-pressed="true">All</button>
+      <button data-filter="advertising" aria-pressed="false">Advertising</button>
+      <button data-filter="editorial" aria-pressed="false">Editorial</button>
+      <button data-filter="personal" aria-pressed="false">Personal</button>
+      <button class="shuffle" id="shuffle" aria-label="Shuffle the grid" title="Shuffle the grid">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+      </button>
     </div>
     <div class="featured" id="featured"></div>
     <div class="grid" id="grid" tabindex="-1"></div>
