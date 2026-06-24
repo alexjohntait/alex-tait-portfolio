@@ -214,7 +214,7 @@
     .nav a { white-space: nowrap; }
     /* small screens: the case-study banner leads the grid anyway */
     @media (max-width: 560px) {
-      #nav-cs, .nav-cs-link { display: none; }
+      #nav-cs, .nav a.nav-cs-link { display: none; }   /* a.nav-cs-link beats `.nav a` specificity */
     }
     .nav a {
       font-family: var(--body);
