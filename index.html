@@ -164,6 +164,55 @@
       border-bottom: 1px solid var(--line);
     }
 
+    /* condensed lead bar: slides down under the sticky header once the
+       hero scrolls away; mirrors the hero title/info via setLead() */
+    .leadbar-mini {
+      position: fixed;
+      left: 0; right: 0;
+      top: 0;                 /* JS sets this to the header's height */
+      z-index: 38;            /* under the header (40) */
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 11px var(--pad);
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      backdrop-filter: saturate(1.4) blur(10px);
+      border-bottom: 1px solid var(--line);
+      transform: translateY(-101%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.4s var(--ease-out), opacity 0.3s var(--ease-out);
+    }
+    .leadbar-mini.show { transform: translateY(0); opacity: 1; }
+    .mini-title {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(15px, 1.7vw, 20px);
+      letter-spacing: -0.025em;
+      line-height: 1;
+      flex: 0 1 auto;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: opacity 0.18s var(--ease-out);
+    }
+    .mini-title::after { content: '.'; color: var(--red); }
+    .mini-sub {
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      letter-spacing: -0.01em; line-height: 1;
+      flex: 1 1 auto; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: opacity 0.18s var(--ease-out);
+    }
+    .leadbar-mini.fading .mini-title,
+    .leadbar-mini.fading .mini-sub { opacity: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .leadbar-mini { transition: opacity 0.2s linear; }
+    }
+    /* desktop hover enhancement: on touch there's no hover to drive it,
+       and the per-tile titles already name each piece */
+    @media (hover: none), (max-width: 640px) {
+      .leadbar-mini { display: none; }
+    }
+
     .wordmark {
       font-family: var(--display);
       font-weight: 800;
@@ -1138,6 +1187,13 @@
   </div>
 </header>
 
+<!-- Condensed lead: mirrors the hero title/info, pins under the nav once
+     the hero scrolls away, so the piece you're browsing is always named -->
+<div class="leadbar-mini" id="leadbar-mini" aria-hidden="true">
+  <span class="mini-title" id="mini-title">Selected Work</span>
+  <span class="mini-sub" id="mini-sub">Illustrator &amp; motion designer, Bath / London</span>
+</div>
+
 <main id="main">
 
   <!-- HOME -->
@@ -1373,6 +1429,9 @@ const viewAbout = document.getElementById('view-about');
 const controls  = document.getElementById('controls');
 const leadTitle = document.getElementById('lead-title');
 const leadSub   = document.getElementById('lead-sub');
+const leadBar   = document.getElementById('leadbar-mini');
+const miniTitle = document.getElementById('mini-title');
+const miniSub   = document.getElementById('mini-sub');
 const filters   = document.getElementById('filters');
 const navWork   = document.getElementById('nav-work');
 const navCS     = document.getElementById('nav-cs');
@@ -1527,13 +1586,19 @@ function setupReveal() {
 
 /* ── LEAD (hover title swap) ─────────────────────────────────── */
 function setLead(title, sub, instant = false) {
-  if (instant) { leadTitle.textContent = title; leadSub.textContent = sub; return; }
+  if (instant) {
+    leadTitle.textContent = title; leadSub.textContent = sub;
+    miniTitle.textContent = title; miniSub.textContent = sub;
+    return;
+  }
   controls.classList.add('fading');
+  leadBar.classList.add('fading');
   clearTimeout(fadeTimer);
   fadeTimer = setTimeout(() => {
-    leadTitle.textContent = title;
-    leadSub.textContent   = sub;
+    leadTitle.textContent = title; leadSub.textContent = sub;
+    miniTitle.textContent = title; miniSub.textContent = sub;
     controls.classList.remove('fading');
+    leadBar.classList.remove('fading');
   }, 120);
 }
 
@@ -1726,6 +1791,7 @@ function goProject(id, dir) {
 function showView(view) {
   [viewHome, viewProj, viewAbout].forEach(v => v.classList.remove('active'));
   view.classList.add('active');
+  leadBar.classList.remove('show');   // condensed lead is home-only
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
@@ -2148,6 +2214,23 @@ setupTouchVideo();
   addEventListener('scroll', () => {
     if (!running) { running = true; lastY = window.scrollY; idle = 0; requestAnimationFrame(frame); }
   }, { passive: true });
+})();
+
+/* ── CONDENSED LEAD: reveal once the hero scrolls under the nav ── */
+(() => {
+  const header = document.querySelector('header');
+  // pin the bar flush under the sticky header (height is fluid)
+  const place = () => { leadBar.style.top = header.offsetHeight + 'px'; };
+  place();
+  addEventListener('resize', place, { passive: true });
+  if ('ResizeObserver' in window) new ResizeObserver(place).observe(header);
+
+  // show the bar when the hero lead has scrolled up past the header
+  const io = new IntersectionObserver(([e]) => {
+    const onHome = viewHome.classList.contains('active');
+    leadBar.classList.toggle('show', onHome && !e.isIntersecting);
+  }, { rootMargin: `-${header.offsetHeight + 8}px 0px 0px 0px`, threshold: 0 });
+  io.observe(controls);
 })();
 
 window.addEventListener('popstate', handleHash);
