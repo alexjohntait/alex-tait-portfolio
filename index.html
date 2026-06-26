@@ -252,6 +252,9 @@
       position: relative;
       transition: transform 0.22s var(--spring), box-shadow 0.22s var(--ease);
     }
+    /* dark-mode swatch: neutral ink that flips with the theme, so it
+       stays visible on both the light and dark nav (red stays the accent) */
+    .dot.dot-mono { --c: var(--ink); }
     /* invisible, non-overlapping hit area for touch (WCAG 2.5.5 spacing) */
     .dot::after {
       content: '';
@@ -1128,10 +1131,9 @@
       <a href="#about" id="nav-about">About</a>
       <a href="shop.html">Shop</a>
     </nav>
-    <div class="dots" role="group" aria-label="Accent colour">
-      <button class="dot" style="--c:#ff69b4" data-accent="#ff69b4" data-theme="dark" aria-label="Pink accent, dark mode"></button>
-      <button class="dot" style="--c:#02b34b" data-accent="#02b34b" data-theme="light" aria-label="Green accent"></button>
-      <button class="dot active" style="--c:#ff1d19" data-accent="#ff1d19" data-theme="light" aria-label="Red accent" aria-pressed="true"></button>
+    <div class="dots" role="group" aria-label="Colour theme">
+      <button class="dot active" style="--c:#ff1d19" data-theme="light" aria-label="Light mode" aria-pressed="true"></button>
+      <button class="dot dot-mono" data-theme="dark" aria-label="Dark mode" aria-pressed="false"></button>
     </div>
   </div>
 </header>
@@ -1912,32 +1914,39 @@ window.addEventListener('keydown', e => {
   }
 });
 
-/* ── ACCENT COLOUR TOGGLE (the dots) ─────────────────────────── */
+/* ── LIGHT / DARK TOGGLE (the dots) ──────────────────────────── */
+/* Red is the one brand accent in both themes; the dots only flip
+   light ↔ dark. (Was a 3-colour accent picker; simplified.) */
 const dots = document.querySelectorAll('.dot');
-function setAccent(color, theme) {
+const ACCENT = '#ff1d19';
+function setMode(theme) {
+  const dark = theme === 'dark';
   const root = document.documentElement;
-  currentAccent = color;
-  root.style.setProperty('--red', color);
-  root.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
-  applyGlow(color);   // concrete rgba (color-mix doesn't recompute reliably on var change)
+  currentAccent = ACCENT;
+  root.style.setProperty('--red', ACCENT);
+  root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  applyGlow(ACCENT);   // concrete rgba (color-mix doesn't recompute reliably on var change)
   dots.forEach(d => {
-    const on = d.dataset.accent === color;
+    const on = d.dataset.theme === (dark ? 'dark' : 'light');
     d.classList.toggle('active', on);
     d.setAttribute('aria-pressed', on);
   });
-  try { localStorage.setItem('accent', JSON.stringify({ color, theme: theme || 'light' })); } catch (e) {}
+  try { localStorage.setItem('mode', dark ? 'dark' : 'light'); } catch (e) {}
 }
 dots.forEach(d => d.addEventListener('click', () => {
-  setAccent(d.dataset.accent, d.dataset.theme);
+  setMode(d.dataset.theme);
   // happy boing on pick
   d.classList.remove('boing'); void d.offsetWidth;
   d.classList.add('boing');
   d.addEventListener('animationend', () => d.classList.remove('boing'), { once: true });
 }));
-let savedAccent = null;
-try { savedAccent = JSON.parse(localStorage.getItem('accent') || 'null'); } catch (e) {}
-if (savedAccent && savedAccent.color) setAccent(savedAccent.color, savedAccent.theme);
-else applyGlow(currentAccent);   // default red glow on first visit
+let savedMode = null;
+try {
+  savedMode = localStorage.getItem('mode');
+  // migrate the old {color, theme} accent storage → just the theme
+  if (!savedMode) { const a = JSON.parse(localStorage.getItem('accent') || 'null'); if (a && a.theme) savedMode = a.theme; }
+} catch (e) {}
+setMode(savedMode === 'dark' ? 'dark' : 'light');
 
 /* ── MOTION ON TOUCH ─────────────────────────────────────────── */
 /* No hover on touch, so play grid videos while they're on screen
