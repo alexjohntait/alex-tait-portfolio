@@ -194,7 +194,7 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: opacity 0.18s var(--ease-out);
     }
-    .mini-title::after { content: '.'; color: var(--red); }
+    .mini-title::after { content: '.'; color: var(--red); display: inline-block; }
     .mini-sub {
       font-size: 13px; font-weight: 500; color: var(--muted);
       letter-spacing: -0.01em; line-height: 1;
@@ -380,8 +380,19 @@
       -webkit-line-clamp: 2;
       overflow: hidden;
     }
-    /* every lead ends with a quiet red full stop — a small house signature */
-    .controls-lead h1::after { content: '.'; color: var(--red); }
+    /* every lead ends with a quiet red full stop — a small house signature
+       that gives a little bounce when you hover the heading */
+    .controls-lead h1::after { content: '.'; color: var(--red); display: inline-block; }
+    @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+      .controls-lead:hover h1::after,
+      .leadbar-mini:hover .mini-title::after { animation: dotBounce 0.55s var(--ease-out); }
+    }
+    @keyframes dotBounce {
+      0%   { transform: translateY(0) scale(1); }
+      30%  { transform: translateY(-7px) scale(1.18); }
+      55%  { transform: translateY(0) scale(0.92); }
+      100% { transform: translateY(0) scale(1); }
+    }
     .controls-lead p {
       font-size: 14px;
       font-weight: 500;
@@ -423,8 +434,13 @@
       align-items: center;
       padding: 8px 18px;
       cursor: pointer;
-      transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.18s var(--ease);
+      transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.22s var(--spring);
     }
+    /* the chosen tab gives a little spring pop as it fills in */
+    @media (prefers-reduced-motion: no-preference) {
+      .filters button.active { animation: pillPop 0.4s var(--spring); }
+    }
+    @keyframes pillPop { from { transform: scale(0.82); } to { transform: scale(1); } }
     /* shuffle: re-deal the deck */
     .filters .shuffle { padding: 8px 12px; }
     .filters .shuffle svg { width: 15px; height: 15px; display: block; }
@@ -456,20 +472,26 @@
       position: relative;
       break-inside: avoid;
       margin-bottom: clamp(30px, 3.6vw, 52px);
-      transition: transform 0.25s var(--ease);
+      transition: transform 0.32s var(--spring);   /* gentle spring = a "picked up" feel */
       display: block;
       color: inherit;
       text-decoration: none;
     }
     .card:active { transform: scale(0.98); }
     @media (hover: hover) and (pointer: fine) {
-      .card:hover { transform: translateY(-5px); }
+      /* lift + a slight toy-like tilt, alternating so the wall feels hand-placed */
+      .card:hover { transform: translateY(-6px) rotate(-1.3deg); }
+      .card:nth-child(even):hover { transform: translateY(-6px) rotate(1.3deg); }
       /* spotlight: the hovered piece lifts out, neighbours ease back */
       .grid.spotlight .card:not(.spot) {
         opacity: 0.78;
         transform: scale(0.985);
         transition: transform 0.35s var(--ease), opacity 0.35s var(--ease);
       }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card { transition: transform 0.18s var(--ease); }
+      .card:hover, .card:nth-child(even):hover { transform: translateY(-4px); }
     }
 
     .card-thumb {
@@ -1696,12 +1718,12 @@ document.getElementById('shuffle')?.addEventListener('click', function () {
     const last = c.getBoundingClientRect();
     const dx = f.left - last.left, dy = f.top - last.top;
     if (!dx && !dy) return;
-    const tilt = (Math.random() * 6 - 3).toFixed(1);
+    const tilt = (Math.random() * 18 - 9).toFixed(1);   // bigger toss, ±9°
     c.style.transition = 'none';
-    c.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg)`;
-    const delay = (n++ % 6) * 0.03;
+    c.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg) scale(0.9)`;
+    const delay = (n++ % 6) * 0.035;
     requestAnimationFrame(() => {
-      c.style.transition = `transform 0.5s var(--ease-out) ${delay}s`;
+      c.style.transition = `transform 0.56s var(--ease-out) ${delay}s`;
       c.style.transform = '';
     });
     c.addEventListener('transitionend', () => { c.style.transition = ''; c.style.transform = ''; }, { once: true });
