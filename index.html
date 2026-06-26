@@ -1598,7 +1598,15 @@ function setupReveal() {
       // during the opening curtain, the first wave waits for the headline/filters
       const base = document.body.classList.contains('boot') ? 0.6 : 0;
       c.style.transitionDelay = (base + (+c.dataset.i % 4) * 0.06) + 's';
-      c.addEventListener('transitionend', () => { c.style.transitionDelay = ''; }, { once: true });
+      // once the entrance finishes, drop the reveal transition so hover uses
+      // the card's own spring (the .reveal.in rule would otherwise shadow it)
+      const done = (e) => {
+        if (e.target !== c) return;            // ignore child transitions bubbling up
+        c.style.transitionDelay = '';
+        c.classList.remove('reveal', 'in');
+        c.removeEventListener('transitionend', done);
+      };
+      c.addEventListener('transitionend', done);
       c.classList.add('in');
       revealIO.unobserve(c);
     });
