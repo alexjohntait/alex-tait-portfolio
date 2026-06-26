@@ -434,6 +434,36 @@
     .card:focus-visible .card-thumb img,
     .card:focus-visible .card-thumb video { transform: scale(1.05); }
 
+    /* ── COLOUR BLEED ───────────────────────────────────────────
+       On hover, the piece blooms a soft halo of its own dominant
+       colour and casts that colour as a shadow — tying the grid to
+       the colour-led project pages. Sits *behind* the thumb. */
+    .card-thumb { z-index: 1; transition: transform 0.4s var(--ease), box-shadow 0.5s var(--ease-out); }
+    .card-bloom {
+      position: absolute;
+      inset: -28% -24%;
+      z-index: 0;
+      background: radial-gradient(closest-side, var(--card-vivid, transparent), transparent 82%);
+      opacity: 0;
+      filter: blur(34px);
+      transform: scale(0.88);
+      transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+      pointer-events: none;
+      will-change: opacity, transform;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .card:hover .card-bloom { opacity: 0.7; transform: scale(1); }
+      .card:not(.is-cs):hover .card-thumb {
+        box-shadow: 0 22px 50px -16px color-mix(in srgb, var(--card-vivid) 70%, transparent);
+      }
+    }
+    .card:focus-visible .card-bloom { opacity: 0.7; transform: scale(1); }
+    @media (prefers-reduced-motion: reduce) {
+      .card-bloom { transition: opacity 0.2s linear; transform: none; }
+      .card:hover .card-bloom,
+      .card:focus-visible .card-bloom { transform: none; }
+    }
+
     /* corner index badge that pops on hover */
     .card-index {
       position: absolute;
