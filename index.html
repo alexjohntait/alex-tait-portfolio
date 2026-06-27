@@ -447,24 +447,28 @@
        grid scroll-reveal (home). A self-animating .view conflicts with the
        VT snapshot of the morph target, so it's intentionally omitted. */
 
-    /* ─────────────────────── CONTROL ROW (home) ─────────────────── */
-    .controls {
-      padding: clamp(24px, 5vw, 48px) var(--pad) 0;
+    /* ── LEAD PANEL (bottom-left) — identity + live hover caption ──── */
+    .lead-panel {
+      position: fixed;
+      left: var(--pad);
+      bottom: clamp(18px, 3.5vh, 38px);
+      z-index: 35;                      /* above the grid, below header(40)/menu */
+      max-width: min(44ch, 78vw);
+      padding: clamp(14px, 1.5vw, 20px) clamp(16px, 1.7vw, 24px);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--paper) 78%, transparent);
+      backdrop-filter: blur(9px) saturate(1.25);
+      box-shadow: 0 14px 50px rgba(0,0,0,0.12);
+      transition: opacity 0.35s var(--ease-out), transform 0.45s var(--spring);
     }
-
-    /* reserved height + line clamps so swapping titles/captions of any
-       length never reflows the filters/grid below */
-    .controls-lead {
-      max-width: 42ch;
-      min-height: clamp(88px, 9vw, 118px);
-    }
-    .controls-lead h1 {
+    .lead-panel h1 {
       font-family: var(--display);
       font-weight: 700;
-      font-size: clamp(28px, 5vw, 52px);
+      font-size: clamp(24px, 3.2vw, 40px);
       letter-spacing: -0.035em;
       line-height: 0.98;
       text-wrap: balance;
+      margin: 0;
       transition: opacity 0.18s var(--ease-out);
       display: -webkit-box;
       -webkit-box-orient: vertical;
@@ -472,11 +476,10 @@
       overflow: hidden;
     }
     /* every lead ends with a quiet red full stop — a small house signature
-       that gives a little bounce when you hover the heading */
-    .controls-lead h1::after { content: '.'; color: var(--red); display: inline-block; }
+       that gives a little bounce when you hover the panel */
+    .lead-panel h1::after { content: '.'; color: var(--red); display: inline-block; }
     @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-      .controls-lead:hover h1::after,
-      .leadbar-mini:hover .mini-title::after { animation: dotBounce 0.55s var(--ease-out); }
+      .lead-panel:hover h1::after { animation: dotBounce 0.55s var(--ease-out); }
     }
     @keyframes dotBounce {
       0%   { transform: translateY(0) scale(1); }
@@ -484,21 +487,30 @@
       55%  { transform: translateY(0) scale(0.92); }
       100% { transform: translateY(0) scale(1); }
     }
-    .controls-lead p {
+    .lead-panel p {
       font-size: 14px;
       font-weight: 500;
       color: var(--muted);
-      margin-top: 10px;
+      margin: 8px 0 0;
       line-height: 1.35;
       letter-spacing: -0.01em;
+      max-width: 42ch;
       transition: opacity 0.18s var(--ease-out);
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow: hidden;
     }
-    .controls.fading .controls-lead h1,
-    .controls.fading .controls-lead p { opacity: 0; }
+    .lead-panel.fading h1,
+    .lead-panel.fading p { opacity: 0; }
+    /* hidden off-home, when the menu is open, or near the footer */
+    .lead-panel.hide { opacity: 0; transform: translateY(14px); pointer-events: none; }
+    body.menu-open .lead-panel { opacity: 0; pointer-events: none; }
+    /* desktop hover affordance; on touch the wordmark + per-tile titles carry it */
+    @media (hover: none), (max-width: 700px) { .lead-panel { display: none; } }
+
+    /* a little breathing room now that the grid leads the page */
+    #view-home .filters { padding-top: clamp(20px, 3.5vw, 36px); }
 
     /* own toolbar row below the heading (left-aligned), clearly separated
        from the top nav so the two don't read as parallel menus */
@@ -558,31 +570,37 @@
       padding: 12px var(--pad) clamp(48px, 8vw, 96px);
     }
 
+    /* registered so the hover vars can spring while --py (parallax, set
+       per-frame on scroll) updates instantly without being transitioned */
+    @property --hover-y { syntax: '<length>'; inherits: false; initial-value: 0px; }
+    @property --hover-r { syntax: '<angle>';  inherits: false; initial-value: 0deg; }
     .card {
       cursor: pointer;
       position: relative;
       break-inside: avoid;
       margin-bottom: clamp(30px, 3.6vw, 52px);
-      transition: transform 0.32s var(--spring);   /* gentle spring = a "picked up" feel */
+      /* per-column parallax (--py) composes with a springy hover lift/tilt */
+      transform: translateY(calc(var(--py, 0px) + var(--hover-y, 0px))) rotate(var(--hover-r, 0deg));
+      transition: --hover-y 0.34s var(--spring), --hover-r 0.34s var(--spring);
       display: block;
       color: inherit;
       text-decoration: none;
     }
-    .card:active { transform: scale(0.98); }
+    .card:active { --hover-y: 2px; }
     @media (hover: hover) and (pointer: fine) {
       /* lift + a slight toy-like tilt, alternating so the wall feels hand-placed */
-      .card:hover { transform: translateY(-6px) rotate(-1.3deg); }
-      .card:nth-child(even):hover { transform: translateY(-6px) rotate(1.3deg); }
-      /* spotlight: the hovered piece lifts out, neighbours ease back */
+      .card:hover { --hover-y: -6px; --hover-r: -1.3deg; }
+      .card:nth-child(even):hover { --hover-r: 1.3deg; }
+      /* spotlight: the hovered piece lifts out, neighbours ease back (parallax kept) */
       .grid.spotlight .card:not(.spot) {
         opacity: 0.78;
-        transform: scale(0.985);
+        transform: translateY(var(--py, 0px)) scale(0.985);
         transition: transform 0.35s var(--ease), opacity 0.35s var(--ease);
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .card { transition: transform 0.18s var(--ease); }
-      .card:hover, .card:nth-child(even):hover { transform: translateY(-4px); }
+      .card { transition: none; }
+      .card:hover, .card:nth-child(even):hover { --hover-y: -4px; --hover-r: 0deg; }
     }
 
     .card-thumb {
@@ -590,9 +608,6 @@
       width: 100%;
       overflow: hidden;
       border-radius: var(--r-media);
-      /* scroll-velocity skew: --sk is driven per-frame on the grid while
-         scrolling (each tile leans about its own centre, settles to 0) */
-      transform: skewY(var(--sk, 0deg));
       /* aspect-ratio set per-card inline (from the file's true dimensions)
          so columns pack correctly with no layout shift */
     }
@@ -983,9 +998,9 @@
     }
     /* reveal class only added by JS when motion is allowed, so content
        is always visible by default (progressive enhancement) */
-    .card.reveal { opacity: 0; transform: translateY(24px); }
+    .card.reveal { opacity: 0; transform: translateY(calc(24px + var(--py, 0px))); }
     .card.reveal.in {
-      opacity: 1; transform: none;
+      opacity: 1; transform: translateY(var(--py, 0px));
       transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
       transition-delay: var(--rd, 0s);
     }
@@ -1309,23 +1324,16 @@
   </div>
 </aside>
 
-<!-- Condensed lead: mirrors the hero title/info, pins under the nav once
-     the hero scrolls away, so the piece you're browsing is always named -->
-<div class="leadbar-mini" id="leadbar-mini" aria-hidden="true">
-  <span class="mini-title" id="mini-title">Selected Work</span>
-  <span class="mini-sub" id="mini-sub">Illustrator &amp; motion designer, Bath / London</span>
+<!-- Identity + live caption: sits bottom-left, names the piece you hover -->
+<div class="lead-panel" id="lead-panel">
+  <h1 id="lead-title">Selected Work</h1>
+  <p id="lead-sub">Illustrator &amp; motion designer, Bath / London</p>
 </div>
 
 <main id="main">
 
   <!-- HOME -->
   <section class="view" id="view-home" aria-label="Selected work">
-    <div class="controls" id="controls">
-      <div class="controls-lead">
-        <h1 id="lead-title">Selected Work</h1>
-        <p id="lead-sub">Illustrator &amp; motion designer, Bath / London</p>
-      </div>
-    </div>
     <div class="filters" id="filters" role="toolbar" aria-label="Filter by category">
       <button class="active" data-filter="all" aria-pressed="true">All</button>
       <button data-filter="advertising" aria-pressed="false">Advertising</button>
@@ -1548,12 +1556,9 @@ const featured  = document.getElementById('featured');
 const viewHome  = document.getElementById('view-home');
 const viewProj  = document.getElementById('view-project');
 const viewAbout = document.getElementById('view-about');
-const controls  = document.getElementById('controls');
+const leadPanel = document.getElementById('lead-panel');
 const leadTitle = document.getElementById('lead-title');
 const leadSub   = document.getElementById('lead-sub');
-const leadBar   = document.getElementById('leadbar-mini');
-const miniTitle = document.getElementById('mini-title');
-const miniSub   = document.getElementById('mini-sub');
 const filters   = document.getElementById('filters');
 const navWork   = document.getElementById('nav-work');
 const navCS     = document.getElementById('nav-cs');
@@ -1718,17 +1723,13 @@ function setupReveal() {
 function setLead(title, sub, instant = false) {
   if (instant) {
     leadTitle.textContent = title; leadSub.textContent = sub;
-    miniTitle.textContent = title; miniSub.textContent = sub;
     return;
   }
-  controls.classList.add('fading');
-  leadBar.classList.add('fading');
+  leadPanel.classList.add('fading');
   clearTimeout(fadeTimer);
   fadeTimer = setTimeout(() => {
     leadTitle.textContent = title; leadSub.textContent = sub;
-    miniTitle.textContent = title; miniSub.textContent = sub;
-    controls.classList.remove('fading');
-    leadBar.classList.remove('fading');
+    leadPanel.classList.remove('fading');
   }, 120);
 }
 
@@ -1749,6 +1750,7 @@ function applyFilter() {
 
   // mutate visibility
   cards.forEach(c => { c.classList.toggle('hidden', !cardMatches(c)); });
+  window.__recomputeParallax && window.__recomputeParallax();   // columns re-packed
 
   if (REDUCE_MOTION) return;
 
@@ -1817,6 +1819,7 @@ document.getElementById('shuffle')?.addEventListener('click', function () {
     [cards[i], cards[j]] = [cards[j], cards[i]];
   }
   cards.forEach(c => grid.appendChild(c));
+  window.__recomputeParallax && window.__recomputeParallax();   // new column order
   if (REDUCE_MOTION) return;
   // LAST + INVERT + PLAY, with a touch of card-toss rotation
   let n = 0;
@@ -1921,7 +1924,7 @@ function goProject(id, dir) {
 function showView(view) {
   [viewHome, viewProj, viewAbout].forEach(v => v.classList.remove('active'));
   view.classList.add('active');
-  leadBar.classList.remove('show');   // condensed lead is home-only
+  leadPanel.classList.toggle('hide', view !== viewHome);   // caption is home-only
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
@@ -2325,42 +2328,56 @@ if (!REDUCE_MOTION && (!location.hash || location.hash === '#')) {
 buildGrid();
 setupTouchVideo();
 
-/* ── SCROLL-VELOCITY SKEW — the grid leans with scroll, gives it weight ── */
+/* ── GRID PARALLAX — columns drift at different speeds as you scroll ──
+   Each column gets one factor (so a column moves as a rigid unit, no
+   intra-column overlap); columns differ, giving depth. --py composes
+   with the hover/reveal transforms via the registered vars above. */
 (() => {
   if (REDUCE_MOTION) return;
-  const roots = [grid, featured].filter(Boolean);
-  let lastY = window.scrollY, sk = 0, idle = 0, running = false;
-  const frame = () => {
+  const FACTORS = [0.0, 0.10, 0.045, 0.13, 0.07];   // per visual column
+  const MAX = 96;                                    // clamp drift (px)
+  let pcards = [];        // [{ el, f }]
+  let ticking = false;
+
+  function recompute() {
+    const cards = [...grid.querySelectorAll('.card')];
+    const lefts = [...new Set(cards.map(c => Math.round(c.offsetLeft)))].sort((a, b) => a - b);
+    const factorByLeft = new Map(lefts.map((l, i) => [l, FACTORS[i % FACTORS.length]]));
+    pcards = cards.map(el => ({ el, f: factorByLeft.get(Math.round(el.offsetLeft)) || 0 }));
+    apply();
+  }
+  function apply() {
     const y = window.scrollY;
-    const vel = y - lastY; lastY = y;
-    const target = Math.max(-4, Math.min(4, vel * 0.18));   // clamp the lean
-    sk += (target - sk) * 0.12;                              // ease toward it / back to 0
-    roots.forEach(r => r.style.setProperty('--sk', sk.toFixed(3) + 'deg'));
-    if (Math.abs(sk) < 0.03 && Math.abs(vel) < 0.4) {
-      if (++idle > 10) { roots.forEach(r => r.style.setProperty('--sk', '0deg')); running = false; return; }
-    } else idle = 0;
-    requestAnimationFrame(frame);
+    for (const { el, f } of pcards) {
+      if (!f) { el.style.removeProperty('--py'); continue; }
+      const py = Math.max(-MAX, Math.min(MAX, y * f));
+      el.style.setProperty('--py', py.toFixed(1) + 'px');
+    }
+  }
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { apply(); ticking = false; });
   };
-  addEventListener('scroll', () => {
-    if (!running) { running = true; lastY = window.scrollY; idle = 0; requestAnimationFrame(frame); }
-  }, { passive: true });
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', recompute, { passive: true });
+  // recompute when the deck changes (filter / shuffle re-pack the columns)
+  window.__recomputeParallax = recompute;
+  // settle after layout + images so the offsetLeft → column buckets are right
+  requestAnimationFrame(() => requestAnimationFrame(recompute));
+  addEventListener('load', recompute);
+  setTimeout(recompute, 700);
 })();
 
-/* ── CONDENSED LEAD: reveal once the hero scrolls under the nav ── */
+/* ── LEAD PANEL: tuck it away as the footer comes into view ─────── */
 (() => {
-  const header = document.querySelector('header');
-  // pin the bar flush under the sticky header (height is fluid)
-  const place = () => { leadBar.style.top = header.offsetHeight + 'px'; };
-  place();
-  addEventListener('resize', place, { passive: true });
-  if ('ResizeObserver' in window) new ResizeObserver(place).observe(header);
-
-  // show the bar when the hero lead has scrolled up past the header
+  const footer = document.querySelector('.site-footer');
+  if (!footer || !('IntersectionObserver' in window)) return;
   const io = new IntersectionObserver(([e]) => {
-    const onHome = viewHome.classList.contains('active');
-    leadBar.classList.toggle('show', onHome && !e.isIntersecting);
-  }, { rootMargin: `-${header.offsetHeight + 8}px 0px 0px 0px`, threshold: 0 });
-  io.observe(controls);
+    // only override on home; route changes own the .hide toggle otherwise
+    if (viewHome.classList.contains('active')) leadPanel.classList.toggle('hide', e.isIntersecting);
+  }, { threshold: 0.01 });
+  io.observe(footer);
 })();
 
 /* ── POP-OUT MENU ────────────────────────────────────────────── */
