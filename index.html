@@ -159,9 +159,8 @@
       justify-content: space-between;
       gap: 24px;
       padding: 18px var(--pad);
-      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      background: color-mix(in srgb, var(--paper) 70%, transparent);
       backdrop-filter: saturate(1.4) blur(10px);
-      border-bottom: 1px solid var(--line);
     }
 
     /* condensed lead bar: slides down under the sticky header once the
@@ -295,26 +294,38 @@
 
     /* ── HAMBURGER + POP-OUT MENU ───────────────────────────────── */
     .menu-btn {
-      width: 46px; height: 46px; border: none; background: none; cursor: pointer;
+      width: 48px; height: 48px; border: none; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
-      border-radius: 50%; transition: transform 0.2s var(--spring);
+      border-radius: 50%;
+      background: var(--red);                       /* a pop of colour up top */
+      box-shadow: 0 6px 18px rgba(255, 29, 25, 0.30);
+      transition: transform 0.26s var(--spring), box-shadow 0.26s var(--ease);
     }
     .menu-btn:active { transform: scale(0.9); }
-    .menu-ico { position: relative; width: 26px; height: 13px; display: block; }
+    @media (hover: hover) and (pointer: fine) {
+      .menu-btn:hover { transform: scale(1.1) rotate(-5deg); box-shadow: 0 11px 28px rgba(255, 29, 25, 0.44); }
+    }
+    .menu-ico { position: relative; width: 25px; height: 13px; display: block; }
     .menu-ico i {
       position: absolute; left: 0; right: 0; height: 2.5px; border-radius: 2px;
-      background: var(--ink);
+      background: #fff;                             /* white bars on the red */
       transition: transform 0.45s var(--spring), background 0.25s var(--ease);
     }
     .menu-ico i:nth-child(1) { top: 0; }
     .menu-ico i:nth-child(2) { bottom: 0; }
-    @media (hover: hover) and (pointer: fine) {
-      .menu-btn:hover .menu-ico i { background: var(--red); }
+    /* playful jiggle on hover — only while the menu is closed */
+    @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+      body:not(.menu-open) .menu-btn:hover .menu-ico i:nth-child(1) { animation: barWiggleA 0.5s var(--ease-out); }
+      body:not(.menu-open) .menu-btn:hover .menu-ico i:nth-child(2) { animation: barWiggleB 0.5s var(--ease-out); }
     }
-    /* open → bars cross into an X (and stay legible over the dark panel) */
-    body.menu-open .menu-ico i { background: var(--paper); }
+    @keyframes barWiggleA { 0%,100% { transform: translateX(0); } 40% { transform: translateX(3.5px); } 72% { transform: translateX(-1.5px); } }
+    @keyframes barWiggleB { 0%,100% { transform: translateX(0); } 40% { transform: translateX(-3.5px); } 72% { transform: translateX(1.5px); } }
+    /* open → bars cross into an X */
     body.menu-open .menu-ico i:nth-child(1) { transform: translateY(5.25px) rotate(45deg); }
     body.menu-open .menu-ico i:nth-child(2) { transform: translateY(-5.25px) rotate(-45deg); }
+    @media (prefers-reduced-motion: reduce) {
+      .menu-btn, .menu-btn:hover { transform: none; transition: box-shadow 0.2s var(--ease); }
+    }
 
     .menu-scrim {
       position: fixed; inset: 0; z-index: 60;
