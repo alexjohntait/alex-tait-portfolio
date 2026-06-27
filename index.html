@@ -215,7 +215,7 @@
     .wordmark {
       font-family: var(--display);
       font-weight: 800;
-      font-size: clamp(22px, 3vw, 30px);
+      font-size: clamp(26px, 3.6vw, 36px);
       letter-spacing: -0.03em;
       line-height: 1;
       color: var(--ink);
@@ -227,7 +227,7 @@
     /* handwritten signature (transparent PNG). Nudged left so the ink,
        not the file's whitespace, sits against the edge. Inverts to white in dark mode. */
     .wordmark .sig {
-      height: clamp(26px, 3.4vw, 36px);
+      height: clamp(31px, 4.1vw, 43px);
       width: auto;
       display: block;
       margin-left: -5px;
@@ -802,6 +802,11 @@
       letter-spacing: -0.01em;
       white-space: nowrap;
       flex-shrink: 0;
+    }
+    /* desktop: drop the under-tile labels — the bottom bar names whatever
+       you hover. Kept on touch/mobile, where there's no hover or bar. */
+    @media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+      .card-meta { display: none; }
     }
 
     .card.hidden { display: none; }
