@@ -293,6 +293,97 @@
     .nav a.current::after { transform: scaleX(1); }
     .nav a.current { color: var(--red); }
 
+    /* ── HAMBURGER + POP-OUT MENU ───────────────────────────────── */
+    .menu-btn {
+      width: 46px; height: 46px; border: none; background: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; transition: transform 0.2s var(--spring);
+    }
+    .menu-btn:active { transform: scale(0.9); }
+    .menu-ico { position: relative; width: 26px; height: 13px; display: block; }
+    .menu-ico i {
+      position: absolute; left: 0; right: 0; height: 2.5px; border-radius: 2px;
+      background: var(--ink);
+      transition: transform 0.45s var(--spring), background 0.25s var(--ease);
+    }
+    .menu-ico i:nth-child(1) { top: 0; }
+    .menu-ico i:nth-child(2) { bottom: 0; }
+    @media (hover: hover) and (pointer: fine) {
+      .menu-btn:hover .menu-ico i { background: var(--red); }
+    }
+    /* open → bars cross into an X (and stay legible over the dark panel) */
+    body.menu-open .menu-ico i { background: var(--paper); }
+    body.menu-open .menu-ico i:nth-child(1) { transform: translateY(5.25px) rotate(45deg); }
+    body.menu-open .menu-ico i:nth-child(2) { transform: translateY(-5.25px) rotate(-45deg); }
+
+    .menu-scrim {
+      position: fixed; inset: 0; z-index: 60;
+      background: color-mix(in srgb, var(--ink) 38%, transparent);
+      opacity: 0; pointer-events: none;
+      backdrop-filter: blur(0px);
+      transition: opacity 0.45s var(--ease-out), backdrop-filter 0.45s var(--ease-out);
+    }
+    body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; backdrop-filter: blur(3px); }
+
+    .menu-panel {
+      position: fixed; top: 0; right: 0; z-index: 61;
+      height: 100dvh; width: min(440px, 88vw);
+      background: var(--ink); color: var(--paper);
+      display: flex; flex-direction: column; justify-content: center;
+      gap: clamp(28px, 6vh, 60px);
+      padding: clamp(40px, 8vh, 92px) clamp(34px, 5vw, 60px);
+      transform: translateX(101%);
+      box-shadow: -34px 0 90px rgba(0,0,0,0.28);
+      visibility: hidden;
+      transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), visibility 0s linear 0.6s;
+    }
+    body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
+    .menu-panel .dot.dot-mono { --c: var(--paper); }   /* stay visible on the panel */
+
+    .menu-nav { display: flex; flex-direction: column; gap: clamp(2px, 1.2vh, 12px); }
+    .menu-nav a {
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(34px, 4.4vw, 54px); letter-spacing: -0.03em; line-height: 1.04;
+      color: var(--paper); text-decoration: none; width: fit-content; overflow: hidden;
+    }
+    .menu-nav a::after { content: '.'; color: var(--red); }
+    .menu-nav a span {
+      display: inline-block;
+      transform: translateX(44px); opacity: 0;
+      transition: transform 0.55s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s var(--ease-out), color 0.2s var(--ease);
+    }
+    body.menu-open .menu-nav a span { transform: none; opacity: 1; }
+    body.menu-open .menu-nav a:nth-child(1) span { transition-delay: 0.14s; }
+    body.menu-open .menu-nav a:nth-child(2) span { transition-delay: 0.20s; }
+    body.menu-open .menu-nav a:nth-child(3) span { transition-delay: 0.26s; }
+    body.menu-open .menu-nav a:nth-child(4) span { transition-delay: 0.32s; }
+    @media (hover: hover) and (pointer: fine) {
+      .menu-nav a:hover span { color: var(--red); transform: translateX(10px); }
+    }
+    .menu-nav a.current span { color: var(--red); }
+
+    .menu-foot {
+      margin-top: auto; display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; opacity: 0; transform: translateY(10px);
+      transition: opacity 0.4s var(--ease-out) 0.36s, transform 0.4s var(--ease-out) 0.36s;
+    }
+    body.menu-open .menu-foot { opacity: 1; transform: none; }
+    .menu-mail { color: var(--paper); opacity: 0.66; font-size: 14px; text-decoration: none;
+      transition: opacity 0.2s var(--ease); }
+    .menu-mail:hover { opacity: 1; }
+
+    /* the header de-clutters while the menu is open */
+    body.menu-open header { background: transparent; border-color: transparent; backdrop-filter: none; z-index: 65; }
+    body.menu-open .wordmark .sig { filter: invert(1); }
+    :root[data-theme="dark"] body.menu-open .wordmark .sig { filter: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .menu-panel { transition: opacity 0.2s linear, visibility 0s; transform: none; opacity: 0; }
+      body.menu-open .menu-panel { opacity: 1; }
+      .menu-nav a span, .menu-foot { transition: opacity 0.2s linear; transform: none; }
+      .menu-ico i { transition: background 0.2s linear; }
+    }
+
     .dots { display: inline-flex; align-items: center; gap: 13px; }
     .dot {
       width: 15px; height: 15px; border-radius: 50%;
@@ -1195,19 +1286,28 @@
     <img class="sig" src="/assets/signature.png" alt="Alex Tait"
          onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" />
   </a>
-  <div class="header-right">
-    <nav class="nav" aria-label="Primary">
-      <a href="#" id="nav-work">Work</a>
-      <a href="#case-studies" id="nav-cs">Case studies</a>
-      <a href="#about" id="nav-about">About</a>
-      <a href="shop.html">Shop</a>
-    </nav>
+  <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="menu-panel">
+    <span class="menu-ico" aria-hidden="true"><i></i><i></i></span>
+  </button>
+</header>
+
+<!-- Pop-out menu (springs in from the right) -->
+<div class="menu-scrim" id="menu-scrim"></div>
+<aside class="menu-panel" id="menu-panel" aria-hidden="true" aria-label="Menu">
+  <nav class="menu-nav" aria-label="Primary">
+    <a href="#" id="nav-work"><span>Work</span></a>
+    <a href="#case-studies" id="nav-cs"><span>Case studies</span></a>
+    <a href="#about" id="nav-about"><span>About</span></a>
+    <a href="shop.html"><span>Shop</span></a>
+  </nav>
+  <div class="menu-foot">
     <div class="dots" role="group" aria-label="Colour theme">
       <button class="dot active" style="--c:#ff1d19" data-theme="light" aria-label="Light mode" aria-pressed="true"></button>
       <button class="dot dot-mono" data-theme="dark" aria-label="Dark mode" aria-pressed="false"></button>
     </div>
+    <a class="menu-mail" href="mailto:alex@alexjohntait.com">alex@alexjohntait.com</a>
   </div>
-</header>
+</aside>
 
 <!-- Condensed lead: mirrors the hero title/info, pins under the nav once
      the hero scrolls away, so the piece you're browsing is always named -->
@@ -2261,6 +2361,48 @@ setupTouchVideo();
     leadBar.classList.toggle('show', onHome && !e.isIntersecting);
   }, { rootMargin: `-${header.offsetHeight + 8}px 0px 0px 0px`, threshold: 0 });
   io.observe(controls);
+})();
+
+/* ── POP-OUT MENU ────────────────────────────────────────────── */
+(() => {
+  const btn = document.getElementById('menu-btn');
+  const panel = document.getElementById('menu-panel');
+  const scrim = document.getElementById('menu-scrim');
+  if (!btn || !panel || !scrim) return;
+  let lastFocus = null;
+  const isOpen = () => document.body.classList.contains('menu-open');
+  const focusables = () => [...panel.querySelectorAll('a[href], button:not([disabled])')];
+  const onKey = (e) => {
+    if (e.key === 'Escape') { close(); return; }
+    if (e.key !== 'Tab') return;
+    const f = focusables(); if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+  function open() {
+    lastFocus = document.activeElement;
+    document.body.classList.add('menu-open');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.setAttribute('aria-label', 'Close menu');
+    panel.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => { (focusables()[0] || panel).focus(); }, 80);
+  }
+  function close() {
+    document.body.classList.remove('menu-open');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-label', 'Open menu');
+    panel.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', onKey);
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  btn.addEventListener('click', () => isOpen() ? close() : open());
+  scrim.addEventListener('click', close);
+  // choosing a destination closes the menu (links route the SPA themselves)
+  panel.querySelectorAll('.menu-nav a').forEach(a => a.addEventListener('click', close));
 })();
 
 window.addEventListener('popstate', handleHash);
