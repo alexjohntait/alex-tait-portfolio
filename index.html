@@ -99,7 +99,7 @@
       --glow:  34%;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: clip; }   /* clip the off-canvas menu so it can't add horizontal scroll */
     :root { transition: --glow 0.4s; }
     body, header, .filters button, .card-thumb {
       transition: background-color 0.4s var(--ease-out), color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
@@ -260,10 +260,6 @@
       gap: clamp(14px, 2vw, 26px);
     }
     .nav a { white-space: nowrap; }
-    /* small screens: the case-study banner leads the grid anyway */
-    @media (max-width: 560px) {
-      #nav-cs, .nav a.nav-cs-link { display: none; }   /* a.nav-cs-link beats `.nav a` specificity */
-    }
     .nav a {
       font-family: var(--body);
       font-size: 14px;
