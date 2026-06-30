@@ -91,7 +91,7 @@
       --glow:  34%;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: clip; }   /* clip the off-canvas menu so it can't add horizontal scroll */
     :root { transition: --glow 0.4s; }
     body, header, .filters button, .card-thumb {
       transition: background-color 0.4s var(--ease-out), color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
@@ -151,15 +151,63 @@
       justify-content: space-between;
       gap: 24px;
       padding: 18px var(--pad);
+      background: color-mix(in srgb, var(--paper) 70%, transparent);
+      backdrop-filter: saturate(1.4) blur(10px);
+    }
+
+    /* condensed lead bar: slides down under the sticky header once the
+       hero scrolls away; mirrors the hero title/info via setLead() */
+    .leadbar-mini {
+      position: fixed;
+      left: 0; right: 0;
+      top: 0;                 /* JS sets this to the header's height */
+      z-index: 38;            /* under the header (40) */
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 11px var(--pad);
       background: color-mix(in srgb, var(--paper) 88%, transparent);
       backdrop-filter: saturate(1.4) blur(10px);
       border-bottom: 1px solid var(--line);
+      transform: translateY(-101%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.4s var(--ease-out), opacity 0.3s var(--ease-out);
+    }
+    .leadbar-mini.show { transform: translateY(0); opacity: 1; }
+    .mini-title {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: clamp(15px, 1.7vw, 20px);
+      letter-spacing: -0.025em;
+      line-height: 1;
+      flex: 0 1 auto;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: opacity 0.18s var(--ease-out);
+    }
+    .mini-title::after { content: '.'; color: var(--red); display: inline-block; }
+    .mini-sub {
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      letter-spacing: -0.01em; line-height: 1;
+      flex: 1 1 auto; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: opacity 0.18s var(--ease-out);
+    }
+    .leadbar-mini.fading .mini-title,
+    .leadbar-mini.fading .mini-sub { opacity: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .leadbar-mini { transition: opacity 0.2s linear; }
+    }
+    /* desktop hover enhancement: on touch there's no hover to drive it,
+       and the per-tile titles already name each piece */
+    @media (hover: none), (max-width: 640px) {
+      .leadbar-mini { display: none; }
     }
 
     .wordmark {
       font-family: var(--display);
       font-weight: 800;
-      font-size: clamp(22px, 3vw, 30px);
+      font-size: clamp(30px, 4.1vw, 41px);
       letter-spacing: -0.03em;
       line-height: 1;
       color: var(--ink);
@@ -171,7 +219,7 @@
     /* handwritten signature (transparent PNG). Nudged left so the ink,
        not the file's whitespace, sits against the edge. Inverts to white in dark mode. */
     .wordmark .sig {
-      height: clamp(26px, 3.4vw, 36px);
+      height: clamp(36px, 4.7vw, 49px);
       width: auto;
       display: block;
       margin-left: -5px;
@@ -204,10 +252,6 @@
       gap: clamp(14px, 2vw, 26px);
     }
     .nav a { white-space: nowrap; }
-    /* small screens: the case-study banner leads the grid anyway */
-    @media (max-width: 560px) {
-      #nav-cs, .nav a.nav-cs-link { display: none; }   /* a.nav-cs-link beats `.nav a` specificity */
-    }
     .nav a {
       font-family: var(--body);
       font-size: 14px;
@@ -236,6 +280,111 @@
     .nav a.current::after { transform: scaleX(1); }
     .nav a.current { color: var(--red); }
 
+    /* ── HAMBURGER + POP-OUT MENU ───────────────────────────────── */
+    .menu-btn {
+      width: 48px; height: 48px; border: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      background: #ffc9da;                          /* Kueski pink — a soft pop up top */
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      transition: transform 0.26s var(--spring), box-shadow 0.26s var(--ease);
+    }
+    .menu-btn:active { transform: scale(0.9); }
+    @media (hover: hover) and (pointer: fine) {
+      .menu-btn:hover { transform: scale(1.1) rotate(-5deg); }
+    }
+    .menu-ico { position: relative; width: 24px; height: 16px; display: block; }
+    .menu-ico i {
+      position: absolute; left: 0; right: 0; height: 2.5px; border-radius: 2px;
+      background: #16120f;                          /* black bars on the pink */
+      transition: transform 0.45s var(--spring), opacity 0.3s var(--ease);
+    }
+    .menu-ico i:nth-child(1) { top: 0; }
+    .menu-ico i:nth-child(2) { top: 50%; transform: translateY(-50%); }
+    .menu-ico i:nth-child(3) { bottom: 0; }
+    /* playful jiggle on hover — only while the menu is closed */
+    @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+      body:not(.menu-open) .menu-btn:hover .menu-ico i:nth-child(1) { animation: barWiggleA 0.5s var(--ease-out); }
+      body:not(.menu-open) .menu-btn:hover .menu-ico i:nth-child(3) { animation: barWiggleB 0.5s var(--ease-out); }
+    }
+    @keyframes barWiggleA { 0%,100% { transform: translateX(0); } 40% { transform: translateX(3.5px); } 72% { transform: translateX(-1.5px); } }
+    @keyframes barWiggleB { 0%,100% { transform: translateX(0); } 40% { transform: translateX(-3.5px); } 72% { transform: translateX(1.5px); } }
+    /* open → middle line fades, outer lines cross into an X */
+    body.menu-open .menu-ico i:nth-child(1) { transform: translateY(6.75px) rotate(45deg); }
+    body.menu-open .menu-ico i:nth-child(2) { opacity: 0; transform: translateY(-50%) scaleX(0.2); }
+    body.menu-open .menu-ico i:nth-child(3) { transform: translateY(-6.75px) rotate(-45deg); }
+    @media (prefers-reduced-motion: reduce) {
+      .menu-btn, .menu-btn:hover { transform: none; }
+    }
+
+    .menu-scrim {
+      position: fixed; inset: 0; z-index: 60;
+      background: color-mix(in srgb, var(--ink) 38%, transparent);
+      opacity: 0; pointer-events: none;
+      backdrop-filter: blur(0px);
+      transition: opacity 0.45s var(--ease-out), backdrop-filter 0.45s var(--ease-out);
+    }
+    body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; backdrop-filter: blur(3px); }
+
+    .menu-panel {
+      position: fixed; top: 0; right: 0; z-index: 61;
+      height: 100dvh; width: min(440px, 88vw);
+      background: var(--ink); color: var(--paper);
+      display: flex; flex-direction: column; justify-content: center;
+      gap: clamp(28px, 6vh, 60px);
+      padding: clamp(40px, 8vh, 92px) clamp(34px, 5vw, 60px);
+      transform: translateX(101%);
+      box-shadow: -34px 0 90px rgba(0,0,0,0.28);
+      visibility: hidden;
+      transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), visibility 0s linear 0.6s;
+    }
+    body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1); }
+    .menu-panel .dot.dot-mono { --c: var(--paper); }   /* stay visible on the panel */
+
+    .menu-nav { display: flex; flex-direction: column; gap: clamp(2px, 1.2vh, 12px); }
+    .menu-nav a {
+      font-family: var(--display); font-weight: 700;
+      font-size: clamp(34px, 4.4vw, 54px); letter-spacing: -0.03em; line-height: 1.04;
+      color: var(--paper); text-decoration: none; width: fit-content; overflow: hidden;
+    }
+    .menu-nav a::after { content: '.'; color: var(--red); }
+    .menu-nav a span {
+      display: inline-block;
+      transform: translateX(44px); opacity: 0;
+      transition: transform 0.55s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s var(--ease-out), color 0.2s var(--ease);
+    }
+    body.menu-open .menu-nav a span { transform: none; opacity: 1; }
+    body.menu-open .menu-nav a:nth-child(1) span { transition-delay: 0.14s; }
+    body.menu-open .menu-nav a:nth-child(2) span { transition-delay: 0.20s; }
+    body.menu-open .menu-nav a:nth-child(3) span { transition-delay: 0.26s; }
+    body.menu-open .menu-nav a:nth-child(4) span { transition-delay: 0.32s; }
+    @media (hover: hover) and (pointer: fine) {
+      .menu-nav a:hover span { color: var(--red); transform: translateX(10px); }
+    }
+    .menu-nav a.current span { color: var(--red); }
+
+    .menu-foot {
+      margin-top: auto; display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; opacity: 0; transform: translateY(10px);
+      transition: opacity 0.4s var(--ease-out) 0.36s, transform 0.4s var(--ease-out) 0.36s;
+    }
+    body.menu-open .menu-foot { opacity: 1; transform: none; }
+    .menu-mail { color: var(--paper); opacity: 0.66; font-size: 14px; text-decoration: none;
+      transition: opacity 0.2s var(--ease); }
+    .menu-mail:hover { opacity: 1; }
+
+    /* the header de-clutters while the menu is open */
+    body.menu-open header { background: transparent; border-color: transparent; backdrop-filter: none; z-index: 65; }
+    body.menu-open .wordmark .sig { filter: invert(1); }
+    :root[data-theme="dark"] body.menu-open .wordmark .sig { filter: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .menu-panel { transition: opacity 0.2s linear, visibility 0s; transform: none; opacity: 0; }
+      body.menu-open .menu-panel { opacity: 1; }
+      .menu-nav a span, .menu-foot { transition: opacity 0.2s linear; transform: none; }
+      .menu-ico i { transition: background 0.2s linear; }
+    }
+
     .dots { display: inline-flex; align-items: center; gap: 13px; }
     .dot {
       width: 15px; height: 15px; border-radius: 50%;
@@ -244,6 +393,9 @@
       position: relative;
       transition: transform 0.22s var(--spring), box-shadow 0.22s var(--ease);
     }
+    /* dark-mode swatch: neutral ink that flips with the theme, so it
+       stays visible on both the light and dark nav (red stays the accent) */
+    .dot.dot-mono { --c: var(--ink); }
     /* invisible, non-overlapping hit area for touch (WCAG 2.5.5 spacing) */
     .dot::after {
       content: '';
@@ -296,47 +448,69 @@
        grid scroll-reveal (home). A self-animating .view conflicts with the
        VT snapshot of the morph target, so it's intentionally omitted. */
 
-    /* ─────────────────────── CONTROL ROW (home) ─────────────────── */
-    .controls {
-      padding: clamp(24px, 5vw, 48px) var(--pad) 0;
+    /* ── LEAD BAR (full-width, bottom) — identity + live hover caption ── */
+    .lead-panel {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 35;                      /* above the grid, below header(40)/menu */
+      display: grid;
+      grid-template-columns: 1fr 1fr;   /* name | info, split at the centre */
+      align-items: center;
+      column-gap: clamp(24px, 3vw, 52px);
+      padding: clamp(16px, 1.9vw, 26px) var(--pad);   /* deeper */
+      background: color-mix(in srgb, var(--paper) 84%, transparent);
+      backdrop-filter: blur(11px) saturate(1.2);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -12px 40px rgba(0,0,0,0.06);
+      transition: opacity 0.35s var(--ease-out), transform 0.45s var(--spring);
     }
-
-    /* reserved height + line clamps so swapping titles/captions of any
-       length never reflows the filters/grid below */
-    .controls-lead {
-      max-width: 42ch;
-      min-height: clamp(88px, 9vw, 118px);
-    }
-    .controls-lead h1 {
+    .lead-panel h1 {
       font-family: var(--display);
       font-weight: 700;
-      font-size: clamp(28px, 5vw, 52px);
-      letter-spacing: -0.035em;
-      line-height: 0.98;
-      text-wrap: balance;
+      font-size: clamp(23px, 2.9vw, 38px);
+      letter-spacing: -0.03em;
+      line-height: 1.02;
+      margin: 0;
+      min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: opacity 0.18s var(--ease-out);
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
     }
-    /* every lead ends with a quiet red full stop — a small house signature */
-    .controls-lead h1::after { content: '.'; color: var(--red); }
-    .controls-lead p {
-      font-size: 14px;
+    /* every lead ends with a quiet red full stop — a small house signature
+       that gives a little bounce when you hover the bar */
+    .lead-panel h1::after { content: '.'; color: var(--red); display: inline-block; }
+    @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+      .lead-panel:hover h1::after { animation: dotBounce 0.55s var(--ease-out); }
+    }
+    @keyframes dotBounce {
+      0%   { transform: translateY(0) scale(1); }
+      30%  { transform: translateY(-7px) scale(1.18); }
+      55%  { transform: translateY(0) scale(0.92); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .lead-panel p {
+      font-size: clamp(13px, 0.98vw, 15px);
       font-weight: 500;
       color: var(--muted);
-      margin-top: 10px;
-      line-height: 1.35;
+      margin: 0;
+      line-height: 1.34;
       letter-spacing: -0.01em;
-      transition: opacity 0.18s var(--ease-out);
+      min-width: 0; max-width: 54ch;
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 2;          /* info runs over two lines */
       overflow: hidden;
+      transition: opacity 0.18s var(--ease-out);
     }
-    .controls.fading .controls-lead h1,
-    .controls.fading .controls-lead p { opacity: 0; }
+    .lead-panel.fading h1,
+    .lead-panel.fading p { opacity: 0; }
+    /* hidden off-home, when the menu is open, or near the footer */
+    .lead-panel.hide { opacity: 0; transform: translateY(100%); pointer-events: none; }
+    body.menu-open .lead-panel { opacity: 0; transform: translateY(100%); pointer-events: none; }
+    /* desktop hover affordance; on touch the wordmark + per-tile titles carry it */
+    @media (hover: none), (max-width: 700px) { .lead-panel { display: none; } }
+
+    /* a little breathing room now that the grid leads the page */
+    #view-home .filters { padding-top: clamp(20px, 3.5vw, 36px); }
 
     /* own toolbar row below the heading (left-aligned), clearly separated
        from the top nav so the two don't read as parallel menus */
@@ -363,8 +537,13 @@
       align-items: center;
       padding: 8px 18px;
       cursor: pointer;
-      transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.18s var(--ease);
+      transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.22s var(--spring);
     }
+    /* the chosen tab gives a little spring pop as it fills in */
+    @media (prefers-reduced-motion: no-preference) {
+      .filters button.active { animation: pillPop 0.4s var(--spring); }
+    }
+    @keyframes pillPop { from { transform: scale(0.82); } to { transform: scale(1); } }
     /* shuffle: re-deal the deck */
     .filters .shuffle { padding: 8px 12px; }
     .filters .shuffle svg { width: 15px; height: 15px; display: block; }
@@ -391,25 +570,37 @@
       padding: 12px var(--pad) clamp(48px, 8vw, 96px);
     }
 
+    /* registered so the hover vars can spring while --py (parallax, set
+       per-frame on scroll) updates instantly without being transitioned */
+    @property --hover-y { syntax: '<length>'; inherits: false; initial-value: 0px; }
+    @property --hover-r { syntax: '<angle>';  inherits: false; initial-value: 0deg; }
     .card {
       cursor: pointer;
       position: relative;
       break-inside: avoid;
       margin-bottom: clamp(30px, 3.6vw, 52px);
-      transition: transform 0.25s var(--ease);
+      /* per-column parallax (--py) composes with a springy hover lift/tilt */
+      transform: translateY(calc(var(--py, 0px) + var(--hover-y, 0px))) rotate(var(--hover-r, 0deg));
+      transition: --hover-y 0.34s var(--spring), --hover-r 0.34s var(--spring);
       display: block;
       color: inherit;
       text-decoration: none;
     }
-    .card:active { transform: scale(0.98); }
+    .card:active { --hover-y: 2px; }
     @media (hover: hover) and (pointer: fine) {
-      .card:hover { transform: translateY(-5px); }
-      /* spotlight: the hovered piece lifts out, neighbours ease back */
+      /* lift + a slight toy-like tilt, alternating so the wall feels hand-placed */
+      .card:hover { --hover-y: -6px; --hover-r: -1.3deg; }
+      .card:nth-child(even):hover { --hover-r: 1.3deg; }
+      /* spotlight: the hovered piece lifts out, neighbours ease back (parallax kept) */
       .grid.spotlight .card:not(.spot) {
         opacity: 0.78;
-        transform: scale(0.985);
+        transform: translateY(var(--py, 0px)) scale(0.985);
         transition: transform 0.35s var(--ease), opacity 0.35s var(--ease);
       }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card { transition: none; }
+      .card:hover, .card:nth-child(even):hover { --hover-y: -4px; --hover-r: 0deg; }
     }
 
     .card-thumb {
@@ -417,9 +608,6 @@
       width: 100%;
       overflow: hidden;
       border-radius: var(--r-media);
-      /* scroll-velocity skew: --sk is driven per-frame on the grid while
-         scrolling (each tile leans about its own centre, settles to 0) */
-      transform: skewY(var(--sk, 0deg));
       /* aspect-ratio set per-card inline (from the file's true dimensions)
          so columns pack correctly with no layout shift */
     }
@@ -602,6 +790,11 @@
       letter-spacing: -0.01em;
       white-space: nowrap;
       flex-shrink: 0;
+    }
+    /* desktop: drop the under-tile labels — the bottom bar names whatever
+       you hover. Kept on touch/mobile, where there's no hover or bar. */
+    @media (hover: hover) and (pointer: fine) and (min-width: 701px) {
+      .card-meta { display: none; }
     }
 
     .card.hidden { display: none; }
@@ -810,9 +1003,9 @@
     }
     /* reveal class only added by JS when motion is allowed, so content
        is always visible by default (progressive enhancement) */
-    .card.reveal { opacity: 0; transform: translateY(24px); }
+    .card.reveal { opacity: 0; transform: translateY(calc(24px + var(--py, 0px))); }
     .card.reveal.in {
-      opacity: 1; transform: none;
+      opacity: 1; transform: translateY(var(--py, 0px));
       transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
       transition-delay: var(--rd, 0s);
     }
@@ -1106,16 +1299,27 @@
 
   <header>
     <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
-    <div class="header-right">
-      <nav class="nav" aria-label="Primary">
-        <a href="../index.html">Work</a>
-        <a href="../index.html#case-studies" class="nav-cs-link">Case studies</a>
-        <a href="../index.html#about">About</a>
-        <a href="../shop.html">Shop</a>
-      </nav>
-      <div class="dots" aria-hidden="true"><span class="dot" style="background:#ff69b4"></span><span class="dot" style="background:#02b34b"></span><span class="dot" style="background:#ff1d19"></span></div>
-    </div>
+    <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="menu-panel">
+      <span class="menu-ico" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
   </header>
+
+  <div class="menu-scrim" id="menu-scrim"></div>
+  <aside class="menu-panel" id="menu-panel" aria-hidden="true" aria-label="Menu">
+    <nav class="menu-nav" aria-label="Primary">
+      <a href="../index.html"><span>Work</span></a>
+      <a href="../index.html#case-studies"><span>Case studies</span></a>
+      <a href="../index.html#about"><span>About</span></a>
+      <a href="../shop.html"><span>Shop</span></a>
+    </nav>
+    <div class="menu-foot">
+      <div class="dots" role="group" aria-label="Colour theme">
+        <button class="dot active" style="--c:#ff1d19" data-theme="light" aria-label="Light mode" aria-pressed="true"></button>
+        <button class="dot dot-mono" data-theme="dark" aria-label="Dark mode" aria-pressed="false"></button>
+      </div>
+      <a class="menu-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+    </div>
+  </aside>
 
   <article>
     <div class="pv-hero" style="background:#f57e2e; color:#fff;">
@@ -1156,6 +1360,40 @@
   </footer>
 
   <script>
+    // light / dark: honour the choice saved on the home page
+    (function () {
+      var dots = document.querySelectorAll('.dot'), ACCENT = '#ff1d19';
+      function setMode(theme) {
+        var dark = theme === 'dark', root = document.documentElement;
+        root.style.setProperty('--red', ACCENT);
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        dots.forEach(function (d) { var on = d.dataset.theme === (dark ? 'dark' : 'light'); d.classList.toggle('active', on); d.setAttribute('aria-pressed', on); });
+        try { localStorage.setItem('mode', dark ? 'dark' : 'light'); } catch (e) {}
+      }
+      dots.forEach(function (d) { d.addEventListener('click', function () { setMode(d.dataset.theme); }); });
+      var saved = null;
+      try { saved = localStorage.getItem('mode'); if (!saved) { var a = JSON.parse(localStorage.getItem('accent') || 'null'); if (a && a.theme) saved = a.theme; } } catch (e) {}
+      setMode(saved === 'dark' ? 'dark' : 'light');
+    })();
+    // pop-out menu
+    (function () {
+      var btn = document.getElementById('menu-btn'), panel = document.getElementById('menu-panel'), scrim = document.getElementById('menu-scrim');
+      if (!btn || !panel || !scrim) return;
+      var lastFocus = null;
+      function focusables() { return [].slice.call(panel.querySelectorAll('a[href], button:not([disabled])')); }
+      function onKey(e) {
+        if (e.key === 'Escape') { close(); return; }
+        if (e.key !== 'Tab') return;
+        var f = focusables(); if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+      function open() { lastFocus = document.activeElement; document.body.classList.add('menu-open'); btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Close menu'); panel.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; document.addEventListener('keydown', onKey); setTimeout(function () { (focusables()[0] || panel).focus(); }, 80); }
+      function close() { document.body.classList.remove('menu-open'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Open menu'); panel.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+      btn.addEventListener('click', function () { document.body.classList.contains('menu-open') ? close() : open(); });
+      scrim.addEventListener('click', close);
+    })();
     // honour reduced motion (no SPA here): pause autoplay, show first frame
     if (matchMedia('(prefers-reduced-motion: reduce)').matches)
       document.querySelectorAll('video').forEach(v => { v.removeAttribute('autoplay'); v.pause(); });

@@ -127,16 +127,27 @@ ${JSON.stringify(jsonld, null, 2)}
 
   <header>
     <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
-    <div class="header-right">
-      <nav class="nav" aria-label="Primary">
-        <a href="../index.html">Work</a>
-        <a href="../index.html#case-studies" class="nav-cs-link">Case studies</a>
-        <a href="../index.html#about">About</a>
-        <a href="../shop.html">Shop</a>
-      </nav>
-      <div class="dots" aria-hidden="true"><span class="dot" style="background:#ff69b4"></span><span class="dot" style="background:#02b34b"></span><span class="dot" style="background:#ff1d19"></span></div>
-    </div>
+    <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="menu-panel">
+      <span class="menu-ico" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
   </header>
+
+  <div class="menu-scrim" id="menu-scrim"></div>
+  <aside class="menu-panel" id="menu-panel" aria-hidden="true" aria-label="Menu">
+    <nav class="menu-nav" aria-label="Primary">
+      <a href="../index.html"><span>Work</span></a>
+      <a href="../index.html#case-studies"><span>Case studies</span></a>
+      <a href="../index.html#about"><span>About</span></a>
+      <a href="../shop.html"><span>Shop</span></a>
+    </nav>
+    <div class="menu-foot">
+      <div class="dots" role="group" aria-label="Colour theme">
+        <button class="dot active" style="--c:#ff1d19" data-theme="light" aria-label="Light mode" aria-pressed="true"></button>
+        <button class="dot dot-mono" data-theme="dark" aria-label="Dark mode" aria-pressed="false"></button>
+      </div>
+      <a class="menu-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+    </div>
+  </aside>
 
   <article>
     <div class="pv-hero" style="background:${p.bg}; color:${ink};">
@@ -177,6 +188,40 @@ ${JSON.stringify(jsonld, null, 2)}
   </footer>
 
   <script>
+    // light / dark: honour the choice saved on the home page
+    (function () {
+      var dots = document.querySelectorAll('.dot'), ACCENT = '#ff1d19';
+      function setMode(theme) {
+        var dark = theme === 'dark', root = document.documentElement;
+        root.style.setProperty('--red', ACCENT);
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        dots.forEach(function (d) { var on = d.dataset.theme === (dark ? 'dark' : 'light'); d.classList.toggle('active', on); d.setAttribute('aria-pressed', on); });
+        try { localStorage.setItem('mode', dark ? 'dark' : 'light'); } catch (e) {}
+      }
+      dots.forEach(function (d) { d.addEventListener('click', function () { setMode(d.dataset.theme); }); });
+      var saved = null;
+      try { saved = localStorage.getItem('mode'); if (!saved) { var a = JSON.parse(localStorage.getItem('accent') || 'null'); if (a && a.theme) saved = a.theme; } } catch (e) {}
+      setMode(saved === 'dark' ? 'dark' : 'light');
+    })();
+    // pop-out menu
+    (function () {
+      var btn = document.getElementById('menu-btn'), panel = document.getElementById('menu-panel'), scrim = document.getElementById('menu-scrim');
+      if (!btn || !panel || !scrim) return;
+      var lastFocus = null;
+      function focusables() { return [].slice.call(panel.querySelectorAll('a[href], button:not([disabled])')); }
+      function onKey(e) {
+        if (e.key === 'Escape') { close(); return; }
+        if (e.key !== 'Tab') return;
+        var f = focusables(); if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+      function open() { lastFocus = document.activeElement; document.body.classList.add('menu-open'); btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Close menu'); panel.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; document.addEventListener('keydown', onKey); setTimeout(function () { (focusables()[0] || panel).focus(); }, 80); }
+      function close() { document.body.classList.remove('menu-open'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Open menu'); panel.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+      btn.addEventListener('click', function () { document.body.classList.contains('menu-open') ? close() : open(); });
+      scrim.addEventListener('click', close);
+    })();
     // honour reduced motion (no SPA here): pause autoplay, show first frame
     if (matchMedia('(prefers-reduced-motion: reduce)').matches)
       document.querySelectorAll('video').forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
