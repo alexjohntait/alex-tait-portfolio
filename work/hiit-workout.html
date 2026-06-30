@@ -1095,6 +1095,60 @@
       .cs-process-grid { grid-template-columns: 1fr 1fr 1fr; }
       .cs-video-grid { grid-template-columns: 1fr; }
     }
+
+    /* ── REDESIGN: hamburger + pop-out menu (ported from the home page) ── */
+    html { overflow-x: clip; }
+    header { border-bottom: none; }
+    .wordmark { font-size: clamp(30px, 4.1vw, 41px); }
+    .wordmark .sig { height: clamp(36px, 4.7vw, 49px); }
+    .dot.dot-mono { --c: var(--ink); }
+    .menu-btn { width: 48px; height: 48px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #ffc9da; box-shadow: 0 3px 10px rgba(0,0,0,0.08); transition: transform 0.26s var(--spring), box-shadow 0.26s var(--ease); }
+    .menu-btn:active { transform: scale(0.9); }
+    @media (hover: hover) and (pointer: fine) { .menu-btn:hover { transform: scale(1.1) rotate(-5deg); } }
+    .menu-ico { position: relative; width: 24px; height: 16px; display: block; }
+    .menu-ico i { position: absolute; left: 0; right: 0; height: 2.5px; border-radius: 2px; background: #16120f; transition: transform 0.45s var(--spring), opacity 0.3s var(--ease); }
+    .menu-ico i:nth-child(1) { top: 0; }
+    .menu-ico i:nth-child(2) { top: 50%; transform: translateY(-50%); }
+    .menu-ico i:nth-child(3) { bottom: 0; }
+    @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+      body:not(.menu-open) .menu-btn:hover .menu-ico i:nth-child(1) { animation: barWiggleA 0.5s var(--ease-out); }
+      body:not(.menu-open) .menu-btn:hover .menu-ico i:nth-child(3) { animation: barWiggleB 0.5s var(--ease-out); }
+    }
+    @keyframes barWiggleA { 0%,100% { transform: translateX(0); } 40% { transform: translateX(3.5px); } 72% { transform: translateX(-1.5px); } }
+    @keyframes barWiggleB { 0%,100% { transform: translateX(0); } 40% { transform: translateX(-3.5px); } 72% { transform: translateX(1.5px); } }
+    body.menu-open .menu-ico i:nth-child(1) { transform: translateY(6.75px) rotate(45deg); }
+    body.menu-open .menu-ico i:nth-child(2) { opacity: 0; transform: translateY(-50%) scaleX(0.2); }
+    body.menu-open .menu-ico i:nth-child(3) { transform: translateY(-6.75px) rotate(-45deg); }
+    @media (prefers-reduced-motion: reduce) { .menu-btn, .menu-btn:hover { transform: none; } }
+    .menu-scrim { position: fixed; inset: 0; z-index: 60; background: color-mix(in srgb, var(--ink) 38%, transparent); opacity: 0; pointer-events: none; backdrop-filter: blur(0px); transition: opacity 0.45s var(--ease-out), backdrop-filter 0.45s var(--ease-out); }
+    body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; backdrop-filter: blur(3px); }
+    .menu-panel { position: fixed; top: 0; right: 0; z-index: 61; height: 100dvh; width: min(440px, 88vw); background: var(--ink); color: var(--paper); display: flex; flex-direction: column; justify-content: center; gap: clamp(28px, 6vh, 60px); padding: clamp(40px, 8vh, 92px) clamp(34px, 5vw, 60px); transform: translateX(101%); box-shadow: -34px 0 90px rgba(0,0,0,0.28); visibility: hidden; transition: transform 0.6s cubic-bezier(0.19,1,0.22,1), visibility 0s linear 0.6s; }
+    body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform 0.6s cubic-bezier(0.19,1,0.22,1); }
+    .menu-panel .dot.dot-mono { --c: var(--paper); }
+    .menu-nav { display: flex; flex-direction: column; gap: clamp(2px, 1.2vh, 12px); }
+    .menu-nav a { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 4.4vw, 54px); letter-spacing: -0.03em; line-height: 1.04; color: var(--paper); text-decoration: none; width: fit-content; overflow: hidden; }
+    .menu-nav a::after { content: '.'; color: var(--red); }
+    .menu-nav a span { display: inline-block; transform: translateX(44px); opacity: 0; transition: transform 0.55s cubic-bezier(0.19,1,0.22,1), opacity 0.5s var(--ease-out), color 0.2s var(--ease); }
+    body.menu-open .menu-nav a span { transform: none; opacity: 1; }
+    body.menu-open .menu-nav a:nth-child(1) span { transition-delay: 0.14s; }
+    body.menu-open .menu-nav a:nth-child(2) span { transition-delay: 0.20s; }
+    body.menu-open .menu-nav a:nth-child(3) span { transition-delay: 0.26s; }
+    body.menu-open .menu-nav a:nth-child(4) span { transition-delay: 0.32s; }
+    @media (hover: hover) and (pointer: fine) { .menu-nav a:hover span { color: var(--red); transform: translateX(10px); } }
+    .menu-nav a.current span { color: var(--red); }
+    .menu-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; opacity: 0; transform: translateY(10px); transition: opacity 0.4s var(--ease-out) 0.36s, transform 0.4s var(--ease-out) 0.36s; }
+    body.menu-open .menu-foot { opacity: 1; transform: none; }
+    .menu-mail { color: var(--paper); opacity: 0.66; font-size: 14px; text-decoration: none; transition: opacity 0.2s var(--ease); }
+    .menu-mail:hover { opacity: 1; }
+    body.menu-open header { background: transparent; border-color: transparent; backdrop-filter: none; z-index: 65; }
+    body.menu-open .wordmark .sig { filter: invert(1); }
+    :root[data-theme="dark"] body.menu-open .wordmark .sig { filter: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .menu-panel { transition: opacity 0.2s linear, visibility 0s; transform: none; opacity: 0; }
+      body.menu-open .menu-panel { opacity: 1; }
+      .menu-nav a span, .menu-foot { transition: opacity 0.2s linear; transform: none; }
+      .menu-ico i { transition: background 0.2s linear; }
+    }
 </style>
 </head>
 <body>
@@ -1102,16 +1156,27 @@
 
   <header>
     <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
-    <div class="header-right">
-      <nav class="nav" aria-label="Primary">
-        <a href="../index.html">Work</a>
-        <a href="../index.html#case-studies" class="current nav-cs-link">Case studies</a>
-        <a href="../index.html#about">About</a>
-        <a href="../shop.html">Shop</a>
-      </nav>
-      <div class="dots" aria-hidden="true"><span class="dot" style="background:#ff69b4"></span><span class="dot" style="background:#02b34b"></span><span class="dot" style="background:#ff1d19"></span></div>
-    </div>
+    <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="menu-panel">
+      <span class="menu-ico" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>
   </header>
+
+  <div class="menu-scrim" id="menu-scrim"></div>
+  <aside class="menu-panel" id="menu-panel" aria-hidden="true" aria-label="Menu">
+    <nav class="menu-nav" aria-label="Primary">
+      <a href="../index.html"><span>Work</span></a>
+      <a href="../index.html#case-studies" class="current"><span>Case studies</span></a>
+      <a href="../index.html#about"><span>About</span></a>
+      <a href="../shop.html"><span>Shop</span></a>
+    </nav>
+    <div class="menu-foot">
+      <div class="dots" role="group" aria-label="Colour theme">
+        <button class="dot active" style="--c:#ff1d19" data-theme="light" aria-label="Light mode" aria-pressed="true"></button>
+        <button class="dot dot-mono" data-theme="dark" aria-label="Dark mode" aria-pressed="false"></button>
+      </div>
+      <a class="menu-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+    </div>
+  </aside>
 
   <article>
 
@@ -1251,5 +1316,40 @@
       });
     }
   </script>
+  <script>
+    (function () {
+      var dots = document.querySelectorAll('.dot'), ACCENT = '#ff1d19';
+      function setMode(theme) {
+        var dark = theme === 'dark', root = document.documentElement;
+        root.style.setProperty('--red', ACCENT);
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        dots.forEach(function (d) { var on = d.dataset.theme === (dark ? 'dark' : 'light'); d.classList.toggle('active', on); d.setAttribute('aria-pressed', on); });
+        try { localStorage.setItem('mode', dark ? 'dark' : 'light'); } catch (e) {}
+      }
+      dots.forEach(function (d) { d.addEventListener('click', function () { setMode(d.dataset.theme); }); });
+      var saved = null;
+      try { saved = localStorage.getItem('mode'); if (!saved) { var a = JSON.parse(localStorage.getItem('accent') || 'null'); if (a && a.theme) saved = a.theme; } } catch (e) {}
+      setMode(saved === 'dark' ? 'dark' : 'light');
+    })();
+    (function () {
+      var btn = document.getElementById('menu-btn'), panel = document.getElementById('menu-panel'), scrim = document.getElementById('menu-scrim');
+      if (!btn || !panel || !scrim) return;
+      var lastFocus = null;
+      function focusables() { return [].slice.call(panel.querySelectorAll('a[href], button:not([disabled])')); }
+      function onKey(e) {
+        if (e.key === 'Escape') { close(); return; }
+        if (e.key !== 'Tab') return;
+        var f = focusables(); if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+      function open() { lastFocus = document.activeElement; document.body.classList.add('menu-open'); btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Close menu'); panel.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; document.addEventListener('keydown', onKey); setTimeout(function () { (focusables()[0] || panel).focus(); }, 80); }
+      function close() { document.body.classList.remove('menu-open'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Open menu'); panel.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+      btn.addEventListener('click', function () { document.body.classList.contains('menu-open') ? close() : open(); });
+      scrim.addEventListener('click', close);
+    })();
+  </script>
+
 </body>
 </html>
