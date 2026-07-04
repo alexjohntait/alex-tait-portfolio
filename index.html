@@ -738,14 +738,20 @@
       aspect-ratio: 16 / 9;
       background: var(--cs-panel, var(--ink));
     }
+    /* --cs-py (scroll parallax, instant) composes with --cs-scale (hover, springs) */
+    @property --cs-scale { syntax: '<number>'; inherits: false; initial-value: 1; }
     .cs-banner-media video,
     .cs-banner-media img {
       width: 100%; height: 100%; object-fit: contain; display: block;
-      transition: transform 0.5s var(--ease);
+      transform: translateY(var(--cs-py, 0px)) scale(var(--cs-scale, 1));
+      transition: --cs-scale 0.5s var(--ease);
     }
     @media (hover: hover) and (pointer: fine) {
       .cs-banner:hover .cs-banner-media video,
-      .cs-banner:hover .cs-banner-media img { transform: scale(1.03); }
+      .cs-banner:hover .cs-banner-media img { --cs-scale: 1.04; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cs-banner-media video, .cs-banner-media img { transform: none; }
     }
     .cs-banner-panel {
       background: var(--cs-panel, var(--ink));
@@ -2374,14 +2380,23 @@ setupTouchVideo();
     const lefts = [...new Set(cards.map(c => Math.round(c.offsetLeft)))].sort((a, b) => a - b);
     const factorByLeft = new Map(lefts.map((l, i) => [l, FACTORS[i % FACTORS.length]]));
     pcards = cards.map(el => ({ el, f: factorByLeft.get(Math.round(el.offsetLeft)) || 0 }));
+    bMedia = bannerMedia();
     apply();
   }
+  const bannerMedia = () => [...document.querySelectorAll('.cs-banner-media img, .cs-banner-media video')];
+  let bMedia = [];
   function apply() {
     const y = window.scrollY;
     for (const { el, f } of pcards) {
       if (!f) { el.style.removeProperty('--py'); continue; }
       const py = Math.max(-MAX, Math.min(MAX, y * f));
       el.style.setProperty('--py', py.toFixed(1) + 'px');
+    }
+    // signature flourish: the illustration inside each case-study banner
+    // drifts within its frame as the banner scrolls (parallax depth)
+    for (const m of bMedia) {
+      const py = Math.max(-52, Math.min(52, y * 0.09));
+      m.style.setProperty('--cs-py', py.toFixed(1) + 'px');
     }
   }
   const onScroll = () => {
