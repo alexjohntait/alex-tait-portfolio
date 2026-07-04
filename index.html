@@ -466,11 +466,15 @@
       align-items: center;
       column-gap: clamp(24px, 3vw, 52px);
       padding: clamp(16px, 1.9vw, 26px) var(--pad);   /* deeper */
-      background: color-mix(in srgb, var(--paper) 84%, transparent);
+      /* base frosted paper, washed toward the hovered piece's colour */
+      background:
+        linear-gradient(color-mix(in srgb, var(--lead-tint, transparent) 12%, transparent), color-mix(in srgb, var(--lead-tint, transparent) 12%, transparent)),
+        color-mix(in srgb, var(--paper) 84%, transparent);
       backdrop-filter: blur(11px) saturate(1.2);
-      border-top: 1px solid var(--line);
+      border-top: 2px solid color-mix(in srgb, var(--lead-tint, var(--line)) 55%, var(--line));
       box-shadow: 0 -12px 40px rgba(0,0,0,0.06);
-      transition: opacity 0.35s var(--ease-out), transform 0.45s var(--spring);
+      transition: background 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
+                  opacity 0.35s var(--ease-out), transform 0.45s var(--spring);
     }
     .lead-panel h1 {
       font-family: var(--display);
@@ -561,7 +565,9 @@
     }
     @keyframes shuffleSpin { from { transform: rotate(-180deg) scale(0.8); } to { transform: rotate(0) scale(1); } }
     @media (hover: hover) and (pointer: fine) {
-      .filters button:hover { color: var(--ink); transform: translateY(-2px); }
+      .filters button:hover { color: var(--ink); transform: translateY(-2px); background: color-mix(in srgb, var(--ink) 7%, transparent); }
+      .filters button.active:hover { background: var(--ink); }   /* active stays solid */
+      .filters .shuffle:hover { background: color-mix(in srgb, var(--red) 12%, transparent); }
     }
     .filters button:active { transform: scale(0.96); }
     .filters button.active {
@@ -1665,6 +1671,7 @@ function buildGrid() {
     const engage = () => {
       setLead(p.title, p.caption || DEFAULT_SUB);
       applyGlow(vivid);
+      leadPanel.style.setProperty('--lead-tint', vivid);   // caption bar wears the piece's colour
       if (vid && !REDUCE_MOTION) vid.play().catch(() => {});
       if (!isCase) { grid.classList.add('spotlight'); card.classList.add('spot'); }
     };
@@ -1672,6 +1679,7 @@ function buildGrid() {
       const lead = activeFilters.size === 1 ? catLabel([...activeFilters][0]) : FILTER_LABELS.all;
       setLead(lead, DEFAULT_SUB);
       applyGlow(currentAccent);
+      leadPanel.style.removeProperty('--lead-tint');
       if (vid && !REDUCE_MOTION) vid.pause();
       if (!isCase) { grid.classList.remove('spotlight'); card.classList.remove('spot'); }
     };
