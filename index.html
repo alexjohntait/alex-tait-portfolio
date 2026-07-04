@@ -1026,17 +1026,26 @@
       from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: none; }
     }
+    @keyframes popIn {
+      0%   { opacity: 0; transform: translateY(26px) scale(0.965); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes barUp { from { transform: translateY(100%); } to { transform: none; } }
     @media (prefers-reduced-motion: no-preference) {
-      body.boot #lead-title { animation: riseIn 0.6s var(--ease-out) 0.20s both; }
-      body.boot #lead-sub   { animation: riseIn 0.6s var(--ease-out) 0.32s both; }
-      body.boot .filters button { animation: riseIn 0.45s var(--ease-out) both; }
-      body.boot .filters button:nth-child(1) { animation-delay: 0.38s; }
-      body.boot .filters button:nth-child(2) { animation-delay: 0.43s; }
-      body.boot .filters button:nth-child(3) { animation-delay: 0.48s; }
-      body.boot .filters button:nth-child(4) { animation-delay: 0.53s; }
-      body.boot .filters button:nth-child(5) { animation-delay: 0.58s; }
-      body.boot .filters button:nth-child(6) { animation-delay: 0.63s; }
-      body.boot .featured .cs-banner { animation: riseIn 0.7s var(--ease-out) 0.5s both; }
+      /* the work leads: case-study banners pop first with a spring */
+      body.boot .featured .cs-banner { animation: popIn 0.72s var(--spring) both; }
+      body.boot .featured .cs-banner:nth-child(1) { animation-delay: 0.06s; }
+      body.boot .featured .cs-banner:nth-child(2) { animation-delay: 0.15s; }
+      /* filters slide in just after, tight stagger */
+      body.boot .filters button { animation: riseIn 0.5s var(--ease-out) both; }
+      body.boot .filters button:nth-child(1) { animation-delay: 0.30s; }
+      body.boot .filters button:nth-child(2) { animation-delay: 0.34s; }
+      body.boot .filters button:nth-child(3) { animation-delay: 0.38s; }
+      body.boot .filters button:nth-child(4) { animation-delay: 0.42s; }
+      body.boot .filters button:nth-child(5) { animation-delay: 0.46s; }
+      body.boot .filters button:nth-child(6) { animation-delay: 0.50s; }
+      /* the caption bar rises up from the bottom edge */
+      body.boot #lead-panel { animation: barUp 0.65s var(--ease-out) 0.6s both; }
     }
 
     /* ─────────────────── CUSTOM CURSOR (fine pointers) ──────────── */
@@ -1714,8 +1723,8 @@ function setupReveal() {
       if (!en.isIntersecting) return;
       const c = en.target;
       // during the opening curtain, the first wave waits for the headline/filters
-      const base = document.body.classList.contains('boot') ? 0.6 : 0;
-      c.style.transitionDelay = (base + (+c.dataset.i % 4) * 0.06) + 's';
+      const base = document.body.classList.contains('boot') ? 0.34 : 0;
+      c.style.transitionDelay = (base + (+c.dataset.i % 4) * 0.05) + 's';
       // once the entrance finishes, drop the reveal transition so hover uses
       // the card's own spring (the .reveal.in rule would otherwise shadow it)
       const done = (e) => {
