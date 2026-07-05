@@ -158,9 +158,13 @@
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      padding: 18px var(--pad);
-      background: color-mix(in srgb, var(--paper) 70%, transparent);
-      backdrop-filter: saturate(1.4) blur(10px);
+      padding: 18px var(--pad) 26px;
+      /* paper, not glass: solid at the top, dissolving to nothing — the
+         work slides underneath like prints under a mat board edge */
+      background: linear-gradient(to bottom,
+        var(--paper) 58%,
+        color-mix(in srgb, var(--paper) 62%, transparent) 84%,
+        transparent);
     }
 
     /* condensed lead bar: slides down under the sticky header once the
@@ -292,15 +296,19 @@
     .menu-btn {
       width: 48px; height: 48px; border: none; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
-      border-radius: 50%;
+      /* a hand-cut sticker, not a perfect circle — slightly wonky at rest,
+         it rounds out and straightens when you reach for it */
+      border-radius: 46% 54% 45% 55% / 52% 46% 56% 44%;
+      transform: rotate(-4deg);
       background: #ffc9da;                          /* Kueski pink — a soft pop up top */
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-      transition: transform 0.26s var(--spring), box-shadow 0.26s var(--ease);
+      transition: transform 0.3s var(--spring), border-radius 0.3s var(--ease), box-shadow 0.26s var(--ease);
     }
-    .menu-btn:active { transform: scale(0.9); }
+    .menu-btn:active { transform: scale(0.9) rotate(-4deg); }
     @media (hover: hover) and (pointer: fine) {
-      .menu-btn:hover { transform: scale(1.1) rotate(-5deg); }
+      .menu-btn:hover { transform: scale(1.1) rotate(2deg); border-radius: 50%; }
     }
+    body.menu-open .menu-btn { transform: rotate(0deg); border-radius: 50%; }
     .menu-ico { position: relative; width: 24px; height: 16px; display: block; }
     .menu-ico i {
       position: absolute; left: 0; right: 0; height: 2.5px; border-radius: 2px;
@@ -466,13 +474,13 @@
       align-items: center;
       column-gap: clamp(24px, 3vw, 52px);
       padding: clamp(16px, 1.9vw, 26px) var(--pad);   /* deeper */
-      /* base frosted paper, washed toward the hovered piece's colour */
+      /* a gallery wall label: flat paper (no glass), washed toward the
+         hovered piece's colour like a sheet of coloured stock */
       background:
-        linear-gradient(color-mix(in srgb, var(--lead-tint, transparent) 28%, transparent), color-mix(in srgb, var(--lead-tint, transparent) 28%, transparent)),
-        color-mix(in srgb, var(--paper) 84%, transparent);
-      backdrop-filter: blur(11px) saturate(1.2);
+        linear-gradient(color-mix(in srgb, var(--lead-tint, transparent) 22%, transparent), color-mix(in srgb, var(--lead-tint, transparent) 22%, transparent)),
+        var(--paper);
       border-top: 3px solid color-mix(in srgb, var(--lead-tint, var(--line)) 85%, var(--line));
-      box-shadow: 0 -12px 44px color-mix(in srgb, var(--lead-tint, #000) 16%, rgba(0,0,0,0.06));
+      box-shadow: 0 -10px 34px color-mix(in srgb, var(--lead-tint, #000) 12%, rgba(0,0,0,0.05));
       transition: background 0.4s var(--ease-out), border-color 0.4s var(--ease-out),
                   opacity 0.35s var(--ease-out), transform 0.45s var(--spring);
     }
@@ -541,21 +549,28 @@
       letter-spacing: -0.01em;
       color: var(--muted);
       background: none;
-      border: 1px solid transparent;
-      border-radius: 100px;
+      border: none;
+      position: relative;
       /* 44px min touch target (WCAG 2.5.5) */
       min-height: 44px;
       display: inline-flex;
       align-items: center;
-      padding: 8px 18px;
+      padding: 8px 14px;
       cursor: pointer;
-      transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.22s var(--spring);
+      transition: color 0.2s var(--ease), transform 0.22s var(--spring);
     }
-    /* the chosen tab gives a little spring pop as it fills in */
-    @media (prefers-reduced-motion: no-preference) {
-      .filters button.active { animation: pillPop 0.4s var(--spring); }
+    /* ink text + a hand-drawn red squiggle that draws itself in — a pen
+       mark, not a pill. Faint preview on hover, full ink when chosen. */
+    .filters button[data-filter]::after {
+      content: '';
+      position: absolute;
+      left: 12px; right: 12px; bottom: 7px; height: 6px;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 7" preserveAspectRatio="none"><path d="M1.5 4.5Q9 1.6 16 4T31 3.2T46 4.2T58.5 2.8" fill="none" stroke="%23ff1d19" stroke-width="2.4" stroke-linecap="round"/></svg>') no-repeat center / 100% 100%;
+      transform: scaleX(0);
+      transform-origin: left center;
+      opacity: 0;
+      transition: transform 0.35s var(--ease-out), opacity 0.2s var(--ease);
     }
-    @keyframes pillPop { from { transform: scale(0.82); } to { transform: scale(1); } }
     /* shuffle: re-deal the deck */
     .filters .shuffle { padding: 8px 12px; }
     .filters .shuffle svg { width: 15px; height: 15px; display: block; }
@@ -565,14 +580,14 @@
     }
     @keyframes shuffleSpin { from { transform: rotate(-180deg) scale(0.8); } to { transform: rotate(0) scale(1); } }
     @media (hover: hover) and (pointer: fine) {
-      .filters button:hover { color: var(--ink); transform: translateY(-2px); background: color-mix(in srgb, var(--ink) 7%, transparent); }
-      .filters button.active:hover { background: var(--ink); }   /* active stays solid */
-      .filters .shuffle:hover { background: color-mix(in srgb, var(--red) 12%, transparent); }
+      .filters button:hover { color: var(--ink); transform: translateY(-2px); }
+      .filters button[data-filter]:hover::after { transform: scaleX(1); opacity: 0.3; }
     }
     .filters button:active { transform: scale(0.96); }
-    .filters button.active {
-      color: var(--paper);
-      background: var(--ink);
+    .filters button.active { color: var(--ink); }
+    .filters button.active::after { transform: scaleX(1); opacity: 1; }
+    @media (prefers-reduced-motion: reduce) {
+      .filters button[data-filter]::after { transition: opacity 0.2s linear; transform: scaleX(1); }
     }
 
     /* ─────────────────── GRID (flowing masonry) ─────────────────── */
@@ -587,34 +602,37 @@
     /* registered so the hover vars can spring while --py (parallax, set
        per-frame on scroll) updates instantly without being transitioned */
     @property --hover-y { syntax: '<length>'; inherits: false; initial-value: 0px; }
-    @property --hover-r { syntax: '<angle>';  inherits: false; initial-value: 0deg; }
+    @property --tilt    { syntax: '<angle>';  inherits: false; initial-value: 0deg; }
     .card {
       cursor: pointer;
       position: relative;
       break-inside: avoid;
       margin-bottom: clamp(30px, 3.6vw, 52px);
-      /* per-column parallax (--py) composes with a springy hover lift/tilt */
-      transform: translateY(calc(var(--py, 0px) + var(--hover-y, 0px))) rotate(var(--hover-r, 0deg));
-      transition: --hover-y 0.34s var(--spring), --hover-r 0.34s var(--spring);
+      /* per-column parallax (--py) composes with the pinned tilt + hover lift */
+      transform: translateY(calc(var(--py, 0px) + var(--hover-y, 0px))) rotate(var(--tilt, 0deg));
+      transition: --hover-y 0.34s var(--spring), --tilt 0.38s var(--spring);
       display: block;
       color: inherit;
       text-decoration: none;
     }
     .card:active { --hover-y: 2px; }
     @media (hover: hover) and (pointer: fine) {
-      /* lift + a slight toy-like tilt, alternating so the wall feels hand-placed */
-      .card:hover { --hover-y: -6px; --hover-r: -1.3deg; }
-      .card:nth-child(even):hover { --hover-r: 1.3deg; }
-      /* spotlight: the hovered piece lifts out, neighbours ease back (parallax kept) */
+      /* prints pinned to the wall: each rests slightly askew (a varied,
+         non-repeating pattern), and straightens as you pick it up */
+      .grid .card:nth-child(3n+1) { --tilt: -0.5deg; }
+      .grid .card:nth-child(3n+2) { --tilt: 0.45deg; }
+      .grid .card:nth-child(4n+3) { --tilt: -0.3deg; }
+      .card:hover { --hover-y: -6px; --tilt: 0deg; }
+      /* spotlight: the hovered piece lifts out, neighbours ease back (parallax + tilt kept) */
       .grid.spotlight .card:not(.spot) {
         opacity: 0.78;
-        transform: translateY(var(--py, 0px)) scale(0.985);
+        transform: translateY(var(--py, 0px)) rotate(var(--tilt, 0deg)) scale(0.985);
         transition: transform 0.35s var(--ease), opacity 0.35s var(--ease);
       }
     }
     @media (prefers-reduced-motion: reduce) {
       .card { transition: none; }
-      .card:hover, .card:nth-child(even):hover { --hover-y: -4px; --hover-r: 0deg; }
+      .card:hover { --hover-y: -4px; }
     }
 
     .card-thumb {
@@ -1023,9 +1041,9 @@
     }
     /* reveal class only added by JS when motion is allowed, so content
        is always visible by default (progressive enhancement) */
-    .card.reveal { opacity: 0; transform: translateY(calc(24px + var(--py, 0px))); }
+    .card.reveal { opacity: 0; transform: translateY(calc(24px + var(--py, 0px))) rotate(var(--tilt, 0deg)); }
     .card.reveal.in {
-      opacity: 1; transform: translateY(var(--py, 0px));
+      opacity: 1; transform: translateY(var(--py, 0px)) rotate(var(--tilt, 0deg));
       transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
       transition-delay: var(--rd, 0s);
     }
@@ -1038,16 +1056,21 @@
       from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: none; }
     }
-    @keyframes popIn {
-      0%   { opacity: 0; transform: translateY(26px) scale(0.965); }
+    /* the banners are dealt onto the wall — they arrive slightly rotated
+       and settle flat, like prints being laid down */
+    @keyframes dealA {
+      0%   { opacity: 0; transform: translateY(28px) rotate(-1.4deg) scale(0.965); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes dealB {
+      0%   { opacity: 0; transform: translateY(28px) rotate(1.2deg) scale(0.965); }
       100% { opacity: 1; transform: none; }
     }
     @keyframes barUp { from { transform: translateY(100%); } to { transform: none; } }
     @media (prefers-reduced-motion: no-preference) {
-      /* the work leads: case-study banners pop first with a spring */
-      body.boot .featured .cs-banner { animation: popIn 0.72s var(--spring) both; }
-      body.boot .featured .cs-banner:nth-child(1) { animation-delay: 0.06s; }
-      body.boot .featured .cs-banner:nth-child(2) { animation-delay: 0.15s; }
+      /* the work leads: case-study banners are dealt first */
+      body.boot .featured .cs-banner:nth-child(1) { animation: dealA 0.78s var(--spring) 0.06s both; }
+      body.boot .featured .cs-banner:nth-child(2) { animation: dealB 0.78s var(--spring) 0.18s both; }
       /* filters slide in just after, tight stagger */
       body.boot .filters button { animation: riseIn 0.5s var(--ease-out) both; }
       body.boot .filters button:nth-child(1) { animation-delay: 0.30s; }
