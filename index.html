@@ -559,17 +559,37 @@
       cursor: pointer;
       transition: color 0.2s var(--ease), transform 0.22s var(--spring);
     }
-    /* ink text + a hand-drawn red squiggle that draws itself in — a pen
-       mark, not a pill. Faint preview on hover, full ink when chosen. */
-    .filters button[data-filter]::after {
+    /* each category wears a shape from the work — it springs in behind
+       the word on hover and stays once chosen (a sticker, not a pill) */
+    .filters button[data-filter]::before {
       content: '';
       position: absolute;
-      left: 12px; right: 12px; bottom: 7px; height: 6px;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 7" preserveAspectRatio="none"><path d="M1.5 4.5Q9 1.6 16 4T31 3.2T46 4.2T58.5 2.8" fill="none" stroke="%23ff1d19" stroke-width="2.4" stroke-linecap="round"/></svg>') no-repeat center / 100% 100%;
-      transform: scaleX(0);
-      transform-origin: left center;
+      inset: 4px -2px;
+      z-index: -1;
+      background: no-repeat center / 100% 100%;
+      transform: scale(0) rotate(var(--sh-r, 0deg));
       opacity: 0;
-      transition: transform 0.35s var(--ease-out), opacity 0.2s var(--ease);
+      transition: transform 0.42s var(--spring), opacity 0.15s var(--ease);
+    }
+    /* blob (Cadooz orange field energy) in Kueski pink */
+    .filters button[data-filter="all"]::before {
+      --sh-r: -3deg;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M12 31Q7 10 33 7T74 9Q94 13 93 31T66 54Q39 60 22 52T12 31Z" fill="%23ffc9da"/></svg>');
+    }
+    /* spark (HIIT sparkles) in Spotify blue */
+    .filters button[data-filter="advertising"]::before {
+      --sh-r: 2deg;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M50 1Q56 20 72 24Q97 29 74 37Q58 42 53 59Q47 43 28 38Q4 31 30 24Q45 20 50 1Z" fill="%23509bf6"/></svg>');
+    }
+    /* cloud (App Store skies) in Tap-on lilac */
+    .filters button[data-filter="editorial"]::before {
+      --sh-r: -2deg;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M20 52Q4 52 6 38Q8 27 21 28Q23 12 44 11Q62 10 66 24Q84 21 88 34Q92 50 72 52Z" fill="%23c3afd4"/></svg>');
+    }
+    /* heart (Offline Dating) in a soft red tint */
+    .filters button[data-filter="personal"]::before {
+      --sh-r: 3deg;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M50 57Q18 39 13 21Q11 5 32 6Q44 7 50 18Q56 7 68 6Q89 5 87 21Q82 39 50 57Z" fill="%23ffb3af"/></svg>');
     }
     /* shuffle: re-deal the deck */
     .filters .shuffle { padding: 8px 12px; }
@@ -580,14 +600,17 @@
     }
     @keyframes shuffleSpin { from { transform: rotate(-180deg) scale(0.8); } to { transform: rotate(0) scale(1); } }
     @media (hover: hover) and (pointer: fine) {
-      .filters button:hover { color: var(--ink); transform: translateY(-2px); }
-      .filters button[data-filter]:hover::after { transform: scaleX(1); opacity: 0.3; }
+      .filters button:hover { transform: translateY(-2px); }
+      .filters button[data-filter]:hover::before { transform: scale(1) rotate(var(--sh-r, 0deg)); opacity: 1; }
     }
     .filters button:active { transform: scale(0.96); }
-    .filters button.active { color: var(--ink); }
-    .filters button.active::after { transform: scaleX(1); opacity: 1; }
+    .filters button.active::before { transform: scale(1) rotate(var(--sh-r, 0deg)); opacity: 1; }
+    /* dark ink over the light shapes in BOTH themes (dark mode's cream
+       text would fail on the pastel shapes) */
+    .filters button.active { color: #16120f; }
+    @media (hover: hover) and (pointer: fine) { .filters button:hover { color: #16120f; } }
     @media (prefers-reduced-motion: reduce) {
-      .filters button[data-filter]::after { transition: opacity 0.2s linear; transform: scaleX(1); }
+      .filters button[data-filter]::before { transition: opacity 0.2s linear; transform: scale(1) rotate(var(--sh-r, 0deg)); }
     }
 
     /* ─────────────────── GRID (flowing masonry) ─────────────────── */
