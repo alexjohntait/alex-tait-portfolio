@@ -78,8 +78,7 @@
 
   body {
     font-family: var(--mono); color: var(--ink);
-    background: color-mix(in srgb, var(--flood, var(--paper)) 16%, var(--paper));
-    transition: background 0.55s var(--out);
+    background: var(--paper);
     -webkit-font-smoothing: antialiased;
     overflow-x: clip;
   }
@@ -481,11 +480,9 @@ const ghost = document.getElementById('ghost');
 let ghostT;
 function floodOn(colour, name) {
   clearTimeout(ghostT);
-  document.body.style.setProperty('--flood', colour);
   ghost.textContent = name; ghost.classList.add('on');
 }
 function floodOff() {
-  document.body.style.removeProperty('--flood');
   ghost.classList.remove('on');
 }
 function announce(text) {
@@ -658,6 +655,9 @@ function layout() {
   /* staggered column starts — one column touches the very top of the
      window, the rest step down for a sporadic top edge */
   const colY = [0, 118, 42, 132, 20, 96];
+  /* the gap between tiles grows with the window, so a large screen gets
+     noticeably more empty space rather than the same fixed breathing room */
+  const gap = Math.min(108 + Math.max(W - 1200, 0) * 0.22, 240);
 
   /* keep the signature mostly clear: only let tiles graze its edge,
      never sit fully behind it */
@@ -705,7 +705,7 @@ function layout() {
     el._resetDrag && el._resetDrag();
     /* advance the column: tile height + a steady breathing gap */
     const h = el.offsetHeight || colw;
-    colY[c] += h + 108;
+    colY[c] += h + gap;
     n++;
   });
   board.style.height = Math.max(...colY) + 60 + 'px';
