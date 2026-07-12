@@ -246,12 +246,11 @@
   .case {
     position: relative;
     display: grid; grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: auto 1fr;   /* title row hugs its text; meta sits right under */
     min-height: 92vh; align-content: center;
     padding: 12vh var(--gx);
   }
   .case .media {
-    grid-column: 1 / 4; grid-row: 2; align-self: start; display: block;
+    grid-column: 1 / 4; align-self: start; display: block;
     background: var(--cb, #ddd);
     transition: box-shadow 0.25s;
   }
@@ -259,19 +258,25 @@
     .case .media:hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
   }
   .case .media img, .case .media video { width: 100%; height: auto; display: block; }
+  /* text sits beside the media, in its own column, top-aligned with it —
+     never floating above it — and stacks title/meta/blurb internally */
+  .case-text {
+    grid-column: 4 / 7; align-self: start; padding: 34px 22px 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 22px;
+  }
   /* headline shares the popup's scale — one "project title" moment site-wide */
   .case h2, .pop-body h2 {
     font-family: var(--sans); font-weight: 400;
     font-size: clamp(32px, 3.6vw, 54px); letter-spacing: -0.01em; line-height: 1.05;
     color: var(--accent); text-wrap: balance;
   }
-  .case h2 { grid-column: 4 / 7; align-self: start; padding: 0 22px; margin-top: 200px; margin-bottom: 30px; }
+  .case h2 { grid-column: 1 / 4; margin: 0 0 30px; }
   /* meta + body copy share one scale with the popup's mono content */
   .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--accent); font-style: italic; }
-  .case .meta { grid-column: 4 / 5; align-self: start; padding: 0 22px; }
+  .case .meta { grid-column: 1 / 2; }
   .case .meta b, .pop-meta b { font-weight: 500; }
   .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--accent); max-width: 44ch; }
-  .case .blurb { grid-column: 5 / 7; align-self: start; padding: 0 22px; }
+  .case .blurb { grid-column: 2 / 4; }
   .case .blurb a { color: var(--accent); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
   .case .blurb a:hover { color: var(--ink); }
   @supports (animation-timeline: view()) {
@@ -366,12 +371,14 @@
       <a class="media" href="work/humantold-nyc.html" aria-label="Humantold NYC case study">
         <video src="images/humantold-nyc.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
       </a>
-      <h2>Making therapy feel reachable</h2>
-      <div class="meta"><b>DATE</b> 2024<br /><b>CLIENT</b> Humantold</div>
-      <div class="blurb">
-        A cast of city-stressed characters for Humantold's subway campaign, rolled out
-        across the New York underground — making therapy feel human, and reachable.
-        <br /><a href="work/humantold-nyc.html">Read the case study →</a>
+      <div class="case-text">
+        <h2>Making therapy feel reachable</h2>
+        <div class="meta"><b>DATE</b> 2024<br /><b>CLIENT</b> Humantold</div>
+        <div class="blurb">
+          A cast of city-stressed characters for Humantold's subway campaign, rolled out
+          across the New York underground — making therapy feel human, and reachable.
+          <br /><a href="work/humantold-nyc.html">Read the case study →</a>
+        </div>
       </div>
     </section>
 
@@ -379,12 +386,14 @@
       <a class="media" href="work/hiit-workout.html" aria-label="HIIT Workout case study">
         <img src="images/hiit-workout.jpg" alt="HIIT Workout for Spotify" loading="lazy" />
       </a>
-      <h2>A coach timed to the beat</h2>
-      <div class="meta"><b>DATE</b> 2020<br /><b>CLIENT</b> Spotify</div>
-      <div class="blurb">
-        An interactive campaign for Spotify — animated coaches keeping the workout on the
-        beat, timed to whatever the listener is playing.
-        <br /><a href="work/hiit-workout.html">Read the case study →</a>
+      <div class="case-text">
+        <h2>A coach timed to the beat</h2>
+        <div class="meta"><b>DATE</b> 2020<br /><b>CLIENT</b> Spotify</div>
+        <div class="blurb">
+          An interactive campaign for Spotify — animated coaches keeping the workout on the
+          beat, timed to whatever the listener is playing.
+          <br /><a href="work/hiit-workout.html">Read the case study →</a>
+        </div>
       </div>
     </section>
   </div>
@@ -646,8 +655,9 @@ function layout() {
      tile's right edge always lands exactly on the next rule, with no
      drift from rounding the same width for every column */
   const colX = Array.from({ length: COLS + 1 }, (_, i) => Math.round(gx + i * colw));
-  /* staggered column starts — the mockup's sporadic top edge */
-  const colY = [8, 96, 30, 108, 18, 82];
+  /* staggered column starts — one column touches the very top of the
+     window, the rest step down for a sporadic top edge */
+  const colY = [0, 118, 42, 132, 20, 96];
 
   /* keep the signature mostly clear: only let tiles graze its edge,
      never sit fully behind it */
@@ -695,7 +705,7 @@ function layout() {
     el._resetDrag && el._resetDrag();
     /* advance the column: tile height + a steady breathing gap */
     const h = el.offsetHeight || colw;
-    colY[c] += h + 64;
+    colY[c] += h + 108;
     n++;
   });
   board.style.height = Math.max(...colY) + 60 + 'px';
