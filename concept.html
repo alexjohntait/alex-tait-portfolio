@@ -40,9 +40,8 @@
   ::selection { background: var(--accent); color: #fff; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-  /* the ruled grid lives on the board only — the case studies get
-     their own soft-pink room below */
-  .board {
+  /* the ruled grid: one continuous sheet, board and case studies alike */
+  .ruled {
     background-image:
       linear-gradient(to right, var(--line) 1px, transparent 1px),
       linear-gradient(to right, var(--line) 1px, transparent 1px);
@@ -190,30 +189,43 @@
   .pill button.active { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
   .pill .sep { color: color-mix(in srgb, var(--accent) 55%, transparent); font-size: 12px; }
 
-  /* ─── case studies (below the board) ─── */
-  .case {
+  /* ─── case studies (below the board) — same sheet, same system,
+     just gently tinted so the section still reads as its own room ─── */
+  .case-wrap {
     position: relative; z-index: 1;
+    /* background-color only — a `background` shorthand here would wipe
+       out .ruled's background-image (same specificity, later in source) */
+    background-color: color-mix(in srgb, #ffc9da 20%, var(--paper));
+  }
+  .case {
+    position: relative;
     display: grid; grid-template-columns: repeat(6, 1fr);
     grid-template-rows: auto 1fr;   /* title row hugs its text; meta sits right under */
     min-height: 92vh; align-content: center;
-    padding: 12vh 0;
+    padding: 12vh var(--gx);
   }
-  .case { padding-left: var(--gx); padding-right: var(--gx); }
-  .case .media { grid-column: 1 / 4; grid-row: 2; align-self: start; display: block; background: var(--cb, #ddd); }
+  .case .media {
+    grid-column: 1 / 4; grid-row: 2; align-self: start; display: block;
+    background: var(--cb, #ddd);
+    transition: box-shadow 0.25s;
+  }
+  @media (hover: hover) {
+    .case .media:hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
+  }
   .case .media img, .case .media video { width: 100%; height: auto; display: block; }
-  .case h2 {
-    grid-column: 4 / 7; align-self: start;
+  /* headline shares the popup's scale — one "project title" moment site-wide */
+  .case h2, .pop-body h2 {
     font-family: var(--sans); font-weight: 400;
-    font-size: clamp(34px, 3.8vw, 60px); letter-spacing: -0.01em; line-height: 1.05;
-    color: var(--accent);
-    padding: 0 22px; margin-top: 200px; margin-bottom: 30px; text-wrap: balance;
+    font-size: clamp(32px, 3.6vw, 54px); letter-spacing: -0.01em; line-height: 1.05;
+    color: var(--accent); text-wrap: balance;
   }
-  /* the case studies get their own soft-pink room, separated from the
-     board's ruled paper */
-  .case-wrap { position: relative; z-index: 1; background: #ffe3e5; }
-  .case .meta { grid-column: 4 / 5; align-self: start; font-size: 13px; line-height: 2; color: var(--accent); font-style: italic; padding: 0 22px; }
-  .case .meta b { font-weight: 500; }
-  .case .blurb { grid-column: 5 / 7; align-self: start; font-size: 13px; line-height: 1.75; color: var(--accent); padding: 0 22px; max-width: 44ch; }
+  .case h2 { grid-column: 4 / 7; align-self: start; padding: 0 22px; margin-top: 200px; margin-bottom: 30px; }
+  /* meta + body copy share one scale with the popup's mono content */
+  .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--accent); font-style: italic; }
+  .case .meta { grid-column: 4 / 5; align-self: start; padding: 0 22px; }
+  .case .meta b, .pop-meta b { font-weight: 500; }
+  .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--accent); max-width: 44ch; }
+  .case .blurb { grid-column: 5 / 7; align-self: start; padding: 0 22px; }
   .case .blurb a { color: var(--accent); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
   .case .blurb a:hover { color: var(--ink); }
   @supports (animation-timeline: view()) {
@@ -250,18 +262,16 @@
   .pop-media { background: var(--pb, #ddd); }
   .pop-media img, .pop-media video, .pop-gal img, .pop-gal video { width: 100%; height: auto; display: block; }
   .pop-body { padding: clamp(22px, 3.5vw, 44px); }
-  .pop-body h2 {
-    font-family: var(--sans); font-weight: 400;
-    font-size: clamp(30px, 3.4vw, 48px); letter-spacing: -0.01em; line-height: 1.05;
-    color: var(--accent); margin-bottom: 20px; text-wrap: balance;
-  }
-  .pop-meta { font-size: 12.5px; font-style: italic; color: var(--accent); line-height: 2; margin-bottom: 20px; }
-  .pop-meta b { font-weight: 500; }
-  .pop-desc { font-size: 13px; line-height: 1.8; color: var(--accent); max-width: 62ch; }
+  .pop-body h2 { margin-bottom: 20px; }   /* scale shared with .case h2, above */
+  .pop-meta { margin-bottom: 20px; }      /* scale shared with .case .meta, above */
+  .pop-desc { line-height: 1.8; max-width: 62ch; }   /* wider column than the case blurb */
   .pop-gal { display: grid; gap: 2px; margin-top: 2px; }
 
   /* ─── mobile ─── */
   @media (max-width: 820px) {
+    /* no column concept on the stacked mobile layout — a stale-width
+       ruled background would just draw stray misaligned lines */
+    .ruled { background-image: none; }
     .board { cursor: auto; padding: 84px 16px 20px; }
     .name { position: static; transform: none; white-space: normal; display: block; margin-bottom: 14px; }
     .board .cell { padding: 16px 0; }
@@ -279,8 +289,6 @@
 </style>
 </head>
 <body>
-
-<div class="lines" aria-hidden="true"></div>
 
 <header>
   <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false"><i></i></button>
@@ -301,13 +309,13 @@
 </aside>
 
 <main>
-  <section class="board" id="board" aria-label="Alex Tait — illustrator and motion designer">
+  <section class="board ruled" id="board" aria-label="Alex Tait — illustrator and motion designer">
     <h1 class="name"><img src="assets/signature.png" alt="Alex Tait"
       onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></h1>
     <div class="grid-m" id="pieces"></div>
   </section>
 
-  <div class="case-wrap">
+  <div class="case-wrap ruled">
     <section class="case" id="cs-humantold" style="--cb:#ec482c">
       <a class="media" href="work/humantold-nyc.html" aria-label="Humantold NYC case study">
         <video src="images/humantold-nyc.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
