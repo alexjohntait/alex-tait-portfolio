@@ -248,12 +248,11 @@
   .case {
     position: relative;
     display: grid; grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: auto 1fr;   /* title row hugs its text; meta sits right under */
     min-height: 92vh; align-content: center;
     padding: 12vh var(--gx);
   }
   .case .media {
-    grid-column: 1 / 4; grid-row: 2; align-self: start; display: block;
+    grid-column: 1 / 4; align-self: start; display: block;
     background: var(--cb, #ddd);
     transition: box-shadow 0.25s;
   }
@@ -261,19 +260,25 @@
     .case .media:hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
   }
   .case .media img, .case .media video { width: 100%; height: auto; display: block; }
+  /* text sits beside the media, in its own column, top-aligned with it —
+     never floating above it — and stacks title/meta/blurb internally */
+  .case-text {
+    grid-column: 4 / 7; align-self: start; padding: 34px 22px 0;
+    display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 22px;
+  }
   /* headline shares the popup's scale — one "project title" moment site-wide */
   .case h2, .pop-body h2 {
     font-family: var(--sans); font-weight: 400;
     font-size: clamp(32px, 3.6vw, 54px); letter-spacing: -0.01em; line-height: 1.05;
     color: var(--accent); text-wrap: balance;
   }
-  .case h2 { grid-column: 4 / 7; align-self: start; padding: 0 22px; margin-top: 200px; margin-bottom: 30px; }
+  .case h2 { grid-column: 1 / 4; margin: 0 0 30px; }
   /* meta + body copy share one scale with the popup's mono content */
   .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--accent); font-style: italic; }
-  .case .meta { grid-column: 4 / 5; align-self: start; padding: 0 22px; }
+  .case .meta { grid-column: 1 / 2; }
   .case .meta b, .pop-meta b { font-weight: 500; }
   .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--accent); max-width: 44ch; }
-  .case .blurb { grid-column: 5 / 7; align-self: start; padding: 0 22px; }
+  .case .blurb { grid-column: 2 / 4; }
   .case .blurb a { color: var(--accent); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
   .case .blurb a:hover { color: var(--ink); }
   @supports (animation-timeline: view()) {
