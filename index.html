@@ -647,7 +647,29 @@ function layout() {
      drift from rounding the same width for every column */
   const colX = Array.from({ length: COLS + 1 }, (_, i) => Math.round(gx + i * colw));
   /* staggered column starts — the mockup's sporadic top edge */
-  const colY = [10, 130, 64, 170, 36, 110];
+  const colY = [8, 96, 30, 108, 18, 82];
+
+  /* keep the signature mostly clear: only let tiles graze its edge,
+     never sit fully behind it */
+  const boardTop = board.getBoundingClientRect().top;
+  const nameImg = document.querySelector('.name img');
+  const PEEK = 44;   /* px of intentional overlap a tile is allowed to have */
+  let sigTop = -1, sigBottom = -1, sigLeft = -1, sigRight = -1;
+  if (nameImg) {
+    const r = nameImg.getBoundingClientRect();
+    const pad = 44; /* rough allowance for the paper halo around the strokes */
+    sigTop = (r.top - boardTop) - pad;
+    sigBottom = (r.bottom - boardTop) + pad;
+    sigLeft = r.left - pad;
+    sigRight = r.right + pad;
+  }
+  const sigCols = new Set();
+  if (nameImg) {
+    for (let c = 0; c < COLS; c++) {
+      if (colX[c] < sigRight && colX[c + 1] > sigLeft) sigCols.add(c);
+    }
+  }
+
   let n = 0;
   stickers.forEach(({ el }) => {
     const on = matches(el);
@@ -659,15 +681,21 @@ function layout() {
     /* shortest column takes the next piece */
     let c = 0;
     for (let k = 1; k < COLS; k++) if (colY[k] < colY[c]) c = k;
+    /* never start a tile inside — or just above — the signature's band;
+       that's how one ends up sunk deep behind it. jump straight past,
+       leaving only a small deliberate peek at the seam */
+    if (sigCols.has(c) && colY[c] <= sigBottom && colY[c] > sigTop - 220) {
+      colY[c] = sigBottom - PEEK;
+    }
     el.style.setProperty('--w', (colX[c + 1] - colX[c]) + 'px');
     el.style.setProperty('--tx', colX[c] + 'px');
     el.style.setProperty('--ty', Math.round(colY[c]) + 'px');
     el.style.setProperty('--s', 1);
     el.style.zIndex = '';
     el._resetDrag && el._resetDrag();
-    /* advance the column: tile height + a breathing gap that varies */
+    /* advance the column: tile height + a steady breathing gap */
     const h = el.offsetHeight || colw;
-    colY[c] += h + 90 + ((n * 37) % 3) * 80;
+    colY[c] += h + 64;
     n++;
   });
   board.style.height = Math.max(...colY) + 60 + 'px';
