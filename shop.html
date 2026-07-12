@@ -10,7 +10,7 @@
   <meta name="author" content="Alex Tait" />
   <meta name="keywords" content="Alex Tait shop, illustration downloads, wallpaper pack, phone wallpaper, desktop wallpaper, digital download" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
-  <meta name="theme-color" content="#ff1d19" />
+  <meta name="theme-color" content="#ff4a1d" />
   <link rel="canonical" href="https://alexjohntait.com/shop.html" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -27,7 +27,6 @@
   <meta name="twitter:description" content="Digital downloads by Alex Tait, starting with a colourful wallpaper pack." />
   <meta name="twitter:image" content="https://alexjohntait.com/images/wallpaper-pack.jpg" />
 
-  <!-- Structured data: the storefront -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -38,7 +37,6 @@
     "isPartOf": { "@type": "WebSite", "name": "Alex Tait", "url": "https://alexjohntait.com/" }
   }
   </script>
-  <!-- Per-product structured data (Product + Offer) for rich results -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org", "@type": "Product",
@@ -51,114 +49,115 @@
   }
   </script>
 
+  <link rel="preconnect" href="https://api.fontshare.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --paper:#fff; --ink:#16120f; --red:#ff1d19; --pink:#ff69b4; --green:#02b34b;
-      --muted:#6b625c; --line:rgba(22,18,15,.12);
-      --display:'Bricolage Grotesque','Hanken Grotesk',sans-serif;
-      --body:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
-      --ease-out:cubic-bezier(.22,1,.36,1); --ease:cubic-bezier(.25,.46,.45,.94);
-      --pad:clamp(16px,4vw,40px);
+      color-scheme: light;
+      --paper: #f6f5ec; --ink: #16120f; --accent: #ff4a1d; --line: rgba(22,18,15,.28);
+      --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
+      --mono: 'Roboto Mono', 'Courier New', monospace;
+      --spring: cubic-bezier(.34,1.56,.64,1); --out: cubic-bezier(.19,1,.22,1);
+      --pad: clamp(20px, 5vw, 60px);
     }
-    html,body{min-height:100%;}
-    body{font-family:var(--body);font-weight:500;background:var(--paper);color:var(--ink);
-      -webkit-font-smoothing:antialiased;overflow-x:hidden;}
-    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:50;
-      box-shadow:inset 0 0 64px 2px rgba(255,29,25,.13);}
-    a{color:inherit;}
-    :focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:2px;}
-    ::selection{background:var(--red);color:#fff;}
-    html{-webkit-tap-highlight-color:transparent;}
+    body { font-family: var(--mono); color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+    ::selection { background: var(--accent); color: #fff; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    a { color: inherit; }
 
-    header{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
-      gap:24px;padding:18px var(--pad);background:color-mix(in srgb,var(--paper) 88%,transparent);
-      backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line);}
-    .wordmark{font-family:var(--display);font-weight:800;font-size:clamp(22px,3vw,30px);
-      letter-spacing:-.03em;line-height:1;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;}
-    .wordmark .sig{height:clamp(26px,3.4vw,36px);width:auto;display:block;margin-left:-5px;
-      transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
-    .wordmark:hover .sig{transform:rotate(-2deg) scale(1.03);}
-    @media (prefers-reduced-motion:no-preference){.wordmark .sig{animation:sigDraw 1.1s cubic-bezier(.45,0,.3,1) .1s both;}}
-    @keyframes sigDraw{0%{clip-path:inset(-8% 104% -8% -4%);}52%{clip-path:inset(-8% 46% -8% -4%);}60%{clip-path:inset(-8% 46% -8% -4%);}100%{clip-path:inset(-8% -4% -8% -4%);}}
-    .nav a{white-space:nowrap;}
-    @media (max-width:560px){.nav-cs-link{display:none;}}
-    .header-right{display:flex;align-items:center;gap:clamp(16px,3vw,32px);}
-    .nav{display:flex;gap:clamp(14px,2vw,26px);}
-    .nav a{font-size:14px;font-weight:600;letter-spacing:-.01em;text-decoration:none;color:var(--ink);
-      position:relative;padding:4px 0;min-height:44px;display:inline-flex;align-items:center;}
-    .nav a::after{content:'';position:absolute;left:0;bottom:9px;width:100%;height:2px;background:var(--red);
-      transform:scaleX(0);transform-origin:left;transition:transform .32s var(--ease-out);}
-    .nav a:hover::after,.nav a.current::after{transform:scaleX(1);}
-    .nav a.current{color:var(--red);}
-    .dots{display:inline-flex;align-items:center;gap:7px;}
-    .dot{width:14px;height:14px;border-radius:50%;}
-    .dot:nth-child(1){background:var(--pink);} .dot:nth-child(2){background:var(--green);} .dot:nth-child(3){background:var(--red);}
-
-    .shop-head{padding:clamp(28px,6vw,64px) var(--pad) clamp(20px,3vw,32px);max-width:60ch;}
-    .shop-head h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,6vw,64px);
-      letter-spacing:-.04em;line-height:.98;text-wrap:balance;}
-    .shop-head p{font-size:clamp(15px,1.6vw,18px);font-weight:500;color:var(--muted);
-      margin-top:14px;line-height:1.5;letter-spacing:-.01em;text-wrap:pretty;}
-
-    .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,240px));justify-content:start;
-      gap:clamp(20px,3vw,32px);padding:12px var(--pad) clamp(56px,8vw,96px);align-items:start;}
-    .product{display:flex;flex-direction:column;}
-    .product-media{width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:10px;background:var(--line);}
-    .product-media img{width:100%;height:100%;object-fit:cover;display:block;
-      transition:transform .5s var(--ease);}
-    @media(hover:hover) and (pointer:fine){ .product:hover .product-media img{transform:scale(1.04);} }
-    .product-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:14px;}
-    .product-title{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:-.03em;line-height:1.2;}
-    .product-price{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:-.02em;
-      color:var(--red);white-space:nowrap;}
-    .product-desc{font-size:14px;font-weight:500;line-height:1.5;color:var(--muted);
-      margin-top:6px;text-wrap:pretty;}
-    .product-buy{margin-top:14px;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;
-      font-family:var(--body);font-size:14px;font-weight:700;letter-spacing:-.01em;
-      background:var(--ink);color:var(--paper);text-decoration:none;
-      padding:11px 18px;border-radius:100px;min-height:44px;
-      transition:transform .18s var(--ease),background .2s var(--ease);}
-    .product-buy:hover{transform:translateY(-2px);background:var(--red);}
-    .product-buy:active{transform:scale(.97);}
-
-    footer{border-top:1px solid var(--line);padding:clamp(28px,5vw,52px) var(--pad);
-      display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:baseline;}
-    footer a{font-weight:700;color:var(--red);text-decoration:none;letter-spacing:-.02em;}
-    footer .note{font-size:13px;color:var(--muted);max-width:46ch;line-height:1.5;}
-
-    @media (prefers-reduced-motion: reduce){
-      *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+    header { position: fixed; top: 0; left: 0; z-index: 70; }
+    .menu-btn { width: 58px; height: 58px; border: 0; cursor: pointer; background: var(--ink); display: grid; place-items: center; transition: background .25s var(--out); }
+    .menu-btn:hover { background: var(--accent); }
+    .menu-btn i { display: block; width: 22px; height: 2px; background: #fff; box-shadow: 0 6px 0 #fff, 0 -6px 0 #fff; transition: box-shadow .25s, transform .35s var(--spring); }
+    body.menu-open .menu-btn i { box-shadow: none; transform: rotate(45deg); }
+    .menu-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(22,18,15,.4); opacity: 0; pointer-events: none; transition: opacity .4s var(--out); }
+    body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; }
+    .menu-panel {
+      position: fixed; top: 0; left: 0; z-index: 61; height: 100dvh; width: min(420px, 88vw);
+      background: var(--ink); color: var(--paper); display: flex; flex-direction: column; justify-content: center; gap: 26px;
+      padding: 80px clamp(24px, 2.5vw, 44px); transform: translateX(-101%); visibility: hidden;
+      transition: transform .55s var(--out), visibility 0s linear .55s;
     }
-    @media (max-width:640px){
-      header{padding:14px var(--pad);gap:12px;}
-      .wordmark{font-size:24px;}
-      .header-right{gap:16px;}
-      .nav{gap:15px;} .nav a{font-size:13px;}
-      .dots{gap:9px;} .dot{width:13px;height:13px;}
-      .shop-head{padding:clamp(24px,7vw,40px) var(--pad) clamp(16px,3vw,24px);}
-      .products{grid-template-columns:1fr;gap:24px;}
-      footer{flex-direction:column;gap:12px;}
+    body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform .55s var(--out); }
+    .menu-panel a.nav, .menu-panel button.nav {
+      font-family: var(--sans); font-weight: 400; font-size: clamp(24px, 2.2vw, 34px); letter-spacing: -.01em;
+      color: var(--paper); text-decoration: none; width: fit-content; background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+    }
+    .menu-panel a.nav:hover, .menu-panel button.nav:hover { color: var(--accent); }
+    .menu-panel .m-foot { margin-top: 30px; display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; letter-spacing: .04em; }
+    .menu-panel .m-foot a { color: color-mix(in srgb, var(--paper) 65%, transparent); text-decoration: none; }
+    .menu-panel .m-foot a:hover { color: var(--accent); }
+    .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px; color: color-mix(in srgb, var(--paper) 65%, transparent); }
+    .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
+
+    .popwrap { position: fixed; inset: 0; z-index: 80; display: none; align-items: flex-start; justify-content: center; overflow-y: auto; overscroll-behavior: contain; background: color-mix(in srgb, var(--ink) 42%, transparent); padding: 6vh 16px 8vh; }
+    .popwrap.open { display: flex; }
+    .pop { background: var(--paper); width: min(720px, 94vw); border: 1px solid var(--line); position: relative; }
+    .pop-x { position: absolute; top: 0; right: 0; z-index: 2; width: 52px; height: 52px; border: 0; cursor: pointer; background: var(--ink); color: #fff; font-size: 20px; line-height: 1; transition: background .25s; }
+    .pop-x:hover { background: var(--accent); }
+    .pop-body { padding: clamp(22px, 3.5vw, 44px); }
+    .pop-body h2 { font-family: var(--sans); font-weight: 400; font-size: clamp(32px, 3.6vw, 54px); letter-spacing: -.01em; line-height: 1.05; color: var(--accent); margin-bottom: 20px; text-wrap: balance; }
+    .pop-meta { font-size: 13px; font-style: italic; color: var(--accent); line-height: 2; margin-bottom: 20px; }
+    .pop-meta b { font-weight: 500; }
+    .pop-desc { font-size: 13px; line-height: 1.8; color: var(--accent); max-width: 62ch; }
+
+    /* ── the shop ── */
+    main { max-width: 1100px; margin: 0 auto; padding: clamp(90px, 12vw, 140px) var(--pad) 40px; }
+    .shop-head h1 { font-family: var(--sans); font-weight: 400; font-size: clamp(40px, 6vw, 74px); letter-spacing: -.015em; line-height: .98; color: var(--accent); text-wrap: balance; }
+    .shop-head p { font-size: 14px; font-weight: 500; color: color-mix(in srgb, var(--ink) 65%, transparent); margin-top: 14px; line-height: 1.6; max-width: 52ch; }
+
+    .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 280px)); gap: clamp(28px, 4vw, 44px); margin-top: clamp(40px, 6vw, 64px); }
+    .product-media { width: 100%; aspect-ratio: 4/3; overflow: hidden; background: var(--line); }
+    .product-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s var(--out); }
+    @media (hover: hover) { .product:hover .product-media img { transform: scale(1.04); } }
+    .product-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 16px; }
+    .product-title { font-family: var(--sans); font-weight: 400; font-size: 21px; letter-spacing: -.01em; color: var(--ink); }
+    .product-price { font-size: 13px; font-weight: 500; color: var(--accent); white-space: nowrap; }
+    .product-desc { font-size: 13px; line-height: 1.6; color: color-mix(in srgb, var(--ink) 62%, transparent); margin-top: 6px; }
+    .product-buy {
+      margin-top: 16px; display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase;
+      color: var(--accent); text-decoration: underline; text-underline-offset: 3px;
+    }
+    .product-buy:hover { color: var(--ink); }
+
+    footer { max-width: 1100px; margin: clamp(60px, 8vw, 100px) auto 0; padding: clamp(28px, 5vw, 52px) var(--pad);
+      border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: baseline; }
+    footer a.back { font-size: 13px; font-weight: 500; color: color-mix(in srgb, var(--ink) 55%, transparent); text-decoration: none; }
+    footer a.back:hover { color: var(--accent); }
+    footer .note { font-size: 12.5px; color: color-mix(in srgb, var(--ink) 55%, transparent); max-width: 46ch; line-height: 1.6; }
+    footer .note a { color: var(--accent); text-decoration: none; }
+    footer .note a:hover { color: var(--ink); }
+
+    @media (max-width: 640px) {
+      .products { grid-template-columns: 1fr 1fr; gap: 20px; }
+      footer { flex-direction: column; gap: 14px; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <a href="index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
-  <div class="header-right">
-    <nav class="nav" aria-label="Primary">
-      <a href="index.html">Work</a>
-      <a href="index.html#case-studies" class="nav-cs-link">Case studies</a>
-      <a href="index.html#about">About</a>
-      <a href="shop.html" class="current" aria-current="page">Shop</a>
-    </nav>
-    <div class="dots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-  </div>
+  <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false"><i></i></button>
 </header>
+
+<div class="menu-scrim" id="menu-scrim"></div>
+<aside class="menu-panel" id="menu-panel" aria-label="Menu">
+  <a class="nav" href="index.html">Work</a>
+  <a class="nav" href="index.html#cs-humantold">Case studies</a>
+  <button type="button" class="nav" id="about-btn">About</button>
+  <a class="nav" href="shop.html">Shop</a>
+  <div class="m-foot">
+    <a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+    <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration</a>
+    <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Represented by Jelly ↗</a>
+    <span class="status"><span class="dot"></span> available for commissions</span>
+  </div>
+</aside>
 
 <main>
   <div class="shop-head">
@@ -167,7 +166,6 @@
   </div>
 
   <section class="products" aria-label="Digital products">
-
     <article class="product">
       <a class="product-media" href="https://taitster8.gumroad.com/l/wallpaperpack1" target="_blank" rel="noopener" aria-label="Wallpaper Pack 1">
         <img src="images/wallpaper-pack.jpg" alt="Colourful wallpaper pack by Alex Tait" loading="lazy" />
@@ -179,14 +177,54 @@
       <p class="product-desc">A pack of vivid original wallpapers for phone and desktop, in dark and bright colourways.</p>
       <a class="product-buy" href="https://taitster8.gumroad.com/l/wallpaperpack1" target="_blank" rel="noopener">Buy &amp; download →</a>
     </article>
-
   </section>
 </main>
 
 <footer>
-  <a href="index.html">← Back to work</a>
+  <a class="back" href="index.html">← Back to work</a>
   <p class="note">Digital downloads are delivered instantly via Gumroad. For commissions, <a href="mailto:alexjohntait@gmail.com">get in touch</a> or reach me through <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Jelly</a>.</p>
 </footer>
 
+<div class="popwrap" id="aboutwrap" role="dialog" aria-modal="true" aria-label="About Alex Tait">
+  <div class="pop" id="about-pop">
+    <button class="pop-x" id="about-x" aria-label="Close">✕</button>
+    <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
+      <h2>I draw characters, and make them <em style="color:var(--ink);font-style:normal">move</em>.</h2>
+      <p class="pop-desc" style="margin-bottom:26px">
+        I'm an illustrator and motion designer based between Bath and London, making bold
+        character work for brands alongside a personal series of dark, gradient creatures.
+        My work has been commissioned by Apple, Google, Spotify and Adidas, spanning
+        broadcast, social, packaging and print.
+      </p>
+      <div class="pop-meta" style="margin-bottom:26px"><b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial</div>
+      <div class="pop-meta">
+        <b>INSTAGRAM</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
+        <b>EMAIL</b> <a href="mailto:alexjohntait@gmail.com" style="color:inherit">alexjohntait@gmail.com</a><br />
+        <b>AGENT</b> <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener" style="color:inherit">Jelly ↗</a><br />
+        <b>LOCATION</b> Bath / London
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim');
+    var toggle = function (on) { document.body.classList.toggle('menu-open', on); btn.setAttribute('aria-expanded', on); };
+    btn.addEventListener('click', function () { toggle(!document.body.classList.contains('menu-open')); });
+    scrim.addEventListener('click', function () { toggle(false); });
+    document.querySelectorAll('.menu-panel a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
+
+    var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
+    document.getElementById('about-btn').addEventListener('click', function () {
+      toggle(false); awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
+    });
+    var closeAbout = function () { awrap.classList.remove('open'); document.body.style.overflow = ''; };
+    ax.addEventListener('click', closeAbout);
+    awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
+  })();
+</script>
 </body>
 </html>

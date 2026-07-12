@@ -19,27 +19,37 @@ const GALLERY  = JSON.parse(grab(/const GALLERY = (\{[\s\S]*?\});/, 'GALLERY'));
 const CSS      = grab(/<style>([\s\S]*?)<\/style>/, 'CSS');
 
 const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-// contrast-aware ink for the project's colour band (WCAG relative luminance)
-const heroInk = bg => {
-  let hex = bg.replace('#', '');
-  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-  const [r, g, b] = [0, 2, 4].map(i => {
-    let v = parseInt(hex.slice(i, i + 2), 16) / 255;
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.45 ? '#16120f' : '#fff';
-};
 const colourfulness = hex => { hex = hex.replace('#',''); const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16); return Math.max(r,g,b)-Math.min(r,g,b); };
 const pickVivid = (bg, fg) => (colourfulness(fg) > colourfulness(bg) ? fg : bg);
-const rgba = (hex, a) => { hex = hex.replace('#',''); return `rgba(${parseInt(hex.slice(0,2),16)}, ${parseInt(hex.slice(2,4),16)}, ${parseInt(hex.slice(4,6),16)}, ${a})`; };
 
-function media(m, alt, eager) {
+function media(m, alt) {
   const src = `../images/${m.file}`;
   const ar = (m.w && m.h) ? ` style="aspect-ratio:${m.w} / ${m.h}"` : '';
   if (m.kind === 'video')
-    return `<video src="${src}#t=0.1" autoplay loop muted playsinline preload="${eager ? 'auto' : 'metadata'}" aria-label="${esc(alt)}"${ar}></video>`;
-  return `<img src="${src}" alt="${esc(alt)}" loading="${eager ? 'eager' : 'lazy'}"${m.w && m.h ? ` width="${m.w}" height="${m.h}"` : ''}${ar} />`;
+    return `<video src="${src}#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="${esc(alt)}"${ar}></video>`;
+  return `<img src="${src}" alt="${esc(alt)}" loading="lazy"${m.w && m.h ? ` width="${m.w}" height="${m.h}"` : ''}${ar} />`;
 }
+
+// extra rules for the standalone page (the modal .pop-* classes don't need
+// these — a page has a back-link, a reading column and prev/next nav)
+const EXTRA_CSS = `
+    .standalone { max-width: 900px; margin: 0 auto; padding: clamp(90px, 11vw, 130px) var(--pad, 20px) 40px; }
+    .standalone .back-link {
+      display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500;
+      color: var(--muted); text-decoration: none; margin-bottom: clamp(22px, 4vw, 40px);
+    }
+    .standalone .back-link:hover { color: var(--accent); }
+    .standalone .pop-media { border-radius: 0; }
+    .standalone .pv-nav {
+      display: flex; justify-content: space-between; gap: 20px; margin-top: clamp(50px, 8vw, 90px);
+      padding-top: 22px; border-top: 1px solid var(--line);
+    }
+    .standalone .pv-nav a { text-decoration: none; color: var(--ink); max-width: 46%; }
+    .standalone .pv-nav a:hover { color: var(--accent); }
+    .standalone .pv-nav .dir { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .standalone .pv-nav .ti { font-family: var(--sans); font-weight: 400; font-size: clamp(17px, 2vw, 22px); letter-spacing: -0.01em; }
+    .standalone .pv-nav .next { text-align: right; margin-left: auto; }
+`;
 
 fs.mkdirSync('work', { recursive: true });
 
@@ -47,33 +57,15 @@ PROJECTS.forEach((p, idx) => {
   if (BESPOKE.has(p.id)) { console.log(`↩ skipping bespoke case study: work/${p.id}.html`); return; }
   const hero = ASSETS[p.id] || {};
   const list = [{ file: hero.file, kind: hero.kind, w: hero.w, h: hero.h }, ...(GALLERY[p.id] || [])].filter(m => m.file);
+  const rest = list.slice(1);
   const prev = PROJECTS[idx - 1], next = PROJECTS[idx + 1];
   const catList = String(p.category || '').split(',').map(s => s.trim()).filter(Boolean)
     .map(s => s.charAt(0).toUpperCase() + s.slice(1));
-  const cat = catList.join(', ') || 'Illustration';
+  const cat = catList.join(' · ') || 'Illustration';
   const heroImg = `${SITE}/images/${hero.file}`;
   const desc = (p.desc || p.caption || `${p.title}: ${cat.toLowerCase()} illustration and motion work by Alex Tait.`).replace(/\s+/g, ' ').trim();
   const metaDesc = desc.length > 300 ? desc.slice(0, 297).trim() + '…' : desc;
-  const glow = rgba(pickVivid(p.bg, p.fg), 0.15);
-
-  // long description preferred; fall back to caption; omit when neither exists
-  const copySrc = (p.desc || p.caption || '').trim();
-  const copyHtml = copySrc
-    ? `<div class="pv-desc">${copySrc.split('\n').filter(s => s.trim()).map(s => `<p>${esc(s.trim())}</p>`).join('')}</div>`
-    : '';
-
-  // hero leads; the rest flows as a full-width masonry
-  const heroHtml = list.length
-    ? `<figure class="pv-heromedia">${media(list[0], p.title, true)}</figure>`
-    : '';
-  const rest = list.slice(1);
-  const galleryHtml = rest.length
-    ? `<div class="project-masonry pv-gallery">${rest.map((m, n) => `<figure class="m-item">${media(m, `${p.title} ${n + 2}`, false)}</figure>`).join('')}</div>`
-    : '';
-  const metaLine = p.client === 'Personal'
-    ? `${catList.map(esc).join(' &middot; ')} &middot; ${esc(p.year)}`
-    : `${esc(p.client)} &middot; ${catList.map(esc).join(' &middot; ')} &middot; ${esc(p.year)}`;
-  const ink = heroInk(p.bg);
+  const vivid = pickVivid(p.bg, p.fg);
 
   const jsonld = {
     "@context": "https://schema.org", "@type": "VisualArtwork",
@@ -90,6 +82,11 @@ PROJECTS.forEach((p, idx) => {
   };
   if (p.client && p.client !== 'Personal') jsonld.commissioner = { "@type": "Organization", "name": p.client };
 
+  const metaBlock =
+    (p.client && p.client !== 'Personal' ? `<b>CLIENT</b> ${esc(p.client)}<br />` : '') +
+    (p.year ? `<b>DATE</b> ${esc(p.year)}<br />` : '') +
+    `<b>FIELD</b> ${esc(cat)}`;
+
   const page = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,7 +96,7 @@ PROJECTS.forEach((p, idx) => {
   <meta name="description" content="${esc(metaDesc)}" />
   <meta name="author" content="Alex Tait" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
-  <meta name="theme-color" content="#ff1d19" />
+  <meta name="theme-color" content="#ff4a1d" />
   <link rel="canonical" href="${SITE}/work/${p.id}.html" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -117,133 +114,103 @@ PROJECTS.forEach((p, idx) => {
   <script type="application/ld+json">
 ${JSON.stringify(jsonld, null, 2)}
   </script>
+  <link rel="preconnect" href="https://api.fontshare.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>${CSS}</style>
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <style>${CSS}${EXTRA_CSS}</style>
 </head>
 <body>
-  <div class="glow" style="opacity:1; box-shadow: inset 0 0 64px 2px ${glow};" aria-hidden="true"></div>
 
   <header>
-    <a href="../index.html" class="wordmark"><img class="sig" src="/assets/signature.png" alt="Alex Tait" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a>
-    <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="menu-panel">
-      <span class="menu-ico" aria-hidden="true"><i></i><i></i><i></i></span>
-    </button>
+    <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false"><i></i></button>
   </header>
 
   <div class="menu-scrim" id="menu-scrim"></div>
-  <aside class="menu-panel" id="menu-panel" aria-hidden="true" aria-label="Menu">
-    <nav class="menu-nav" aria-label="Primary">
-      <a href="../index.html"><span>Work</span></a>
-      <a href="../index.html#case-studies"><span>Case studies</span></a>
-      <a href="../index.html#about"><span>About</span></a>
-      <a href="../shop.html"><span>Shop</span></a>
-    </nav>
-    <div class="menu-foot">
-      <div class="dots" role="group" aria-label="Colour theme">
-        <button class="dot active" style="--c:#ff1d19" data-theme="light" aria-label="Light mode" aria-pressed="true"></button>
-        <button class="dot dot-mono" data-theme="dark" aria-label="Dark mode" aria-pressed="false"></button>
-      </div>
-      <a class="menu-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+  <aside class="menu-panel" id="menu-panel" aria-label="Menu">
+    <a class="nav" href="../index.html">Work</a>
+    <a class="nav" href="../index.html#cs-humantold">Case studies</a>
+    <button type="button" class="nav" id="about-btn">About</button>
+    <a class="nav" href="../shop.html">Shop</a>
+    <div class="m-foot">
+      <a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
+      <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration</a>
+      <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Represented by Jelly ↗</a>
+      <span class="status"><span class="dot"></span> available for commissions</span>
     </div>
   </aside>
 
-  <article>
-    <div class="pv-hero" style="background:${p.bg}; color:${ink};">
-      <div class="pv-bar">
-        <a href="../index.html" class="back-link"><span aria-hidden="true">←</span> All work</a>
-        <span class="pview-count">${String(idx + 1).padStart(2, '0')} / ${String(PROJECTS.length).padStart(2, '0')}</span>
-      </div>
-      <h1 class="pv-title">${esc(p.title)}</h1>
-      <p class="pv-meta">${metaLine}</p>
+  <main class="standalone">
+    <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> All work</a>
+    <div class="pop-media" style="--pb:${p.bg}">${media(list[0] || {}, p.title)}</div>
+    <div class="pop-body">
+      <h2>${esc(p.title)}</h2>
+      <div class="pop-meta">${metaBlock}</div>
+      <p class="pop-desc">${esc(desc)}</p>
     </div>
-    <div class="pv-lead">
-      ${heroHtml}
-      ${copyHtml}
-    </div>
-    ${galleryHtml}
-    <nav class="project-nav" aria-label="More projects">
-      ${prev ? `<a class="pnav" href="${prev.id}.html"><span class="pnav-dir">← Previous</span><span class="pnav-title">${esc(prev.title)}</span></a>` : `<span class="pnav" style="opacity:.2"></span>`}
-      ${next ? `<a class="pnav" href="${next.id}.html" style="text-align:right;align-items:flex-end"><span class="pnav-dir">Next →</span><span class="pnav-title">${esc(next.title)}</span></a>` : `<span class="pnav"></span>`}
+    ${rest.length ? `<div class="pop-gal">${rest.map((m, n) => media(m, `${p.title} ${n + 2}`)).join('')}</div>` : ''}
+    <nav class="pv-nav" aria-label="More projects">
+      ${prev ? `<a href="${prev.id}.html"><span class="dir">← Previous</span><span class="ti">${esc(prev.title)}</span></a>` : '<span></span>'}
+      ${next ? `<a class="next" href="${next.id}.html"><span class="dir">Next →</span><span class="ti">${esc(next.title)}</span></a>` : ''}
     </nav>
-  </article>
+  </main>
 
-  <footer class="site-footer">
-    <div class="foot-inner">
-      <div class="foot-cta">
-        <span class="foot-status"><span class="foot-dot" aria-hidden="true"></span>Available for commissions</span>
-        <a class="foot-mail" href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
-        <img class="foot-sig" src="/assets/signature.png" alt="" aria-hidden="true" loading="lazy" />
-      </div>
-      <div class="foot-clients">
-        <span class="foot-eyebrow">Selected clients</span>
-        <p class="foot-list">Apple · Google · Spotify · Adidas</p>
-      </div>
-      <div class="foot-meta">
-        <span>Represented by <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Jelly</a> for commissions worldwide</span>
-        <span>© 2026 Alex Tait</span>
+  <!-- about overlay: identical to the home page, so the nav feels the same everywhere -->
+  <div class="popwrap" id="aboutwrap" role="dialog" aria-modal="true" aria-label="About Alex Tait">
+    <div class="pop" id="about-pop" style="width:min(720px, 94vw)">
+      <button class="pop-x" id="about-x" aria-label="Close">✕</button>
+      <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
+        <h2>I draw characters, and make them <em style="color:var(--ink);font-style:normal">move</em>.</h2>
+        <p class="pop-desc" style="margin-bottom:26px">
+          I'm an illustrator and motion designer based between Bath and London, making bold
+          character work for brands alongside a personal series of dark, gradient creatures.
+          My work has been commissioned by Apple, Google, Spotify and Adidas, spanning
+          broadcast, social, packaging and print.
+        </p>
+        <div class="pop-meta" style="margin-bottom:26px"><b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial</div>
+        <div class="pop-meta">
+          <b>INSTAGRAM</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
+          <b>EMAIL</b> <a href="mailto:alexjohntait@gmail.com" style="color:inherit">alexjohntait@gmail.com</a><br />
+          <b>AGENT</b> <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener" style="color:inherit">Jelly ↗</a><br />
+          <b>LOCATION</b> Bath / London
+        </div>
       </div>
     </div>
-  </footer>
+  </div>
 
   <script>
-    // light / dark: honour the choice saved on the home page
+    // menu
     (function () {
-      var dots = document.querySelectorAll('.dot'), ACCENT = '#ff1d19';
-      function setMode(theme) {
-        var dark = theme === 'dark', root = document.documentElement;
-        root.style.setProperty('--red', ACCENT);
-        root.setAttribute('data-theme', dark ? 'dark' : 'light');
-        dots.forEach(function (d) { var on = d.dataset.theme === (dark ? 'dark' : 'light'); d.classList.toggle('active', on); d.setAttribute('aria-pressed', on); });
-        try { localStorage.setItem('mode', dark ? 'dark' : 'light'); } catch (e) {}
-      }
-      dots.forEach(function (d) { d.addEventListener('click', function () { setMode(d.dataset.theme); }); });
-      var saved = null;
-      try { saved = localStorage.getItem('mode'); if (!saved) { var a = JSON.parse(localStorage.getItem('accent') || 'null'); if (a && a.theme) saved = a.theme; } } catch (e) {}
-      setMode(saved === 'dark' ? 'dark' : 'light');
+      var btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim');
+      var toggle = function (on) { document.body.classList.toggle('menu-open', on); btn.setAttribute('aria-expanded', on); };
+      btn.addEventListener('click', function () { toggle(!document.body.classList.contains('menu-open')); });
+      scrim.addEventListener('click', function () { toggle(false); });
+      document.querySelectorAll('.menu-panel a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
+      addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
+
+      var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
+      document.getElementById('about-btn').addEventListener('click', function () {
+        toggle(false); awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
+      });
+      var closeAbout = function () { awrap.classList.remove('open'); document.body.style.overflow = ''; };
+      ax.addEventListener('click', closeAbout);
+      awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
+      addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
     })();
-    // pop-out menu
-    (function () {
-      var btn = document.getElementById('menu-btn'), panel = document.getElementById('menu-panel'), scrim = document.getElementById('menu-scrim');
-      if (!btn || !panel || !scrim) return;
-      var lastFocus = null;
-      function focusables() { return [].slice.call(panel.querySelectorAll('a[href], button:not([disabled])')); }
-      function onKey(e) {
-        if (e.key === 'Escape') { close(); return; }
-        if (e.key !== 'Tab') return;
-        var f = focusables(); if (!f.length) return;
-        var first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-      function open() { lastFocus = document.activeElement; document.body.classList.add('menu-open'); btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Close menu'); panel.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; document.addEventListener('keydown', onKey); setTimeout(function () { (focusables()[0] || panel).focus(); }, 80); }
-      function close() { document.body.classList.remove('menu-open'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Open menu'); panel.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; document.removeEventListener('keydown', onKey); if (lastFocus && lastFocus.focus) lastFocus.focus(); }
-      btn.addEventListener('click', function () { document.body.classList.contains('menu-open') ? close() : open(); });
-      scrim.addEventListener('click', close);
-    })();
-    // honour reduced motion (no SPA here): pause autoplay, show first frame
+    // reduced motion: pause autoplay, show first frame
     if (matchMedia('(prefers-reduced-motion: reduce)').matches)
-      document.querySelectorAll('video').forEach(v => { v.removeAttribute('autoplay'); v.pause(); });
+      document.querySelectorAll('video').forEach(function (v) { v.removeAttribute('autoplay'); v.pause(); });
     // correct video boxes to true ratio
-    document.querySelectorAll('video').forEach(v => {
-      const set = () => { if (v.videoWidth && v.videoHeight) v.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
+    document.querySelectorAll('video').forEach(function (v) {
+      var set = function () { if (v.videoWidth && v.videoHeight) v.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
       v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
     });
-    // footer sign-off: the signature writes itself when it scrolls into view
-    (function () {
-      var fs = document.querySelector('.foot-sig');
-      if (!fs || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-      fs.classList.add('ready');
-      var io = new IntersectionObserver(function (es) {
-        es.forEach(function (e) { if (e.isIntersecting) { fs.classList.add('write'); io.disconnect(); } });
-      }, { threshold: 0.4 });
-      io.observe(fs);
-    })();
-    // keyboard nav: ← / → between projects, Esc back to the grid
+    // keyboard: ← / → between projects, Esc back to the grid
     var _prev = ${prev ? `'${prev.id}.html'` : 'null'}, _next = ${next ? `'${next.id}.html'` : 'null'};
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (document.body.classList.contains('menu-open') || document.getElementById('aboutwrap').classList.contains('open')) return;
       if (e.key === 'ArrowRight' && _next) location.href = _next;
       else if (e.key === 'ArrowLeft' && _prev) location.href = _prev;
       else if (e.key === 'Escape') location.href = '../index.html';
