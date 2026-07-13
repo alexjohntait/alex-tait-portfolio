@@ -267,7 +267,12 @@
     font-size: clamp(32px, 3.6vw, 54px); letter-spacing: -0.01em; line-height: 1.05;
     color: var(--accent); text-wrap: balance;
   }
-  .case h2 { grid-column: 1 / 4; margin: 0 0 30px; }
+  /* the case-study headline carries more weight than the popup's — it's
+     a section opener and should read with real presence */
+  .case h2 {
+    grid-column: 1 / 4; margin: 0 0 30px;
+    font-weight: 600; font-size: clamp(36px, 4.1vw, 62px); letter-spacing: -0.02em;
+  }
   /* meta + body copy share one scale with the popup's mono content */
   .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--accent); font-style: italic; }
   .case .meta { grid-column: 1 / 2; }
