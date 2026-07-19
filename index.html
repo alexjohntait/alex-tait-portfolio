@@ -217,22 +217,24 @@
   }
   .ghost.on { opacity: 1; transform: none; }
 
-  /* the filter pill */
+  /* the filter bar: a paper card on the sheet, butted to the first rule —
+     square corners, hairline edge, mono — same language as the tiles */
   .pill {
     position: fixed; left: var(--gx); bottom: 4vh; z-index: 40;
     display: flex; align-items: center; gap: 4px;
-    background: var(--ink); border-radius: 100px;
-    padding: 8px 16px;
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 6px 16px 6px 14px;
   }
+  .pill::before { content: ''; width: 8px; height: 8px; background: var(--accent); margin-right: 10px; }
   .pill button {
     font-family: var(--mono); font-size: 12px; font-weight: 500;
     letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--accent); background: none; border: 0; cursor: pointer;
+    color: var(--ink); background: none; border: 0; cursor: pointer;
     padding: 8px 6px; transition: color 0.2s;
   }
-  .pill button:hover { color: #fff; }
-  .pill button.active { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
-  .pill .sep { color: color-mix(in srgb, var(--accent) 55%, transparent); font-size: 12px; }
+  .pill button:hover { color: var(--accent); }
+  .pill button.active { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .pill .sep { color: color-mix(in srgb, var(--ink) 30%, transparent); font-size: 12px; }
 
   /* ─── case studies (below the board) — same sheet, same system,
      just gently tinted so the section still reads as its own room ─── */
