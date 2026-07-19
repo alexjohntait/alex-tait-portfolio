@@ -242,17 +242,29 @@
        out .ruled's background-image (same specificity, later in source) */
     background-color: color-mix(in srgb, #ffc9da 20%, var(--paper));
   }
+  /* a quiet threshold before the first case — the section announces itself */
+  .case-head { padding: clamp(70px, 12vh, 130px) var(--gx) 0; }
+  .case-kicker {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink);
+  }
+  .case-kicker::before { content: ''; width: 9px; height: 9px; background: var(--accent); }
   .case {
     position: relative;
     display: grid; grid-template-columns: repeat(6, 1fr);
     min-height: 92vh; align-content: center;
-    padding: 12vh var(--gx);
+    padding: 10vh var(--gx);
   }
   .case .media {
-    grid-column: 1 / 4; align-self: start; display: block;
+    grid-column: 1 / 4; grid-row: 1; align-self: start; display: block;
     background: var(--cb, #ddd);
     transition: box-shadow 0.25s;
   }
+  /* every other case mirrors — media right, text left — so the section
+     reads as a spread, not the same page twice */
+  .case:nth-of-type(even) .media { grid-column: 4 / 7; }
+  .case:nth-of-type(even) .case-text { grid-column: 1 / 4; }
   @media (hover: hover) {
     .case .media:hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
   }
@@ -260,8 +272,14 @@
   /* text sits beside the media, in its own column, top-aligned with it —
      never floating above it — and stacks title/meta/blurb internally */
   .case-text {
-    grid-column: 4 / 7; align-self: start; padding: 34px 22px 0;
+    grid-column: 4 / 7; grid-row: 1; align-self: start; padding: 34px 22px 0;
     display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 22px;
+  }
+  /* the index number ties the section to the case-study pages' "01 ·" system */
+  .case-num {
+    grid-column: 1 / 4; display: block;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.16em;
+    color: var(--ink); margin-bottom: 16px;
   }
   /* headline shares the popup's scale — one "project title" moment site-wide */
   .case h2, .pop-body h2 {
@@ -335,6 +353,7 @@
     .sticker.deal { animation: none; }
     .sticker.out { display: none; }
     .ghost, #ink { display: none; }
+    .case-head { padding: 56px 16px 0; }
     .case { display: block; padding: 10vh 16px; min-height: 0; }
     .case h2, .case .meta, .case .blurb { padding: 0; }
     .case h2 { margin: 20px 0 14px; }
@@ -352,7 +371,7 @@
 <div class="menu-scrim" id="menu-scrim"></div>
 <aside class="menu-panel" id="menu-panel" aria-label="Menu">
   <a class="nav" href="index.html">Work</a>
-  <a class="nav" href="#cs-humantold">Case studies</a>
+  <a class="nav" href="#case-studies">Case studies</a>
   <button type="button" class="nav" id="about-btn">About</button>
   <a class="nav" href="shop.html">Shop</a>
   <div class="m-foot">
@@ -371,11 +390,15 @@
   </section>
 
   <div class="case-wrap ruled">
+    <div class="case-head" id="case-studies">
+      <span class="case-kicker">Case studies</span>
+    </div>
     <section class="case" id="cs-humantold" style="--cb:#ec482c">
       <a class="media" href="work/humantold-nyc.html" aria-label="Humantold NYC case study">
         <video src="images/humantold-nyc.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
       </a>
       <div class="case-text">
+        <span class="case-num">01 / 02</span>
         <h2>Making therapy feel reachable</h2>
         <div class="meta"><b>DATE</b> 2024<br /><b>CLIENT</b> Humantold</div>
         <div class="blurb">
@@ -391,6 +414,7 @@
         <img src="images/hiit-workout.jpg" alt="HIIT Workout for Spotify" loading="lazy" />
       </a>
       <div class="case-text">
+        <span class="case-num">02 / 02</span>
         <h2>A coach timed to the beat</h2>
         <div class="meta"><b>DATE</b> 2020<br /><b>CLIENT</b> Spotify</div>
         <div class="blurb">
