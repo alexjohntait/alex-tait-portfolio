@@ -6,6 +6,10 @@ on:
     # racing manual pushes every half hour (use "Run workflow" for instant)
     - cron: '0 */6 * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    # editing this file is a deliberate "run me now" — a no-UI manual trigger
+    paths: ['.github/workflows/rebuild.yml']
 
 jobs:
   build:
