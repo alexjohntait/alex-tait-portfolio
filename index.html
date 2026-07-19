@@ -352,6 +352,7 @@
     .ruled { background-image: none; }
     .board { cursor: auto; padding: 84px 14px 30px; }
     .name { position: static; transform: none; white-space: normal; display: block; margin-bottom: 20px; }
+    .name img { margin: 0 auto; }   /* centred, like it is on the big board */
     /* a true two-column masonry: no row-alignment holes, room to breathe */
     .grid-m { display: block; columns: 2; column-gap: 12px; }
     .sticker {
@@ -371,7 +372,11 @@
     .case-num { margin-bottom: 12px; }
     .case h2 { margin: 0 0 16px; }
     .case .meta { margin-bottom: 16px; }
-    .pill { left: 12px; bottom: 12px; flex-wrap: wrap; }
+    /* compact enough to sit on one line on a phone */
+    .pill { left: 12px; bottom: 12px; padding: 4px 10px 4px 9px; gap: 2px; }
+    .pill::before { width: 7px; height: 7px; margin-right: 7px; }
+    .pill button { font-size: 10.5px; padding: 7px 4px; letter-spacing: 0.06em; }
+    .pill .sep { font-size: 10.5px; }
     .menu-panel { width: min(84vw, 340px); }
   }
 </style>
