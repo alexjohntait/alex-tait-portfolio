@@ -142,6 +142,11 @@
   .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px;
     color: color-mix(in srgb, var(--paper) 65%, transparent); }
   .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
+  .menu-panel .m-sketch { width: 96px; margin-bottom: 14px; background: var(--paper); padding: 6px; transform: rotate(-2deg); }
+
+  /* marginalia: sketchbook doodles tucked into the gaps, behind the work */
+  .doodle { position: absolute; z-index: 0; pointer-events: none; opacity: 0.95; }
+  .doodle img, .doodle video { width: 100%; height: auto; display: block; }
 
   /* ─── the board: every project, on the lines ─── */
   .board { position: relative; z-index: 1; cursor: crosshair; }
@@ -219,22 +224,24 @@
   }
   .ghost.on { opacity: 1; transform: none; }
 
-  /* the filter pill */
+  /* the filter bar: a paper card on the sheet, butted to the first rule —
+     square corners, hairline edge, mono — same language as the tiles */
   .pill {
     position: fixed; left: var(--gx); bottom: 4vh; z-index: 40;
     display: flex; align-items: center; gap: 4px;
-    background: var(--ink); border-radius: 100px;
-    padding: 8px 16px;
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 6px 16px 6px 14px;
   }
+  .pill::before { content: ''; width: 8px; height: 8px; background: var(--accent); margin-right: 10px; }
   .pill button {
     font-family: var(--mono); font-size: 12px; font-weight: 500;
     letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--accent); background: none; border: 0; cursor: pointer;
+    color: var(--ink); background: none; border: 0; cursor: pointer;
     padding: 8px 6px; transition: color 0.2s;
   }
-  .pill button:hover { color: #fff; }
-  .pill button.active { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
-  .pill .sep { color: color-mix(in srgb, var(--accent) 55%, transparent); font-size: 12px; }
+  .pill button:hover { color: var(--accent); }
+  .pill button.active { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .pill .sep { color: color-mix(in srgb, var(--ink) 30%, transparent); font-size: 12px; }
 
   /* ─── case studies (below the board) — same sheet, same system,
      just gently tinted so the section still reads as its own room ─── */
@@ -244,17 +251,29 @@
        out .ruled's background-image (same specificity, later in source) */
     background-color: color-mix(in srgb, #ffc9da 20%, var(--paper));
   }
+  /* a quiet threshold before the first case — the section announces itself */
+  .case-head { padding: clamp(70px, 12vh, 130px) var(--gx) 0; }
+  .case-kicker {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink);
+  }
+  .case-kicker::before { content: ''; width: 9px; height: 9px; background: var(--accent); }
   .case {
     position: relative;
     display: grid; grid-template-columns: repeat(6, 1fr);
     min-height: 92vh; align-content: center;
-    padding: 12vh var(--gx);
+    padding: 10vh var(--gx);
   }
   .case .media {
-    grid-column: 1 / 4; align-self: start; display: block;
+    grid-column: 1 / 4; grid-row: 1; align-self: start; display: block;
     background: var(--cb, #ddd);
     transition: box-shadow 0.25s;
   }
+  /* every other case mirrors — media right, text left — so the section
+     reads as a spread, not the same page twice */
+  .case:nth-of-type(even) .media { grid-column: 4 / 7; }
+  .case:nth-of-type(even) .case-text { grid-column: 1 / 4; }
   @media (hover: hover) {
     .case .media:hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
   }
@@ -262,8 +281,14 @@
   /* text sits beside the media, in its own column, top-aligned with it —
      never floating above it — and stacks title/meta/blurb internally */
   .case-text {
-    grid-column: 4 / 7; align-self: start; padding: 34px 22px 0;
+    grid-column: 4 / 7; grid-row: 1; align-self: start; padding: 34px 22px 0;
     display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 22px;
+  }
+  /* the index number ties the section to the case-study pages' "01 ·" system */
+  .case-num {
+    grid-column: 1 / 4; display: block;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.16em;
+    color: var(--ink); margin-bottom: 16px;
   }
   /* headline shares the popup's scale — one "project title" moment site-wide */
   .case h2, .pop-body h2 {
@@ -336,7 +361,8 @@
     .sticker { position: relative; width: auto !important; touch-action: auto; transform: none !important; transition: none; }
     .sticker.deal { animation: none; }
     .sticker.out { display: none; }
-    .ghost, #ink { display: none; }
+    .ghost, #ink, .doodle { display: none; }
+    .case-head { padding: 56px 16px 0; }
     .case { display: block; padding: 10vh 16px; min-height: 0; }
     .case h2, .case .meta, .case .blurb { padding: 0; }
     .case h2 { margin: 20px 0 14px; }
@@ -371,7 +397,8 @@
   <div class="menu-scrim" id="menu-scrim"></div>
   <aside class="menu-panel" id="menu-panel" aria-label="Menu">
     <a class="nav" href="../index.html">Work</a>
-    <a class="nav" href="../index.html#cs-humantold">Case studies</a>
+    <a class="nav" href="../index.html#case-studies">Case studies</a>
+    <a class="nav" href="../sketchbook.html">Sketchbook</a>
     <button type="button" class="nav" id="about-btn">About</button>
     <a class="nav" href="../shop.html">Shop</a>
     <div class="m-foot">

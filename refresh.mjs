@@ -12,6 +12,7 @@ import { execFileSync } from 'child_process';
 
 const BASE = 'appjYUthm8ib2ctuH';
 const TABLE = 'tblY3AdUL6JNOnYcY';
+const SKETCH_TABLE = 'Sketchbook';   // referenced by tab name, not field IDs
 const fileArg = process.argv[2];
 const token = process.env.AIRTABLE_TOKEN;
 
@@ -35,6 +36,90 @@ async function fetchRecords() {
   fs.writeFileSync(out, JSON.stringify({ records, metadata: { totalRecordCount: records.length } }));
   console.log(`  pulled ${records.length} records`);
   return out;
+}
+
+/* ── sketchbook: fun drawings + throwaway gifs, schema-agnostic ──
+   Pulls the Sketchbook table by name, harvests EVERY attachment found in
+   any field (so the table can be a single attachments column, or anything),
+   downloads them to images/sketchbook/, and injects `const SKETCHES` into
+   index.html (marginalia) and sketchbook.html (the full wall).
+   Non-fatal on purpose: if the table is missing/renamed the main refresh
+   still succeeds — the site just keeps its previous sketches. */
+async function refreshSketchbook() {
+  if (!token) { console.log('• Sketchbook: skipped (no token / file mode)'); return; }
+  let records;
+  try {
+    records = [];
+    let offset;
+    do {
+      const url = new URL(`https://api.airtable.com/v0/${BASE}/${encodeURIComponent(SKETCH_TABLE)}`);
+      url.searchParams.set('pageSize', '100');
+      if (offset) url.searchParams.set('offset', offset);
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(`Airtable ${res.status}`);
+      const json = await res.json();
+      records.push(...json.records);
+      offset = json.offset;
+    } while (offset);
+  } catch (e) {
+    console.warn(`• Sketchbook: skipped (${e.message}) — check the tab is named "${SKETCH_TABLE}"`);
+    return;
+  }
+
+  const DIR = 'images/sketchbook';
+  fs.mkdirSync(DIR, { recursive: true });
+  const extFor = a => {
+    const m = /\.(gif|png|jpe?g|webp|mp4|webm)(\?|$)/i.exec(a.filename || a.url || '');
+    if (m) return m[1].toLowerCase().replace('jpeg', 'jpg');
+    const t = a.type || '';
+    return t.includes('gif') ? 'gif' : t.includes('png') ? 'png' : t.includes('webp') ? 'webp'
+      : t.includes('mp4') ? 'mp4' : t.includes('webm') ? 'webm' : 'jpg';
+  };
+
+  const sketches = [];
+  for (const r of records) {
+    let i = 0;
+    for (const v of Object.values(r.fields || {})) {
+      if (!Array.isArray(v)) continue;
+      for (const a of v) {
+        if (!a || typeof a !== 'object' || !a.url || !a.type) continue;
+        if (!/^(image|video)\//.test(a.type)) continue;
+        const ext = extFor(a);
+        const file = `${r.id}-${i++}.${ext}`;
+        const kind = a.type.startsWith('video') ? 'video' : 'img';
+        // gifs/videos must come from the original url (thumbnails are static);
+        // stills can use the large thumbnail to keep the repo light
+        const src = (ext === 'gif' || kind === 'video')
+          ? a.url
+          : (a.thumbnails && a.thumbnails.large ? a.thumbnails.large.url : a.url);
+        sketches.push({ f: file, k: kind, src });
+      }
+    }
+  }
+
+  let fresh = 0;
+  for (const s of sketches) {
+    const dest = `${DIR}/${s.f}`;
+    if (fs.existsSync(dest)) continue;   // record ids are stable; skip re-downloads
+    try {
+      const res = await fetch(s.src);
+      if (!res.ok) throw new Error(res.status);
+      fs.writeFileSync(dest, Buffer.from(await res.arrayBuffer()));
+      fresh++;
+    } catch (e) { console.warn(`  sketch ${s.f} failed: ${e.message}`); }
+  }
+  // prune files whose records were deleted in Airtable
+  const keep = new Set(sketches.map(s => s.f));
+  for (const f of fs.readdirSync(DIR)) if (!keep.has(f)) fs.unlinkSync(`${DIR}/${f}`);
+
+  const list = sketches.filter(s => fs.existsSync(`${DIR}/${s.f}`)).map(({ f, k }) => ({ f, k }));
+  const decl = 'const SKETCHES = ' + JSON.stringify(list) + ';';
+  for (const page of ['index.html', 'sketchbook.html']) {
+    let html = fs.readFileSync(page, 'utf8');
+    if (!/const SKETCHES = \[[\s\S]*?\];/.test(html)) { console.warn(`  no SKETCHES seed in ${page}`); continue; }
+    fs.writeFileSync(page, html.replace(/const SKETCHES = \[[\s\S]*?\];/, decl));
+  }
+  console.log(`• Sketchbook: ${list.length} sketches (${fresh} newly downloaded)`);
 }
 
 function injectData() {
@@ -69,6 +154,8 @@ function injectData() {
     execFileSync('node', ['optimise.mjs'], { stdio: 'inherit' });
 
     injectData();
+
+    await refreshSketchbook();
 
     console.log('• Rebuilding project pages + sitemap…');
     execFileSync('node', ['build-pages.mjs'], { stdio: 'inherit' });

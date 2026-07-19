@@ -130,7 +130,8 @@ ${JSON.stringify(jsonld, null, 2)}
   <div class="menu-scrim" id="menu-scrim"></div>
   <aside class="menu-panel" id="menu-panel" aria-label="Menu">
     <a class="nav" href="../index.html">Work</a>
-    <a class="nav" href="../index.html#cs-humantold">Case studies</a>
+    <a class="nav" href="../index.html#case-studies">Case studies</a>
+    <a class="nav" href="../sketchbook.html">Sketchbook</a>
     <button type="button" class="nav" id="about-btn">About</button>
     <a class="nav" href="../shop.html">Shop</a>
     <div class="m-foot">
@@ -226,6 +227,7 @@ ${JSON.stringify(jsonld, null, 2)}
 const urls = [
   { loc: SITE + '/', pri: '1.0', freq: 'monthly' },
   { loc: SITE + '/shop.html', pri: '0.8', freq: 'weekly' },
+  { loc: SITE + '/sketchbook.html', pri: '0.6', freq: 'daily' },
   ...PROJECTS.map(p => ({ loc: `${SITE}/work/${p.id}.html`, pri: '0.7', freq: 'monthly' }))
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

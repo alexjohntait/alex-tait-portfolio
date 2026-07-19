@@ -5,47 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- ── SEO ─────────────────────────────────────────────────── -->
-  <title>Shop — Digital Downloads by Alex Tait</title>
-  <meta name="description" content="Digital downloads by illustrator Alex Tait, starting with a colourful wallpaper pack for phone and desktop. Instant download via Gumroad." />
+  <title>Sketchbook — Alex Tait</title>
+  <meta name="description" content="Fun little drawings, doodles and throwaway gifs from the sketchbook of illustrator and motion designer Alex Tait." />
   <meta name="author" content="Alex Tait" />
-  <meta name="keywords" content="Alex Tait shop, illustration downloads, wallpaper pack, phone wallpaper, desktop wallpaper, digital download" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="theme-color" content="#ff4a1d" />
-  <link rel="canonical" href="https://alexjohntait.com/shop.html" />
+  <link rel="canonical" href="https://alexjohntait.com/sketchbook.html" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <link rel="manifest" href="/site.webmanifest" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Alex Tait" />
-  <meta property="og:title" content="Shop — Digital Downloads by Alex Tait" />
-  <meta property="og:description" content="Digital downloads by Alex Tait, starting with a colourful wallpaper pack for phone and desktop." />
-  <meta property="og:url" content="https://alexjohntait.com/shop.html" />
-  <meta property="og:image" content="https://alexjohntait.com/images/wallpaper-pack.jpg" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Shop — Digital Downloads by Alex Tait" />
-  <meta name="twitter:description" content="Digital downloads by Alex Tait, starting with a colourful wallpaper pack." />
-  <meta name="twitter:image" content="https://alexjohntait.com/images/wallpaper-pack.jpg" />
+  <meta property="og:title" content="Sketchbook — Alex Tait" />
+  <meta property="og:description" content="Fun little drawings, doodles and throwaway gifs from the sketchbook." />
+  <meta property="og:url" content="https://alexjohntait.com/sketchbook.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Sketchbook — Alex Tait" />
+  <meta name="twitter:description" content="Fun little drawings, doodles and throwaway gifs from the sketchbook." />
 
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": "Shop — Alex Tait",
-    "url": "https://alexjohntait.com/shop.html",
-    "description": "Digital downloads by illustrator and motion designer Alex Tait.",
+    "name": "Sketchbook — Alex Tait",
+    "url": "https://alexjohntait.com/sketchbook.html",
+    "description": "Drawings, doodles and gifs from the sketchbook of illustrator Alex Tait.",
     "isPartOf": { "@type": "WebSite", "name": "Alex Tait", "url": "https://alexjohntait.com/" }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org", "@type": "Product",
-    "name": "Wallpaper Pack 1",
-    "image": "https://alexjohntait.com/images/wallpaper-pack.jpg",
-    "description": "A pack of vivid original wallpapers for phone and desktop, in dark and bright colourways.",
-    "brand": { "@type": "Brand", "name": "Alex Tait" },
-    "category": "Digital download",
-    "offers": { "@type": "Offer", "price": "8.00", "priceCurrency": "GBP", "availability": "https://schema.org/InStock", "url": "https://taitster8.gumroad.com/l/wallpaperpack1" }
   }
   </script>
 
@@ -59,12 +45,18 @@
     :root {
       color-scheme: light;
       --paper: #f6f5ec; --ink: #16120f; --accent: #ff4a1d; --line: rgba(22,18,15,.28);
+      --rule: color-mix(in srgb, #ff8fb0 34%, transparent);
       --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
       --mono: 'Roboto Mono', 'Courier New', monospace;
       --spring: cubic-bezier(.34,1.56,.64,1); --out: cubic-bezier(.19,1,.22,1);
       --pad: clamp(20px, 5vw, 60px);
     }
-    body { font-family: var(--mono); color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+    body {
+      font-family: var(--mono); color: var(--ink);
+      /* a lined notebook page: horizontal rules, unlike the board's columns */
+      background: var(--paper) repeating-linear-gradient(to bottom, transparent 0 47px, var(--rule) 47px 48px);
+      -webkit-font-smoothing: antialiased; overflow-x: clip;
+    }
     ::selection { background: var(--accent); color: #fff; }
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
     a { color: inherit; }
@@ -105,36 +97,38 @@
     .pop-meta b { font-weight: 500; }
     .pop-desc { font-size: 13px; line-height: 1.8; color: var(--accent); max-width: 62ch; }
 
-    /* ── the shop ── */
-    main { max-width: 1100px; margin: 0 auto; padding: clamp(90px, 12vw, 140px) var(--pad) 40px; }
-    .shop-head h1 { font-family: var(--sans); font-weight: 400; font-size: clamp(40px, 6vw, 74px); letter-spacing: -.015em; line-height: .98; color: var(--accent); text-wrap: balance; }
-    .shop-head p { font-size: 14px; font-weight: 500; color: color-mix(in srgb, var(--ink) 65%, transparent); margin-top: 14px; line-height: 1.6; max-width: 52ch; }
-
-    .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 280px)); gap: clamp(28px, 4vw, 44px); margin-top: clamp(40px, 6vw, 64px); }
-    .product-media { width: 100%; aspect-ratio: 4/3; overflow: hidden; background: var(--line); }
-    .product-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s var(--out); }
-    @media (hover: hover) { .product:hover .product-media img { transform: scale(1.04); } }
-    .product-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 16px; }
-    .product-title { font-family: var(--sans); font-weight: 400; font-size: 21px; letter-spacing: -.01em; color: var(--ink); }
-    .product-price { font-size: 13px; font-weight: 500; color: var(--accent); white-space: nowrap; }
-    .product-desc { font-size: 13px; line-height: 1.6; color: color-mix(in srgb, var(--ink) 62%, transparent); margin-top: 6px; }
-    .product-buy {
-      margin-top: 16px; display: inline-flex; align-items: center; gap: 8px;
-      font-size: 12.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase;
-      color: var(--accent); text-decoration: underline; text-underline-offset: 3px;
+    /* ── the sketchbook ── */
+    main { max-width: 1200px; margin: 0 auto; padding: clamp(90px, 12vw, 140px) var(--pad) 60px; }
+    .sk-head .kicker {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
     }
-    .product-buy:hover { color: var(--ink); }
+    .sk-head .kicker::before { content: ''; width: 9px; height: 9px; background: var(--accent); }
+    .sk-head h1 { font-family: var(--sans); font-weight: 400; font-size: clamp(40px, 6vw, 74px); letter-spacing: -.015em; line-height: .98; color: var(--accent); margin-top: 14px; text-wrap: balance; }
+    .sk-head p { font-size: 14px; font-weight: 500; color: color-mix(in srgb, var(--ink) 65%, transparent); margin-top: 14px; line-height: 1.6; max-width: 52ch; }
 
-    footer { max-width: 1100px; margin: clamp(60px, 8vw, 100px) auto 0; padding: clamp(28px, 5vw, 52px) var(--pad);
+    .wall { columns: 4 240px; column-gap: clamp(24px, 3vw, 44px); margin-top: clamp(44px, 6vw, 72px); }
+    .sk {
+      display: block; width: 100%; margin: 0 0 clamp(28px, 4vw, 52px);
+      break-inside: avoid;
+    }
+    .sk img, .sk video { width: 100%; height: auto; display: block; }
+    /* loose, off-hand angles — a page of doodles, not a grid of work */
+    .sk:nth-child(4n + 1) { transform: rotate(-1.6deg); }
+    .sk:nth-child(4n + 2) { transform: rotate(1.1deg); }
+    .sk:nth-child(4n + 3) { transform: rotate(2deg); }
+    .sk:nth-child(4n)     { transform: rotate(-0.8deg); }
+
+    .sk-empty { margin-top: clamp(44px, 6vw, 72px); font-size: 13px; font-style: italic; color: color-mix(in srgb, var(--ink) 55%, transparent); }
+
+    footer { max-width: 1200px; margin: clamp(60px, 8vw, 100px) auto 0; padding: clamp(28px, 5vw, 52px) var(--pad);
       border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: baseline; }
     footer a.back { font-size: 13px; font-weight: 500; color: color-mix(in srgb, var(--ink) 55%, transparent); text-decoration: none; }
     footer a.back:hover { color: var(--accent); }
     footer .note { font-size: 12.5px; color: color-mix(in srgb, var(--ink) 55%, transparent); max-width: 46ch; line-height: 1.6; }
-    footer .note a { color: var(--accent); text-decoration: none; }
-    footer .note a:hover { color: var(--ink); }
 
     @media (max-width: 640px) {
-      .products { grid-template-columns: 1fr 1fr; gap: 20px; }
+      .wall { columns: 2; column-gap: 16px; }
       footer { flex-direction: column; gap: 14px; }
     }
   </style>
@@ -161,29 +155,19 @@
 </aside>
 
 <main>
-  <div class="shop-head">
-    <h1>Shop</h1>
-    <p>Digital downloads from the studio. Buy once, download instantly via Gumroad.</p>
+  <div class="sk-head">
+    <span class="kicker">Off the clock</span>
+    <h1>Sketchbook</h1>
+    <p>Fun little drawings and throwaway gifs — the stuff that happens between the proper work. Refills itself from my desk every few hours.</p>
   </div>
 
-  <section class="products" aria-label="Digital products">
-    <article class="product">
-      <a class="product-media" href="https://taitster8.gumroad.com/l/wallpaperpack1" target="_blank" rel="noopener" aria-label="Wallpaper Pack 1">
-        <img src="images/wallpaper-pack.jpg" alt="Colourful wallpaper pack by Alex Tait" loading="lazy" />
-      </a>
-      <div class="product-top">
-        <h2 class="product-title">Wallpaper Pack 1</h2>
-        <span class="product-price">£8</span>
-      </div>
-      <p class="product-desc">A pack of vivid original wallpapers for phone and desktop, in dark and bright colourways.</p>
-      <a class="product-buy" href="https://taitster8.gumroad.com/l/wallpaperpack1" target="_blank" rel="noopener">Buy &amp; download →</a>
-    </article>
-  </section>
+  <div class="wall" id="wall" aria-label="Sketchbook drawings"></div>
+  <p class="sk-empty" id="sk-empty" hidden>The sketchbook is out being scribbled in — new pages land here soon.</p>
 </main>
 
 <footer>
   <a class="back" href="index.html">← Back to work</a>
-  <p class="note">Digital downloads are delivered instantly via Gumroad. For commissions, <a href="mailto:alexjohntait@gmail.com">get in touch</a> or reach me through <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Jelly</a>.</p>
+  <p class="note">Everything here is a one-off — drawn for no client, no brief, and no reason beyond the fun of it.</p>
 </footer>
 
 <div class="popwrap" id="aboutwrap" role="dialog" aria-modal="true" aria-label="About Alex Tait">
@@ -209,23 +193,41 @@
 </div>
 
 <script>
-  (function () {
-    var btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim');
-    var toggle = function (on) { document.body.classList.toggle('menu-open', on); btn.setAttribute('aria-expanded', on); };
-    btn.addEventListener('click', function () { toggle(!document.body.classList.contains('menu-open')); });
-    scrim.addEventListener('click', function () { toggle(false); });
-    document.querySelectorAll('.menu-panel a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
-    addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
+/* injected by refresh.mjs from the Airtable "Sketchbook" table — do not edit by hand */
+const SKETCHES = [];
 
-    var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
-    document.getElementById('about-btn').addEventListener('click', function () {
-      toggle(false); awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
-    });
-    var closeAbout = function () { awrap.classList.remove('open'); document.body.style.overflow = ''; };
-    ax.addEventListener('click', closeAbout);
-    awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
-    addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
-  })();
+(function () {
+  var wall = document.getElementById('wall');
+  if (!SKETCHES.length) { document.getElementById('sk-empty').hidden = false; return; }
+  var frag = document.createDocumentFragment();
+  SKETCHES.forEach(function (s) {
+    var d = document.createElement('div');
+    d.className = 'sk';
+    d.innerHTML = s.k === 'video'
+      ? '<video src="images/sketchbook/' + s.f + '#t=0.1" muted loop autoplay playsinline preload="metadata"></video>'
+      : '<img src="images/sketchbook/' + s.f + '" alt="Sketchbook drawing" loading="lazy" />';
+    frag.appendChild(d);
+  });
+  wall.appendChild(frag);
+})();
+
+(function () {
+  var btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim');
+  var toggle = function (on) { document.body.classList.toggle('menu-open', on); btn.setAttribute('aria-expanded', on); };
+  btn.addEventListener('click', function () { toggle(!document.body.classList.contains('menu-open')); });
+  scrim.addEventListener('click', function () { toggle(false); });
+  document.querySelectorAll('.menu-panel a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
+
+  var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
+  document.getElementById('about-btn').addEventListener('click', function () {
+    toggle(false); awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
+  });
+  var closeAbout = function () { awrap.classList.remove('open'); document.body.style.overflow = ''; };
+  ax.addEventListener('click', closeAbout);
+  awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
+})();
 </script>
 </body>
 </html>

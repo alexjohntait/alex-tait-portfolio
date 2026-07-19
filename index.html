@@ -140,6 +140,11 @@
   .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px;
     color: color-mix(in srgb, var(--paper) 65%, transparent); }
   .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
+  .menu-panel .m-sketch { width: 96px; margin-bottom: 14px; background: var(--paper); padding: 6px; transform: rotate(-2deg); }
+
+  /* marginalia: sketchbook doodles tucked into the gaps, behind the work */
+  .doodle { position: absolute; z-index: 0; pointer-events: none; opacity: 0.95; }
+  .doodle img, .doodle video { width: 100%; height: auto; display: block; }
 
   /* ─── the board: every project, on the lines ─── */
   .board { position: relative; z-index: 1; cursor: crosshair; }
@@ -354,7 +359,7 @@
     .sticker { position: relative; width: auto !important; touch-action: auto; transform: none !important; transition: none; }
     .sticker.deal { animation: none; }
     .sticker.out { display: none; }
-    .ghost, #ink { display: none; }
+    .ghost, #ink, .doodle { display: none; }
     .case-head { padding: 56px 16px 0; }
     .case { display: block; padding: 10vh 16px; min-height: 0; }
     .case h2, .case .meta, .case .blurb { padding: 0; }
@@ -374,9 +379,11 @@
 <aside class="menu-panel" id="menu-panel" aria-label="Menu">
   <a class="nav" href="index.html">Work</a>
   <a class="nav" href="#case-studies">Case studies</a>
+  <a class="nav" href="sketchbook.html">Sketchbook</a>
   <button type="button" class="nav" id="about-btn">About</button>
   <a class="nav" href="shop.html">Shop</a>
   <div class="m-foot">
+    <img class="m-sketch" id="m-sketch" alt="" hidden />
     <a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
     <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration</a>
     <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Represented by Jelly ↗</a>
@@ -524,6 +531,7 @@ function announce(text) {
 }
 
 /* ─── data: embedded directly (refresh.mjs injects fresh copies here) ─── */
+const SKETCHES = [];
 const PROJECTS = [
   {"id":"app-store","title":"App Store","category":"advertising","year":"2023","client":"Apple","caption":"Series of Today Tab cards created for Apple's app store and podcast store. They were featured across multiple regions","bg":"#68c0ff","fg":"#000000","desc":"A series of illustrated cards created for Apple's Today Tab, the editorial front page of the App Store and Podcast Store. Each card was built around a specific app or curated set, using character work and bold composition to catch attention in a space where illustration competes with photography and UI. The cards were featured across multiple regions, which meant the work had to read cleanly at small scale while holding up as a full-bleed feature.","tags":""},
   {"id":"humantold-nyc","title":"Humantold NYC","category":"advertising, animation","year":"2024","client":"Humantold","caption":"Series of animations demonstrating the us of therapy. This was rolled out across the subway in NY.","bg":"#ec482c","fg":"#000000","desc":"Out-of-home illustration and animation for Humantold, a mental health platform built for New Yorkers. The work rolled out across the subway: a deliberate choice for a campaign about accessing therapy in a city that moves fast and stops rarely. The characters were drawn from the specific texture of city stress: construction noise, ghosting, the relentless pace of it. Designed to catch people in the brief stillness of a platform wait, and make the idea of talking to someone feel genuinely reachable.","tags":""},
@@ -664,6 +672,33 @@ function wireDrag(el, p) {
   });
 }
 
+/* ─── marginalia: a few sketchbook doodles live in the sheet's margins ───
+   Non-interactive, behind the tiles, random picks each visit. The full
+   collection lives on sketchbook.html; these are just notes in the margin. */
+const doodles = [];
+if (SKETCHES.length && !MOBILE.matches) {
+  const picks = SKETCHES.slice().sort(() => Math.random() - 0.5).slice(0, 6);
+  const gm = document.getElementById('pieces');
+  picks.forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'doodle';
+    d.innerHTML = s.k === 'video'
+      ? `<video src="images/sketchbook/${s.f}#t=0.1" muted loop ${REDUCE ? '' : 'autoplay '}playsinline preload="metadata"></video>`
+      : `<img src="images/sketchbook/${s.f}" alt="" loading="lazy" />`;
+    board.insertBefore(d, gm);   /* before the grid → paints behind the work */
+    doodles.push(d);
+  });
+}
+/* one stray sketch pinned inside the menu panel, different every visit */
+if (SKETCHES.length) {
+  const imgs = SKETCHES.filter(s => s.k === 'img');
+  if (imgs.length) {
+    const el = document.getElementById('m-sketch');
+    el.src = 'images/sketchbook/' + imgs[Math.floor(Math.random() * imgs.length)].f;
+    el.hidden = false;
+  }
+}
+
 /* ─── masonry on the lines: everything fits, nothing overlaps ─── */
 let currentF = 'all';
 function matches(el) {
@@ -712,6 +747,7 @@ function layout() {
   }
 
   let n = 0;
+  const spots = [];   /* the gap under each placed tile — where doodles live */
   stickers.forEach(({ el }) => {
     const on = matches(el);
     el.classList.toggle('out', !on);
@@ -736,10 +772,23 @@ function layout() {
     el._resetDrag && el._resetDrag();
     /* advance the column: tile height + a steady breathing gap */
     const h = el.offsetHeight || colw;
+    spots.push({ x: colX[c], w: colX[c + 1] - colX[c], y: colY[c] + h + 22 });
     colY[c] += h + gap;
     n++;
   });
   board.style.height = Math.max(...colY) + 60 + 'px';
+
+  /* marginalia: spread the doodles through the gaps, off-grid on purpose */
+  if (doodles.length && spots.length) {
+    doodles.forEach((d, i) => {
+      const sp = spots[Math.min(spots.length - 1, Math.floor((i + 0.5) * spots.length / doodles.length))];
+      const w = Math.round(Math.min(170, sp.w * 0.5));
+      d.style.width = w + 'px';
+      d.style.left = Math.round(sp.x + sp.w * (0.15 + ((i * 37) % 5) / 12)) + 'px';
+      d.style.top = Math.round(sp.y) + 'px';
+      d.style.transform = `rotate(${((i * 53) % 11) - 5}deg)`;
+    });
+  }
 }
 
 /* pill filters: click a category; click it again for everything */
