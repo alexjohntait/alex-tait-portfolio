@@ -350,18 +350,27 @@
     /* no column concept on the stacked mobile layout — a stale-width
        ruled background would just draw stray misaligned lines */
     .ruled { background-image: none; }
-    .board { cursor: auto; padding: 84px 16px 20px; }
-    .name { position: static; transform: none; white-space: normal; display: block; margin-bottom: 14px; }
-    .board .cell { padding: 16px 0; }
-    .grid-m { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-    .sticker { position: relative; width: auto !important; touch-action: auto; transform: none !important; transition: none; }
+    .board { cursor: auto; padding: 84px 14px 30px; }
+    .name { position: static; transform: none; white-space: normal; display: block; margin-bottom: 20px; }
+    /* a true two-column masonry: no row-alignment holes, room to breathe */
+    .grid-m { display: block; columns: 2; column-gap: 12px; }
+    .sticker {
+      position: relative; display: block; width: auto !important; margin-bottom: 12px;
+      break-inside: avoid; touch-action: auto; transform: none !important; transition: none;
+    }
+    /* the about / clients notes span the full page — editorial pauses in the flow */
+    .sticker.txt { column-span: all; }
+    .board .cell { padding: 22px 4px 26px; }
     .sticker.deal { animation: none; }
     .sticker.out { display: none; }
     .ghost, #ink, .doodle { display: none; }
     .case-head { padding: 56px 16px 0; }
-    .case { display: block; padding: 10vh 16px; min-height: 0; }
+    .case { display: block; padding: 8vh 16px; min-height: 0; }
+    .case-text { display: block; padding: 24px 0 0; }
     .case h2, .case .meta, .case .blurb { padding: 0; }
-    .case h2 { margin: 20px 0 14px; }
+    .case-num { margin-bottom: 12px; }
+    .case h2 { margin: 0 0 16px; }
+    .case .meta { margin-bottom: 16px; }
     .pill { left: 12px; bottom: 12px; flex-wrap: wrap; }
     .menu-panel { width: min(84vw, 340px); }
   }
