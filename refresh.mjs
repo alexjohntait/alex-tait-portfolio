@@ -42,7 +42,7 @@ async function fetchRecords() {
    Pulls the Sketchbook table by name, harvests EVERY attachment found in
    any field (so the table can be a single attachments column, or anything),
    downloads them to images/sketchbook/, and injects `const SKETCHES` into
-   index.html (marginalia) and sketchbook.html (the full wall).
+   index.html, where they appear as marginalia doodles dotted on the grid.
    Non-fatal on purpose: if the table is missing/renamed the main refresh
    still succeeds — the site just keeps its previous sketches. */
 async function refreshSketchbook() {
@@ -114,7 +114,7 @@ async function refreshSketchbook() {
 
   const list = sketches.filter(s => fs.existsSync(`${DIR}/${s.f}`)).map(({ f, k }) => ({ f, k }));
   const decl = 'const SKETCHES = ' + JSON.stringify(list) + ';';
-  for (const page of ['index.html', 'sketchbook.html']) {
+  for (const page of ['index.html']) {
     let html = fs.readFileSync(page, 'utf8');
     if (!/const SKETCHES = \[[\s\S]*?\];/.test(html)) { console.warn(`  no SKETCHES seed in ${page}`); continue; }
     fs.writeFileSync(page, html.replace(/const SKETCHES = \[[\s\S]*?\];/, decl));

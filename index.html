@@ -140,8 +140,6 @@
   .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px;
     color: color-mix(in srgb, var(--paper) 65%, transparent); }
   .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
-  .menu-panel .m-sketch { width: 96px; margin-bottom: 14px; background: var(--paper); padding: 6px; transform: rotate(-2deg); }
-
   /* marginalia: sketchbook doodles tucked into the gaps, behind the work */
   .doodle { position: absolute; z-index: 0; pointer-events: none; opacity: 0.95; }
   .doodle img, .doodle video { width: 100%; height: auto; display: block; }
@@ -379,11 +377,9 @@
 <aside class="menu-panel" id="menu-panel" aria-label="Menu">
   <a class="nav" href="index.html">Work</a>
   <a class="nav" href="#case-studies">Case studies</a>
-  <a class="nav" href="sketchbook.html">Sketchbook</a>
   <button type="button" class="nav" id="about-btn">About</button>
   <a class="nav" href="shop.html">Shop</a>
   <div class="m-foot">
-    <img class="m-sketch" id="m-sketch" alt="" hidden />
     <a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
     <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration</a>
     <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Represented by Jelly ↗</a>
@@ -672,12 +668,11 @@ function wireDrag(el, p) {
   });
 }
 
-/* ─── marginalia: a few sketchbook doodles live in the sheet's margins ───
-   Non-interactive, behind the tiles, random picks each visit. The full
-   collection lives on sketchbook.html; these are just notes in the margin. */
+/* ─── marginalia: sketchbook doodles dotted through the sheet's margins ───
+   Non-interactive, behind the tiles, a fresh random handful each visit. */
 const doodles = [];
 if (SKETCHES.length && !MOBILE.matches) {
-  const picks = SKETCHES.slice().sort(() => Math.random() - 0.5).slice(0, 6);
+  const picks = SKETCHES.slice().sort(() => Math.random() - 0.5).slice(0, 8);
   const gm = document.getElementById('pieces');
   picks.forEach(s => {
     const d = document.createElement('div');
@@ -689,16 +684,6 @@ if (SKETCHES.length && !MOBILE.matches) {
     doodles.push(d);
   });
 }
-/* one stray sketch pinned inside the menu panel, different every visit */
-if (SKETCHES.length) {
-  const imgs = SKETCHES.filter(s => s.k === 'img');
-  if (imgs.length) {
-    const el = document.getElementById('m-sketch');
-    el.src = 'images/sketchbook/' + imgs[Math.floor(Math.random() * imgs.length)].f;
-    el.hidden = false;
-  }
-}
-
 /* ─── masonry on the lines: everything fits, nothing overlaps ─── */
 let currentF = 'all';
 function matches(el) {
