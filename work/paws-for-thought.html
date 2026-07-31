@@ -138,12 +138,16 @@
   .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px;
     color: color-mix(in srgb, var(--paper) 65%, transparent); }
   .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
-  /* marginalia: sketchbook doodles tucked into the gaps, behind the work */
-  .doodle { position: absolute; z-index: 0; pointer-events: none; opacity: 0.95; }
+  /* marginalia: sketchbook doodles tucked into the gaps, behind the work.
+     multiply drops their white grounds out onto the paper — the gifs have
+     no real alpha, so the blend mode does the knocking-out for us */
+  .doodle { position: absolute; z-index: 0; pointer-events: none; mix-blend-mode: multiply; }
   .doodle img, .doodle video { width: 100%; height: auto; display: block; }
 
   /* ─── the board: every project, on the lines ─── */
-  .board { position: relative; z-index: 1; cursor: crosshair; }
+  /* background-color (longhand — never the shorthand, it would wipe .ruled's
+     lines) gives the doodles an opaque paper backdrop to multiply against */
+  .board { position: relative; z-index: 1; cursor: crosshair; background-color: var(--paper); }
 
   .name {
     position: absolute; left: 50%; top: 50vh; z-index: 30;
