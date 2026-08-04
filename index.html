@@ -172,14 +172,6 @@
   /* the sketchbook gifs ride along as small asides, whites knocked out */
   .card.sketch { mix-blend-mode: multiply; }
   .card.sketch img { border-radius: 0; }
-  /* text panels are cards too — they fly the same path as the work */
-  .card.txt {
-    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
-    padding: 26px 24px; font-size: 13px; line-height: 1.75; color: var(--accent);
-  }
-  .card.txt em { font-style: italic; }
-  .card.txt .u { text-decoration: underline; text-underline-offset: 3px; }
-  .card.txt ul { list-style: none; margin-top: 6px; }
   @media (hover: hover) {
     .card.hit:hover img, .card.hit:hover video { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
   }
@@ -630,6 +622,8 @@ let SPACING = 165,    /* gap between cards along the sideways track   */
     PER = 230;        /* scroll pixels spent on each card             */
 
 const cards = [];
+const HOVER = 1.26;   /* how much a card swells under the pointer */
+let hovered = null;
 let span = 0, travel = 0, aim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
 let currentF = 'all', capId = null, started = false;
 
@@ -654,12 +648,7 @@ function mediaHTML(p) {
 
 function buildCloud() {
   const works = PROJECTS.filter(p => !BESPOKE.has(p.id));
-  const items = [];
-  works.forEach((p, i) => {
-    items.push({ kind: 'work', p });
-    if (i === 3) items.push({ kind: 'about' });
-    if (i === 9) items.push({ kind: 'clients' });
-  });
+  const items = works.map(p => ({ kind: 'work', p }));
   /* thread the sketchbook gifs through the flight as little asides */
   SKETCHES.forEach((s, i) => {
     const at = Math.min(items.length, 6 + i * 6);
@@ -668,18 +657,7 @@ function buildCloud() {
 
   items.forEach(item => {
     let el, cats = 'advertising editorial personal', p = null, small = false;
-    if (item.kind === 'about') {
-      el = document.createElement('div');
-      el.className = 'card txt';
-      el.innerHTML = `<em>Alex Tait</em> is an illustrator and motion designer with a simple style
-        focused on expression and movement. He specialises in character design, creating work
-        that is surreal and spirited, bursting with colour and energy.`;
-    } else if (item.kind === 'clients') {
-      el = document.createElement('div');
-      el.className = 'card txt';
-      el.innerHTML = `<span class="u">Clients include</span>
-        <ul><li>Apple</li><li>Google</li><li>Spotify</li><li>Adidas</li></ul>`;
-    } else if (item.kind === 'sketch') {
+    if (item.kind === 'sketch') {
       el = document.createElement('div');
       el.className = 'card sketch';
       el.innerHTML = `<img src="images/sketchbook/${item.s.f}" alt="" loading="lazy" />`;
@@ -701,7 +679,13 @@ function buildCloud() {
     }
     el.dataset.cats = cats;
     space.appendChild(el);
-    cards.push({ el, p, small, vis: true, x: 0, y: 0, z0: 0, rot: 0, shown: false });
+    const c = { el, p, small, vis: true, ox: 0, oy: 0, st: 0, dy: 0, w: 0, hs: 1, shown: false };
+    cards.push(c);
+    /* only the work responds to the pointer — the sketches are just texture */
+    if (p) {
+      el.addEventListener('pointerenter', () => { hovered = c; });
+      el.addEventListener('pointerleave', () => { if (hovered === c) hovered = null; });
+    }
   });
 }
 
@@ -754,6 +738,8 @@ function frame() {
     if (t <= -1 || t >= 1) {
       if (c.shown) {
         el.style.opacity = '0'; el.classList.remove('hit'); c.shown = false;
+        c.hs = 1;
+        if (hovered === c) hovered = null;   /* it left under the pointer */
         const v = el.querySelector('video'); if (v) v.pause();
       }
       continue;
@@ -768,13 +754,20 @@ function frame() {
     const x = RANGE * te + c.ox * s;        /* the group opens out as it grows */
     const y = c.oy * s + c.dy * te;
 
+    /* the pointer swells a card in place — hover multiplies the visual scale
+       only, never the layout offsets, so it grows without shifting */
+    c.hs += ((hovered === c ? HOVER : 1) - c.hs) * 0.18;
+    const vs = s * c.hs;
+
     el.style.transform =
-      `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${s.toFixed(4)}) translate(-50%, -50%)`;
+      `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${vs.toFixed(4)}) translate(-50%, -50%)`;
     el.style.opacity = clamp(ease / 0.20, 0, 1).toFixed(3);
+    /* bigger reads as nearer, so it stacks in front — and the hovered card wins */
+    el.style.zIndex = Math.round(vs * 100) + (hovered === c ? 500 : 0);
 
     if (!c.shown) {
       c.shown = true;
-      el.classList.add('hit');
+      if (c.p) el.classList.add('hit');
       const v = el.querySelector('video'); if (v) v.play().catch(() => {});
     }
     if (c.p && Math.abs(bx) < Math.abs(nearX)) { nearX = bx; near = c; }
@@ -784,12 +777,14 @@ function frame() {
   nameEl.style.opacity = (1 - clamp((prog - 0.015) / 0.07, 0, 1)).toFixed(3);
   progEl.style.width = (prog * 100).toFixed(2) + '%';
 
-  /* name whatever is crossing the middle */
+  /* the caption follows the pointer when there is one, and otherwise names
+     whatever is crossing the middle */
   const inFlight = prog > 0.005 && prog < 0.995;
-  if (near && inFlight) {
-    if (near.p.id !== capId) {
-      capId = near.p.id;
-      const p = near.p;
+  const pick = (hovered && hovered.shown) ? hovered : (inFlight ? near : null);
+  if (pick) {
+    if (pick.p.id !== capId) {
+      capId = pick.p.id;
+      const p = pick.p;
       const bits = [p.client && p.client !== 'Personal' ? p.client : 'Personal', p.year].filter(Boolean);
       capEl.innerHTML = `<span class="t">${p.title}</span><span class="m">${bits.join(' · ')}</span>`;
     }
