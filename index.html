@@ -716,7 +716,7 @@ function place() {
     c.ox = Math.cos(ang) * rad;
     c.oy = Math.sin(ang) * rad * 0.95;
     c.st = -i * SPACING;
-    c.rot = (rnd(i + 41) - 0.5) * 8;
+    c.dy = (rnd(i + 41) - 0.5) * 150;   /* a little vertical travel as it crosses */
     c.w = c.small ? MINW * 0.6 : MINW + rnd(i + 99) * (MAXW - MINW);
     c.el.style.setProperty('--w', Math.round(c.w) + 'px');
   });
@@ -759,13 +759,17 @@ function frame() {
       continue;
     }
 
-    const ease = 1 - Math.abs(t);           /* 0 at the edges, 1 in the middle */
+    /* ease the crossing: a card hurries in from the edge, eases through the
+       middle where it is biggest, then slides away again. The blend keeps a
+       little linear motion in it, so nothing ever stalls dead centre. */
+    const te = 0.45 * t + 0.55 * Math.sign(t) * Math.pow(Math.abs(t), 1.6);
+    const ease = 1 - Math.abs(te);          /* 0 at the edges, 1 in the middle */
     const s = SMIN + (SMAX - SMIN) * Math.pow(ease, 0.7);
-    const x = bx + c.ox * s;                /* the group opens out as it grows */
-    const y = c.oy * s;
+    const x = RANGE * te + c.ox * s;        /* the group opens out as it grows */
+    const y = c.oy * s + c.dy * te;
 
     el.style.transform =
-      `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${c.rot.toFixed(2)}deg) scale(${s.toFixed(4)}) translate(-50%, -50%)`;
+      `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${s.toFixed(4)}) translate(-50%, -50%)`;
     el.style.opacity = clamp(ease / 0.20, 0, 1).toFixed(3);
 
     if (!c.shown) {
