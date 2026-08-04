@@ -621,38 +621,28 @@ const GOLD = Math.PI * (3 - Math.sqrt(5));
 const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 
-let PERSP = 900,      /* camera focal length                          */
-    SPACING = 430,    /* gap between cards along the Z axis           */
-    FAR = 3600,       /* beyond this a card has not been born yet     */
-    NEAR = 620,       /* past this it has swept out of frame          */
-    FADE = 1000,      /* the far-end dissolve                         */
-    NEARFADE = 380,   /* where the near-end dissolve begins           */
-    MINR = 95, SPREAD = 255,  /* scatter off the axis                 */
-    MINW = 245, MAXW = 420,   /* card widths in 3D space              */
-    TRUCKX = 0.36,    /* how hard the camera trucks left as it dollies */
-    TRUCKY = 0.13,    /* and how much it rises, so cards fan downward  */
+let SPACING = 165,    /* gap between cards along the sideways track   */
+    SMIN = 0.14,      /* how small a card is as it appears            */
+    SMAX = 1.0,       /* and how big it gets crossing the middle      */
+    MINR = 90, SPREAD = 300,  /* scatter off the track                */
+    MINW = 300, MAXW = 540,   /* card widths at full size             */
+    RANGE = 660,      /* how far out of centre a card lives before it goes */
     PER = 230;        /* scroll pixels spent on each card             */
 
 const cards = [];
-let span = 0, camZ = 0, aim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
+let span = 0, travel = 0, aim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
 let currentF = 'all', capId = null, started = false;
 
 function tune() {
   const w = innerWidth, h = innerHeight;
   const small = w < 820;
-  PERSP = small ? 720 : 900;
-  SPACING = small ? 300 : 340;
-  MINR = small ? 80 : 120;
-  SPREAD = small ? 210 : 330;
-  MINW = small ? 190 : 300;
-  MAXW = small ? 300 : 520;
-  TRUCKX = small ? 0.26 : 0.30;
+  SPACING = small ? 105 : 165;
+  MINR = small ? 60 : 90;
+  SPREAD = small ? 175 : 300;
+  MINW = small ? 175 : 300;
+  MAXW = small ? 280 : 540;
+  RANGE = w * (small ? 0.60 : 0.50);
   PER = clamp(h * 0.24, 150, 260);
-  space.style.setProperty('--persp', PERSP + 'px');
-  /* let cards swell right up to the lens before they go — the reference
-     lets them fill half the frame, so the dissolve has to start late */
-  NEAR = PERSP * 0.79;
-  NEARFADE = PERSP * 0.60;
 }
 
 function mediaHTML(p) {
@@ -715,51 +705,53 @@ function buildCloud() {
   });
 }
 
-/* every card holds one seat along the axis, with a little scatter off it */
+/* every card takes a station on the sideways track, with a little scatter
+   off it. The scatter is multiplied by the card's scale at render time, so
+   a group opens out as it grows and closes up again as it shrinks. */
 function place() {
   const live = cards.filter(c => c.vis);
   live.forEach((c, i) => {
     const ang = i * GOLD;
     const rad = MINR + rnd(i) * SPREAD;
-    c.sx = Math.cos(ang) * rad;           /* scatter, not position — the      */
-    c.sy = Math.sin(ang) * rad * 0.74;    /* truck below supplies the sweep   */
-    c.z0 = -i * SPACING;
-    c.rot = (rnd(i + 41) - 0.5) * 7;
-    c.w = c.small ? MINW * 0.7 : MINW + rnd(i + 99) * (MAXW - MINW);
+    c.ox = Math.cos(ang) * rad;
+    c.oy = Math.sin(ang) * rad * 0.95;
+    c.st = -i * SPACING;
+    c.rot = (rnd(i + 41) - 0.5) * 8;
+    c.w = c.small ? MINW * 0.6 : MINW + rnd(i + 99) * (MAXW - MINW);
     c.el.style.setProperty('--w', Math.round(c.w) + 'px');
   });
   span = Math.max(0, (live.length - 1) * SPACING);
-  const run = (live.length + 2) * PER;
-  scroller.style.height = (stage.offsetHeight + run) + 'px';
+  scroller.style.height = (stage.offsetHeight + (live.length + 2) * PER) + 'px';
 }
 
 function matches(c) {
   return currentF === 'all' || c.el.dataset.cats.includes(currentF);
 }
 
-/* one frame of the flight. The camera dollies forward AND trucks left, so
-   a card is born small near the vanishing point, then fans down and to the
-   right as it comes forward — the diagonal sweep the reference makes.
-   Tying the truck to each card's own depth (rather than to elapsed camera
-   travel) keeps the drift local: it never accumulates over a long run. */
+/* one frame. Nothing travels in depth: the whole field slides sideways at
+   a constant distance, and each card's scale is a function of how far it
+   is from the middle of the frame — so it appears small at one edge, opens
+   out as it crosses, and closes down again on its way off the other side. */
 function frame() {
   const total = scroller.offsetHeight - stage.offsetHeight;
   const prog = total > 0 ? clamp(-scroller.getBoundingClientRect().top / total, 0, 1) : 0;
 
-  aim = prog * (span + NEAR + 300);
-  camZ += (aim - camZ) * 0.14;              /* a glide, never a snap */
+  aim = prog * (span + RANGE * 2);
+  travel += (aim - travel) * 0.14;          /* a glide, never a snap */
   px += (aimX - px) * 0.06;
   py += (aimY - py) * 0.06;
-  space.style.perspectiveOrigin = `calc(50% + ${px.toFixed(1)}px) calc(50% + ${py.toFixed(1)}px)`;
+  space.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`;
 
-  let near = null, nearZ = Infinity;
+  let near = null, nearX = Infinity;
 
   for (const c of cards) {
     const el = c.el;
     if (!c.vis) { if (c.shown) { el.style.opacity = '0'; el.classList.remove('hit'); c.shown = false; } continue; }
 
-    const z = c.z0 + camZ;
-    if (z < -FAR || z > NEAR) {
+    const bx = c.st + travel;               /* where its station has slid to */
+    const t = bx / RANGE;                   /* -1 at one edge, +1 at the other */
+
+    if (t <= -1 || t >= 1) {
       if (c.shown) {
         el.style.opacity = '0'; el.classList.remove('hit'); c.shown = false;
         const v = el.querySelector('video'); if (v) v.pause();
@@ -767,32 +759,28 @@ function frame() {
       continue;
     }
 
-    /* the sweep: depth drives the drift, so every card walks the same
-       diagonal path through the frame at its own moment */
-    const x = c.sx + z * TRUCKX;
-    const y = c.sy + z * TRUCKY;
-
-    let o = 1;
-    if (z < -FAR + FADE) o = (z + FAR) / FADE;
-    else if (z > NEARFADE) o = clamp((NEAR - z) / (NEAR - NEARFADE), 0, 1);
+    const ease = 1 - Math.abs(t);           /* 0 at the edges, 1 in the middle */
+    const s = SMIN + (SMAX - SMIN) * Math.pow(ease, 0.7);
+    const x = bx + c.ox * s;                /* the group opens out as it grows */
+    const y = c.oy * s;
 
     el.style.transform =
-      `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotate(${c.rot.toFixed(2)}deg) translate(-50%, -50%)`;
-    el.style.opacity = o.toFixed(3);
+      `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${c.rot.toFixed(2)}deg) scale(${s.toFixed(4)}) translate(-50%, -50%)`;
+    el.style.opacity = clamp(ease / 0.20, 0, 1).toFixed(3);
 
     if (!c.shown) {
       c.shown = true;
       el.classList.add('hit');
       const v = el.querySelector('video'); if (v) v.play().catch(() => {});
     }
-    if (c.p && Math.abs(z) < Math.abs(nearZ)) { nearZ = z; near = c; }
+    if (c.p && Math.abs(bx) < Math.abs(nearX)) { nearX = bx; near = c; }
   }
 
   /* the signature owns the opening frame, then steps aside */
   nameEl.style.opacity = (1 - clamp((prog - 0.015) / 0.07, 0, 1)).toFixed(3);
   progEl.style.width = (prog * 100).toFixed(2) + '%';
 
-  /* name whatever is passing the lens */
+  /* name whatever is crossing the middle */
   const inFlight = prog > 0.005 && prog < 0.995;
   if (near && inFlight) {
     if (near.p.id !== capId) {
