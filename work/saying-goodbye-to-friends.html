@@ -92,7 +92,7 @@
     background-image:
       linear-gradient(to right, var(--line) 1px, transparent 1px),
       linear-gradient(to right, var(--line) 1px, transparent 1px);
-    background-size: var(--colw, 240px) 100%, 1px 100%;
+    background-size: calc((100% - var(--gx) * 2) / 6) 100%, 1px 100%;
     background-position: var(--gx) 0, calc(100% - var(--gx)) 0;
     background-repeat: repeat-x, no-repeat;
   }
@@ -142,19 +142,53 @@
   .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px;
     color: color-mix(in srgb, var(--paper) 65%, transparent); }
   .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
-  /* marginalia: sketchbook doodles tucked into the gaps, behind the work.
-     multiply drops their white grounds out onto the paper — the gifs have
-     no real alpha, so the blend mode does the knocking-out for us */
-  .doodle { position: absolute; z-index: 0; pointer-events: none; mix-blend-mode: multiply; }
-  .doodle img, .doodle video { width: 100%; height: auto; display: block; }
+  /* ─── the image cloud: a linear flight through the work ───
+     Every card sits at a fixed point in 3D space — scattered on a
+     golden-angle spiral around one long Z axis, so nothing ever clumps.
+     Scrolling dollies the camera forward: cards swell, drift outward
+     under perspective, and sail past the edges of the frame. */
+  .cloud-scroll { position: relative; }
+  .cloud-stage {
+    position: sticky; top: 0; height: 100svh; overflow: hidden;
+    background-color: var(--paper); cursor: crosshair;
+  }
+  .cloud-space {
+    position: absolute; inset: 0;
+    perspective: var(--persp, 900px);
+    perspective-origin: 50% 50%;
+  }
+  .card {
+    position: absolute; left: 50%; top: 50%;
+    width: var(--w, 300px);
+    transform-origin: 0 0;   /* the transform chain does its own centring */
+    text-decoration: none; color: var(--ink);
+    opacity: 0; pointer-events: none;
+    backface-visibility: hidden;
+  }
+  .card.hit { pointer-events: auto; }
+  .card img, .card video {
+    width: 100%; height: auto; display: block;
+    border-radius: 10px; background: var(--bg, transparent);
+    transition: box-shadow 0.3s var(--out);
+  }
+  /* the sketchbook gifs ride along as small asides, whites knocked out */
+  .card.sketch { mix-blend-mode: multiply; }
+  .card.sketch img { border-radius: 0; }
+  /* text panels are cards too — they fly the same path as the work */
+  .card.txt {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 26px 24px; font-size: 13px; line-height: 1.75; color: var(--accent);
+  }
+  .card.txt em { font-style: italic; }
+  .card.txt .u { text-decoration: underline; text-underline-offset: 3px; }
+  .card.txt ul { list-style: none; margin-top: 6px; }
+  @media (hover: hover) {
+    .card.hit:hover img, .card.hit:hover video { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
+  }
 
-  /* ─── the board: every project, on the lines ─── */
-  /* background-color (longhand — never the shorthand, it would wipe .ruled's
-     lines) gives the doodles an opaque paper backdrop to multiply against */
-  .board { position: relative; z-index: 1; cursor: crosshair; background-color: var(--paper); }
-
+  /* the signature holds the centre on arrival, then clears out of the way */
   .name {
-    position: absolute; left: 50%; top: 50vh; z-index: 30;
+    position: absolute; left: 50%; top: 50%; z-index: 30;
     transform: translate(-50%, -50%);
     font-family: var(--sans); font-weight: 400;
     font-size: clamp(44px, 5.2vw, 78px); letter-spacing: -0.01em;
@@ -167,50 +201,53 @@
     filter: drop-shadow(0 0 12px var(--paper)) drop-shadow(0 0 30px var(--paper));
   }
 
-  /* mono text set straight into the flow of the grid */
-  .cell { font-size: 13px; line-height: 1.75; color: var(--accent); padding: 22px; }
-  .cell em { font-style: italic; }
-  .cell .u { text-decoration: underline; text-underline-offset: 3px; }
-  .cell ul { list-style: none; }
+  /* a quiet nudge that the page wants scrolling — leaves after first move */
+  .cloud-hint {
+    position: absolute; left: 50%; bottom: 5vh; z-index: 20;
+    transform: translateX(-50%);
+    font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink) 45%, transparent);
+    pointer-events: none; transition: opacity 0.6s var(--out);
+  }
+  .cloud-hint.gone { opacity: 0; }
 
-  .sticker {
-    position: absolute; left: 0; top: 0; z-index: 5;
-    width: var(--w, 200px);
-    text-decoration: none; color: var(--ink);
-    background: var(--bg, transparent);
-    cursor: grab; touch-action: none; user-select: none;
-    transform: translate(calc(var(--tx) + var(--dx, 0px)), calc(var(--ty) + var(--dy, 0px)))
-               scale(calc(var(--s, 1) * var(--hs, 1)));
-    transition: --tx 0.7s var(--out), --ty 0.7s var(--out),
-                --s 0.5s var(--out), --hs 0.35s var(--spring),
-                box-shadow 0.25s, opacity 0.4s;
+  /* the caption names whatever is nearest the camera right now */
+  .cloud-cap {
+    position: fixed; right: var(--gx); bottom: 4vh; z-index: 40;
+    text-align: right; max-width: 44ch; pointer-events: none;
+    opacity: 0; transition: opacity 0.45s var(--out);
   }
-  .sticker.txt { cursor: default; }
-  @media (hover: hover) {
-    .sticker:not(.grabbed):not(.txt):hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
+  .cloud-cap.on { opacity: 1; }
+  .cloud-cap .t {
+    display: block; font-family: var(--sans); font-weight: 400;
+    font-size: clamp(19px, 2.1vw, 30px); letter-spacing: -0.01em; line-height: 1.05;
+    color: var(--ink);
   }
-  .sticker.tidying { transition: --tx 0.7s var(--out), --ty 0.7s var(--out), --dx 0.55s var(--out), --dy 0.55s var(--out), --s 0.5s var(--out), box-shadow 0.25s, opacity 0.4s; }
-  .sticker.grabbed { cursor: grabbing; transition: box-shadow 0.25s; box-shadow: 0 30px 54px -16px rgba(0,0,0,0.4); }
-  .sticker img, .sticker video { width: 100%; height: auto; display: block; pointer-events: none; }
-  .sticker video { aspect-ratio: auto 4 / 3; }
-  .sticker.out { opacity: 0; pointer-events: none; --s: 0.92; }
+  .cloud-cap .m {
+    display: block; margin-top: 6px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent);
+  }
 
-  /* the drop: tiles fall in from above the page, with a settle */
-  @media (prefers-reduced-motion: no-preference) {
-    /* the flurry: tiles tumble in from above — swaying, slightly rotated,
-       in loose (not sequential) order — and settle onto the lines */
-    .sticker.deal { animation: dropIn 1.05s var(--drop) both; animation-delay: var(--dd, 0s); }
-    @keyframes dropIn {
-      from { opacity: 0; transform: translate(calc(var(--tx) + var(--fx, 0px)), calc(var(--ty) - 118vh)) rotate(var(--fr, 0deg)); }
-      30%  { opacity: 1; }
-      70%  { transform: translate(calc(var(--tx) + var(--fx, 0px) * -0.25), calc(var(--ty) + 6px)) rotate(calc(var(--fr, 0deg) * -0.3)); }
-      to   { opacity: 1; transform: translate(var(--tx), var(--ty)) rotate(0deg); }
-    }
-    .name, .board .cell { animation: fadeIn 1s var(--out) 0.5s both; }
-    @keyframes fadeIn { from { opacity: 0; } }
+  /* how far through the work you have flown */
+  .cloud-prog {
+    position: fixed; top: 0; left: 0; z-index: 75;
+    height: 2px; width: 0; background: var(--accent);
   }
+
+  /* reduced motion: no flight, no depth — just the work in a plain grid */
   @media (prefers-reduced-motion: reduce) {
-    .sticker, .sticker.tidying { transition: opacity 0.3s, box-shadow 0.25s; }
+    .cloud-stage { position: static; height: auto; overflow: visible; padding: 96px var(--gx) 40px; }
+    .cloud-space {
+      position: static; perspective: none;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px;
+    }
+    .card {
+      position: static; width: auto !important; opacity: 1 !important;
+      transform: none !important; pointer-events: auto;
+    }
+    .name { position: static; transform: none; margin-bottom: 28px; }
+    .cloud-cap, .cloud-prog, .cloud-hint { display: none; }
   }
 
   #ink { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
@@ -353,24 +390,13 @@
 
   /* ─── mobile ─── */
   @media (max-width: 820px) {
-    /* no column concept on the stacked mobile layout — a stale-width
-       ruled background would just draw stray misaligned lines */
+    /* the ruled lines only describe the six-column case layout */
     .ruled { background-image: none; }
-    .board { cursor: auto; padding: 84px 14px 30px; }
-    .name { position: static; transform: none; white-space: normal; display: block; margin-bottom: 20px; }
-    .name img { margin: 0 auto; }   /* centred, like it is on the big board */
-    /* a true two-column masonry: no row-alignment holes, room to breathe */
-    .grid-m { display: block; columns: 2; column-gap: 12px; }
-    .sticker {
-      position: relative; display: block; width: auto !important; margin-bottom: 12px;
-      break-inside: avoid; touch-action: auto; transform: none !important; transition: none;
-    }
-    /* the about / clients notes span the full page — editorial pauses in the flow */
-    .sticker.txt { column-span: all; }
-    .board .cell { padding: 22px 4px 26px; }
-    .sticker.deal { animation: none; }
-    .sticker.out { display: none; }
-    .ghost, #ink, .doodle { display: none; }
+    .cloud-stage { cursor: auto; }
+    /* caption sits above the filter bar rather than beside it */
+    .cloud-cap { left: 12px; right: 12px; bottom: 62px; text-align: left; max-width: none; }
+    .cloud-hint { bottom: 104px; }
+    .ghost, #ink { display: none; }
     .case-head { padding: 56px 16px 0; }
     .case { display: block; padding: 8vh 16px; min-height: 0; }
     .case-text { display: block; padding: 24px 0 0; }
