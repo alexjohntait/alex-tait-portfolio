@@ -161,16 +161,21 @@
     backface-visibility: hidden;
   }
   .card.hit { pointer-events: auto; }
-  .card img, .card video {
+  .card img {
     width: 100%; height: auto; display: block;
     border-radius: 10px; background: var(--bg, transparent);
     transition: box-shadow 0.3s var(--out);
+  }
+  /* the clip lies over its poster once hover has fetched it */
+  .card .vid {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block; border-radius: 10px;
   }
   /* the sketchbook gifs ride along as small asides, whites knocked out */
   .card.sketch { mix-blend-mode: multiply; }
   .card.sketch img { border-radius: 0; }
   @media (hover: hover) {
-    .card.hit:hover img, .card.hit:hover video { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
+    .card.hit:hover img, .card.hit:hover .vid { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
   }
 
   /* the signature is a standing mark now: small, top left, always there —
@@ -470,7 +475,7 @@
           My work has been commissioned by Apple, Google, Spotify and Adidas, spanning
           broadcast, social, packaging and print.
         </p>
-        <div class="pop-meta" style="margin-bottom:26px"><b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial</div>
+        <div class="pop-meta" style="margin-bottom:26px"><b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial<br /><b>SELECTED CLIENTS</b> Apple, Google, Spotify, Adidas, The Telegraph, First Bus, AO, Kueski</div>
         <div class="pop-meta">
           <b>INSTAGRAM</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
           <b>EMAIL</b> <a href="mailto:alexjohntait@gmail.com" style="color:inherit">alexjohntait@gmail.com</a><br />

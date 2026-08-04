@@ -163,16 +163,21 @@
     backface-visibility: hidden;
   }
   .card.hit { pointer-events: auto; }
-  .card img, .card video {
+  .card img {
     width: 100%; height: auto; display: block;
     border-radius: 10px; background: var(--bg, transparent);
     transition: box-shadow 0.3s var(--out);
+  }
+  /* the clip lies over its poster once hover has fetched it */
+  .card .vid {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block; border-radius: 10px;
   }
   /* the sketchbook gifs ride along as small asides, whites knocked out */
   .card.sketch { mix-blend-mode: multiply; }
   .card.sketch img { border-radius: 0; }
   @media (hover: hover) {
-    .card.hit:hover img, .card.hit:hover video { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
+    .card.hit:hover img, .card.hit:hover .vid { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
   }
 
   /* the signature is a standing mark now: small, top left, always there —
@@ -511,7 +516,8 @@
         broadcast, social, packaging and print.
       </p>
       <div class="pop-meta" style="margin-bottom:26px">
-        <b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial
+        <b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial<br />
+        <b>SELECTED CLIENTS</b> Apple, Google, Spotify, Adidas, The Telegraph, First Bus, AO, Kueski
       </div>
       <div class="pop-meta">
         <b>INSTAGRAM</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
@@ -631,6 +637,7 @@ const HOVER = 1.26;   /* how much a card swells under the pointer */
 let hovered = null;
 let span = 0, travel = 0, aim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
 let currentF = 'all', capId = null, started = false;
+let running = false, scrollerTop = 0, scrollerH = 0, stageH = 0;
 
 function tune() {
   const w = innerWidth, h = innerHeight;
@@ -646,9 +653,27 @@ function tune() {
 
 function mediaHTML(p) {
   const a = ASSETS[p.id] || {};
-  return a.kind === 'video'
-    ? `<video src="images/${a.file}#t=0.1" muted loop playsinline preload="metadata" aria-label="${p.title}"></video>`
-    : `<img src="images/${a.file}" alt="${p.title}" draggable="false" loading="lazy" />`;
+  /* a video project shows its poster here. The clip itself is only fetched
+     when you point at the card — otherwise simply scrolling the cloud pulls
+     every mp4 on the site, which measured ~25MB of video on one visit. */
+  const src = a.kind === 'video' ? `images/posters/${p.id}.jpg` : `images/${a.file}`;
+  return `<img src="${src}" alt="${p.title}" draggable="false" loading="lazy" />`;
+}
+
+/* the clip is attached the first time you point at a card, then paused
+   rather than destroyed, so a second look starts instantly */
+function wakeVideo(c) {
+  if (!c.clip || REDUCE) return;
+  if (!c.vid) {
+    const v = document.createElement('video');
+    v.className = 'vid';
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('aria-hidden', 'true');
+    v.src = 'images/' + c.clip;
+    c.el.appendChild(v);
+    c.vid = v;
+  }
+  c.vid.play().catch(() => {});
 }
 
 function buildCloud() {
@@ -661,7 +686,7 @@ function buildCloud() {
   });
 
   items.forEach(item => {
-    let el, cats = 'advertising editorial personal', p = null, small = false;
+    let el, cats = 'advertising editorial personal', p = null, small = false, clip = null;
     if (item.kind === 'sketch') {
       el = document.createElement('div');
       el.className = 'card sketch';
@@ -669,6 +694,8 @@ function buildCloud() {
       small = true;
     } else {
       p = item.p;
+      const a = ASSETS[p.id] || {};
+      clip = a.kind === 'video' ? a.file : null;
       el = document.createElement('a');
       el.className = 'card';
       el.href = 'work/' + p.id + '.html';
@@ -683,13 +710,25 @@ function buildCloud() {
       });
     }
     el.dataset.cats = cats;
+    /* out of frame means out of the tab order too — otherwise all 28 links
+       stay keyboard-reachable and screen-readable while invisible */
+    el.tabIndex = -1;
+    el.setAttribute('aria-hidden', 'true');
     space.appendChild(el);
-    const c = { el, p, small, vis: true, ox: 0, oy: 0, st: 0, dy: 0, w: 0, hs: 1, shown: false };
+    const c = { el, p, small, clip, vid: null, vis: true,
+                ox: 0, oy: 0, st: 0, dy: 0, w: 0, hs: 1, shown: false };
     cards.push(c);
     /* only the work responds to the pointer — the sketches are just texture */
     if (p) {
-      el.addEventListener('pointerenter', () => { hovered = c; });
-      el.addEventListener('pointerleave', () => { if (hovered === c) hovered = null; });
+      el.addEventListener('pointerenter', () => { hovered = c; wakeVideo(c); start(); });
+      el.addEventListener('pointerleave', () => {
+        if (hovered === c) hovered = null;
+        if (c.vid) c.vid.pause();
+        start();
+      });
+      /* keyboard focus gets the same treatment as hover */
+      el.addEventListener('focus', () => { hovered = c; start(); });
+      el.addEventListener('blur', () => { if (hovered === c) hovered = null; start(); });
     }
   });
 }
@@ -711,10 +750,28 @@ function place() {
   });
   span = Math.max(0, (live.length - 1) * SPACING);
   scroller.style.height = (stage.offsetHeight + (live.length + 2) * PER) + 'px';
+  /* measured once here rather than every frame, so the render loop never
+     has to read layout back out of the document */
+  stageH = stage.offsetHeight;
+  scrollerH = scroller.offsetHeight;
+  scrollerTop = scroller.getBoundingClientRect().top + scrollY;
 }
 
 function matches(c) {
   return currentF === 'all' || c.el.dataset.cats.includes(currentF);
+}
+
+function hide(c) {
+  const el = c.el;
+  if (!c.shown) return;
+  el.style.opacity = '0'; c._op = '0';
+  el.classList.remove('hit');
+  el.tabIndex = -1;
+  el.setAttribute('aria-hidden', 'true');
+  c.shown = false;
+  c.hs = 1;
+  if (hovered === c) hovered = null;   /* it left under the pointer */
+  if (c.vid) c.vid.pause();
 }
 
 /* one frame. Nothing travels in depth: the whole field slides sideways at
@@ -722,8 +779,14 @@ function matches(c) {
    is from the middle of the frame — so it appears small at one edge, opens
    out as it crosses, and closes down again on its way off the other side. */
 function frame() {
-  const total = scroller.offsetHeight - stage.offsetHeight;
-  const prog = total > 0 ? clamp(-scroller.getBoundingClientRect().top / total, 0, 1) : 0;
+  const total = scrollerH - stageH;
+  const prog = total > 0 ? clamp((scrollY - scrollerTop) / total, 0, 1) : 0;
+
+  /* asleep whenever the stage is nowhere near the viewport */
+  if (scrollY + innerHeight < scrollerTop || scrollY > scrollerTop + scrollerH) {
+    running = false;
+    return;
+  }
 
   aim = prog * (span + RANGE * 2);
   travel += (aim - travel) * 0.14;          /* a glide, never a snap */
@@ -731,24 +794,19 @@ function frame() {
   py += (aimY - py) * 0.06;
   space.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`;
 
+  /* keep animating only while something is actually still moving */
+  let busy = Math.abs(aim - travel) > 0.3 ||
+             Math.abs(aimX - px) > 0.3 || Math.abs(aimY - py) > 0.3;
   let near = null, nearX = Infinity;
 
   for (const c of cards) {
     const el = c.el;
-    if (!c.vis) { if (c.shown) { el.style.opacity = '0'; el.classList.remove('hit'); c.shown = false; } continue; }
+    if (!c.vis) { hide(c); continue; }
 
     const bx = c.st + travel;               /* where its station has slid to */
     const t = bx / RANGE;                   /* -1 at one edge, +1 at the other */
 
-    if (t <= -1 || t >= 1) {
-      if (c.shown) {
-        el.style.opacity = '0'; el.classList.remove('hit'); c.shown = false;
-        c.hs = 1;
-        if (hovered === c) hovered = null;   /* it left under the pointer */
-        const v = el.querySelector('video'); if (v) v.pause();
-      }
-      continue;
-    }
+    if (t <= -1 || t >= 1) { hide(c); continue; }
 
     /* ease the crossing: a card hurries in from the edge, eases through the
        middle where it is biggest, then slides away again. The blend keeps a
@@ -761,19 +819,23 @@ function frame() {
 
     /* the pointer swells a card in place — hover multiplies the visual scale
        only, never the layout offsets, so it grows without shifting */
-    c.hs += ((hovered === c ? HOVER : 1) - c.hs) * 0.18;
+    const hTarget = hovered === c ? HOVER : 1;
+    if (Math.abs(hTarget - c.hs) > 0.002) busy = true;
+    c.hs += (hTarget - c.hs) * 0.18;
     const vs = s * c.hs;
 
-    el.style.transform =
-      `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${vs.toFixed(4)}) translate(-50%, -50%)`;
-    el.style.opacity = clamp(ease / 0.20, 0, 1).toFixed(3);
+    /* only touch the DOM when the value actually changed */
+    const tf = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${vs.toFixed(4)}) translate(-50%, -50%)`;
+    if (tf !== c._tf) { el.style.transform = tf; c._tf = tf; }
+    const op = clamp(ease / 0.20, 0, 1).toFixed(3);
+    if (op !== c._op) { el.style.opacity = op; c._op = op; }
     /* bigger reads as nearer, so it stacks in front — and the hovered card wins */
-    el.style.zIndex = Math.round(vs * 100) + (hovered === c ? 500 : 0);
+    const zi = String(Math.round(vs * 100) + (hovered === c ? 500 : 0));
+    if (zi !== c._zi) { el.style.zIndex = zi; c._zi = zi; }
 
     if (!c.shown) {
       c.shown = true;
-      if (c.p) el.classList.add('hit');
-      const v = el.querySelector('video'); if (v) v.play().catch(() => {});
+      if (c.p) { el.classList.add('hit'); el.tabIndex = 0; el.removeAttribute('aria-hidden'); }
     }
     if (c.p && Math.abs(bx) < Math.abs(nearX)) { nearX = bx; near = c; }
   }
@@ -798,6 +860,15 @@ function frame() {
     capId = null;
   }
 
+  if (busy) requestAnimationFrame(frame);
+  else running = false;
+}
+
+/* the loop sleeps once everything has settled; anything that could move the
+   field wakes it again */
+function start() {
+  if (running || REDUCE) return;
+  running = true;
   requestAnimationFrame(frame);
 }
 
@@ -807,14 +878,16 @@ if (!REDUCE) {
     if (MOBILE.matches) return;
     aimX = (e.clientX / innerWidth - 0.5) * -70;
     aimY = (e.clientY / innerHeight - 0.5) * -50;
+    start();
   }, { passive: true });
 }
 
 addEventListener('scroll', () => {
+  start();
   if (started) return;
   started = true;
   hintEl.classList.add('gone');
-}, { passive: true, once: false });
+}, { passive: true });
 
 /* pill filters: click a category; click it again for everything */
 document.querySelectorAll('.pill button').forEach(b => {
@@ -827,18 +900,18 @@ document.querySelectorAll('.pill button').forEach(b => {
     });
     cards.forEach(c => { c.vis = matches(c); });
     place();
+    start();
     const n = cards.filter(c => c.vis && c.p).length;
     announce(currentF === 'all' ? `everything · ${n}` : `${currentF} · ${n}`);
-    /* fly back to the start of the newly filtered run */
-    const top = scroller.offsetTop;
-    if (scrollY > top) scrollTo({ top, behavior: REDUCE ? 'auto' : 'smooth' });
+    /* back to the start of the newly filtered run */
+    if (scrollY > scrollerTop) scrollTo({ top: scrollerTop, behavior: REDUCE ? 'auto' : 'smooth' });
   });
 });
 
 let rt;
 addEventListener('resize', () => {
   clearTimeout(rt);
-  rt = setTimeout(() => { tune(); place(); }, 150);
+  rt = setTimeout(() => { tune(); place(); start(); }, 150);
 });
 
 /* ─── the popup: a project opens FROM its tile ─── */
@@ -945,7 +1018,7 @@ function observeVideos() {
 
 /* boot */
 tune(); buildCloud(); place(); observeVideos();
-if (!REDUCE) requestAnimationFrame(frame);
+start();
 </script>
 </body>
 </html>
