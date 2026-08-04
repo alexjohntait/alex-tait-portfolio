@@ -95,20 +95,19 @@
     background-repeat: repeat-x, no-repeat;
   }
 
-  /* ─── menu: ink square top-left; panel opens to the SECOND line ─── */
-  header { position: fixed; top: 0; left: 0; z-index: 70; }
+  /* ─── menu: bare vermillion rules, top right ─── */
+  header { position: fixed; top: 0; right: 0; z-index: 70; }
   .menu-btn {
     width: 58px; height: 58px; border: 0; cursor: pointer;
-    background: var(--ink); display: grid; place-items: center;
-    transition: background .25s var(--out);
+    background: none; display: grid; place-items: center;
   }
-  /* desktop: butt the square right up to the first column line */
   @media (min-width: 821px) {
     .menu-btn { width: var(--gx); height: var(--gx); }
   }
-  .menu-btn:hover { background: var(--accent); }
-  .menu-btn i { display: block; width: 22px; height: 2px; background: #fff;
-    box-shadow: 0 6px 0 #fff, 0 -6px 0 #fff; transition: box-shadow .25s, transform .35s var(--spring); }
+  .menu-btn i { display: block; width: 24px; height: 2px; background: var(--accent);
+    box-shadow: 0 6px 0 var(--accent), 0 -6px 0 var(--accent);
+    transition: box-shadow .25s, transform .35s var(--spring); }
+  .menu-btn:hover i { background: var(--ink); box-shadow: 0 6px 0 var(--ink), 0 -6px 0 var(--ink); }
   body.menu-open .menu-btn i { box-shadow: none; transform: rotate(45deg); }
 
   .menu-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(22,18,15,0.4);
@@ -176,19 +175,21 @@
     .card.hit:hover img, .card.hit:hover video { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
   }
 
-  /* the signature holds the centre on arrival, then clears out of the way */
+  /* the signature is a standing mark now: small, top left, always there —
+     it sits opposite the menu rules and holds the corner */
   .name {
-    position: absolute; left: 50%; top: 50%; z-index: 30;
-    transform: translate(-50%, -50%);
+    position: fixed; left: var(--gx); top: 0; z-index: 65;
+    height: 58px; display: flex; align-items: center;
     font-family: var(--sans); font-weight: 400;
-    font-size: clamp(44px, 5.2vw, 78px); letter-spacing: -0.01em;
+    font-size: clamp(15px, 1.6vw, 24px); letter-spacing: -0.01em;
     color: var(--accent); white-space: nowrap;
     pointer-events: none;
   }
+  @media (min-width: 821px) { .name { height: var(--gx); } }
   .name img {
-    height: clamp(80px, 10.5vw, 138px); width: auto; display: block;
+    height: clamp(24px, 3.15vw, 41px); width: auto; display: block;
     /* a soft paper halo keeps the handwriting legible over the work */
-    filter: drop-shadow(0 0 12px var(--paper)) drop-shadow(0 0 30px var(--paper));
+    filter: drop-shadow(0 0 8px var(--paper)) drop-shadow(0 0 20px var(--paper));
   }
 
   /* a quiet nudge that the page wants scrolling — leaves after first move */
@@ -236,7 +237,6 @@
       position: static; width: auto !important; opacity: 1 !important;
       transform: none !important; pointer-events: auto;
     }
-    .name { position: static; transform: none; margin-bottom: 28px; }
     .cloud-cap, .cloud-prog, .cloud-hint { display: none; }
   }
 
@@ -773,8 +773,7 @@ function frame() {
     if (c.p && Math.abs(bx) < Math.abs(nearX)) { nearX = bx; near = c; }
   }
 
-  /* the signature owns the opening frame, then steps aside */
-  nameEl.style.opacity = (1 - clamp((prog - 0.015) / 0.07, 0, 1)).toFixed(3);
+  /* the signature is a standing mark now — it stays put the whole way */
   progEl.style.width = (prog * 100).toFixed(2) + '%';
 
   /* the caption follows the pointer when there is one, and otherwise names
