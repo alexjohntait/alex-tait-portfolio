@@ -437,7 +437,7 @@
       <div class="cloud-space" id="cloud-space"></div>
       <h1 class="name" id="name"><img src="assets/signature.png" alt="Alex Tait"
         onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></h1>
-      <div class="cloud-hint" id="cloud-hint">scroll to fly through</div>
+      <div class="cloud-hint" id="cloud-hint">scroll</div>
     </div>
   </div>
   <div class="cloud-cap" id="cloud-cap" aria-live="polite"></div>
@@ -621,33 +621,30 @@ const GOLD = Math.PI * (3 - Math.sqrt(5));
 const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 
-let PERSP = 900,      /* camera focal length            */
-    SPACING = 520,    /* gap between cards along Z      */
-    FAR = 3600,       /* beyond this a card is unborn   */
-    NEAR = 620,       /* past this it has flown by      */
-    FADE = 900,       /* the far-end dissolve           */
-    NEARFADE = 380,   /* where the near-end dissolve starts */
-    MINR = 130, SPREAD = 300,   /* how wide the cloud sits off-axis */
-    MINW = 210, MAXW = 360,     /* card widths in 3D space */
-    PER = 230;        /* scroll pixels spent on each card */
+let PERSP = 900,      /* camera focal length                        */
+    SPACING = 300,    /* gap between cards along the path           */
+    ZBACK = -1500,    /* the far end of the depth range             */
+    ZFRONT = 260,     /* the near end — big cards, quick across     */
+    MINW = 245, MAXW = 420,   /* card widths in 3D space            */
+    YAMP = 320,       /* how far cards sit off the centre line      */
+    PER = 230;        /* scroll pixels spent on each card           */
 
 const cards = [];
-let depth = 0, camZ = 0, camAim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
+let span = 0, travel = 0, aim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
 let currentF = 'all', capId = null, started = false;
 
 function tune() {
   const w = innerWidth, h = innerHeight;
   const small = w < 820;
   PERSP = small ? 720 : 900;
-  MINR = small ? 70 : 95;
-  SPREAD = small ? 175 : 255;
+  SPACING = small ? 210 : 300;
+  ZBACK = small ? -1100 : -1500;
+  ZFRONT = small ? 170 : 260;
   MINW = small ? 165 : 245;
   MAXW = small ? 250 : 420;
-  SPACING = small ? 380 : 430;
+  YAMP = Math.min(h * 0.33, small ? 240 : 330);
   PER = clamp(h * 0.24, 150, 260);
   space.style.setProperty('--persp', PERSP + 'px');
-  NEAR = PERSP * 0.69;
-  NEARFADE = PERSP * 0.42;
 }
 
 function mediaHTML(p) {
@@ -710,21 +707,20 @@ function buildCloud() {
   });
 }
 
-/* hand every visible card a seat in 3D space, then size the scroll run */
+/* every card waits its turn off to the left, at its own depth */
 function place() {
   const live = cards.filter(c => c.vis);
   live.forEach((c, i) => {
-    const ang = i * GOLD;
-    const rad = MINR + rnd(i) * SPREAD;
-    c.x = Math.cos(ang) * rad;
-    c.y = Math.sin(ang) * rad * 0.74;
-    c.z0 = -i * SPACING;
+    c.x0 = -i * SPACING;                  /* the queue stretches away to the left */
+    c.y = Math.sin(i * GOLD) * YAMP;      /* golden angle keeps the stack even    */
+    c.z = ZBACK + rnd(i + 7) * (ZFRONT - ZBACK);
     c.rot = (rnd(i + 41) - 0.5) * 7;
-    const w = c.small ? MINW * 0.7 : MINW + rnd(i + 99) * (MAXW - MINW);
-    c.el.style.setProperty('--w', Math.round(w) + 'px');
+    c.w = c.small ? MINW * 0.7 : MINW + rnd(i + 99) * (MAXW - MINW);
+    c.sc = PERSP / (PERSP - c.z);         /* depth decides both size and pace     */
+    c.el.style.setProperty('--w', Math.round(c.w) + 'px');
   });
-  depth = Math.max(0, (live.length - 1) * SPACING);
-  const run = (live.length + 3) * PER;
+  span = Math.max(0, (live.length - 1) * SPACING);
+  const run = (live.length + 2) * PER;
   scroller.style.height = (stage.offsetHeight + run) + 'px';
 }
 
@@ -732,49 +728,57 @@ function matches(c) {
   return currentF === 'all' || c.el.dataset.cats.includes(currentF);
 }
 
-/* one frame of the flight */
+/* one frame of the traverse: the whole cloud slides left to right,
+   and perspective does the parallax for free — near cards sweep across
+   quickly, far ones drift, exactly as depth should behave */
 function frame() {
   const total = scroller.offsetHeight - stage.offsetHeight;
   const prog = total > 0 ? clamp(-scroller.getBoundingClientRect().top / total, 0, 1) : 0;
 
-  camAim = prog * (depth + NEAR + 300);
-  camZ += (camAim - camZ) * 0.14;          /* a glide, never a snap */
+  /* start part-way along so the opening frame is a full composition,
+     not a queue banked up against the left edge */
+  aim = innerWidth * 0.34 + prog * (span + innerWidth * 1.5);
+  travel += (aim - travel) * 0.14;          /* a glide, never a snap */
   px += (aimX - px) * 0.06;
   py += (aimY - py) * 0.06;
   space.style.perspectiveOrigin = `calc(50% + ${px.toFixed(1)}px) calc(50% + ${py.toFixed(1)}px)`;
 
-  let near = null, nearZ = Infinity;
+  const half = innerWidth / 2;
+  let near = null, nearX = Infinity;
+
   for (const c of cards) {
     const el = c.el;
     if (!c.vis) { if (c.shown) { el.style.opacity = '0'; el.classList.remove('hit'); c.shown = false; } continue; }
-    const z = c.z0 + camZ;
-    if (z < -FAR || z > NEAR) {
+
+    const x = c.x0 + travel;                /* position along the path */
+    const sx = x * c.sc;                    /* where that lands on screen */
+    const edge = half + (c.w * c.sc) / 2 + 70;
+
+    if (sx < -edge || sx > edge) {
       if (c.shown) {
         el.style.opacity = '0'; el.classList.remove('hit'); c.shown = false;
         const v = el.querySelector('video'); if (v) v.pause();
       }
       continue;
     }
-    let o = 1;
-    if (z < -FAR + FADE) o = (z + FAR) / FADE;
-    else if (z > NEARFADE) o = clamp((NEAR - z) / (NEAR - NEARFADE), 0, 1);
 
     el.style.transform =
-      `translate3d(${c.x.toFixed(1)}px, ${c.y.toFixed(1)}px, ${z.toFixed(1)}px) rotate(${c.rot.toFixed(2)}deg) translate(-50%, -50%)`;
-    el.style.opacity = o.toFixed(3);
+      `translate3d(${x.toFixed(1)}px, ${c.y.toFixed(1)}px, ${c.z.toFixed(1)}px) rotate(${c.rot.toFixed(2)}deg) translate(-50%, -50%)`;
+    el.style.opacity = clamp((edge - Math.abs(sx)) / 150, 0, 1).toFixed(3);
+
     if (!c.shown) {
       c.shown = true;
       el.classList.add('hit');
       const v = el.querySelector('video'); if (v) v.play().catch(() => {});
     }
-    if (c.p && Math.abs(z) < Math.abs(nearZ)) { nearZ = z; near = c; }
+    if (c.p && Math.abs(sx) < Math.abs(nearX)) { nearX = sx; near = c; }
   }
 
   /* the signature owns the opening frame, then steps aside */
   nameEl.style.opacity = (1 - clamp((prog - 0.015) / 0.07, 0, 1)).toFixed(3);
   progEl.style.width = (prog * 100).toFixed(2) + '%';
 
-  /* name whatever is closest to the lens */
+  /* name whatever is crossing the middle of the frame */
   const inFlight = prog > 0.005 && prog < 0.995;
   if (near && inFlight) {
     if (near.p.id !== capId) {
