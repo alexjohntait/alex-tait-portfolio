@@ -69,17 +69,18 @@
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
     a { color: inherit; }
 
-    header { position: fixed; top: 0; left: 0; z-index: 70; }
-    .menu-btn { width: 58px; height: 58px; border: 0; cursor: pointer; background: var(--ink); display: grid; place-items: center; transition: background .25s var(--out); }
-    .menu-btn:hover { background: var(--accent); }
-    .menu-btn i { display: block; width: 22px; height: 2px; background: #fff; box-shadow: 0 6px 0 #fff, 0 -6px 0 #fff; transition: box-shadow .25s, transform .35s var(--spring); }
+    header { position: fixed; top: 0; right: 0; z-index: 70; }
+    .menu-btn { width: 58px; height: 58px; border: 0; cursor: pointer; background: none; display: grid; place-items: center; }
+    
+    .menu-btn i { display: block; width: 24px; height: 2px; background: var(--accent); box-shadow: 0 6px 0 var(--accent), 0 -6px 0 var(--accent); transition: box-shadow .25s, transform .35s var(--spring); }
+    .menu-btn:hover i { background: var(--ink); box-shadow: 0 6px 0 var(--ink), 0 -6px 0 var(--ink); }
     body.menu-open .menu-btn i { box-shadow: none; transform: rotate(45deg); }
     .menu-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(22,18,15,.4); opacity: 0; pointer-events: none; transition: opacity .4s var(--out); }
     body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; }
     .menu-panel {
-      position: fixed; top: 0; left: 0; z-index: 61; height: 100dvh; width: min(420px, 88vw);
+      position: fixed; top: 0; right: 0; z-index: 61; height: 100dvh; width: min(430px, 86vw);
       background: var(--ink); color: var(--paper); display: flex; flex-direction: column; justify-content: center; gap: 26px;
-      padding: 80px clamp(24px, 2.5vw, 44px); transform: translateX(-101%); visibility: hidden;
+      padding: 80px clamp(24px, 2.5vw, 44px); transform: translateX(101%); visibility: hidden;
       transition: transform .55s var(--out), visibility 0s linear .55s;
     }
     body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform .55s var(--out); }

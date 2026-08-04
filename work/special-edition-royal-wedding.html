@@ -115,14 +115,14 @@
   .menu-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(22,18,15,0.4);
     opacity: 0; pointer-events: none; transition: opacity .4s var(--out); }
   body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; }
+  /* opens from the right, out of the corner the button now lives in */
   .menu-panel {
-    position: fixed; top: 0; left: 0; z-index: 61; height: 100dvh;
-    width: calc(var(--gx, 60px) + var(--colw, 240px) * 2);   /* flush to the second column line */
-    min-width: 280px;
+    position: fixed; top: 0; right: 0; z-index: 61; height: 100dvh;
+    width: min(430px, 86vw);
     background: var(--ink); color: var(--paper);
     display: flex; flex-direction: column; justify-content: center; gap: 26px;
     padding: 80px clamp(24px, 2.5vw, 44px);
-    transform: translateX(-101%); visibility: hidden;
+    transform: translateX(101%); visibility: hidden;
     transition: transform .55s var(--out), visibility 0s linear .55s;
   }
   body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform .55s var(--out); }
@@ -180,16 +180,21 @@
   /* the signature is a standing mark now: small, top left, always there —
      it sits opposite the menu rules and holds the corner */
   .name {
-    position: fixed; left: var(--gx); top: 0; z-index: 65;
+    /* the left inset is derived from the gap above it, so the mark sits an
+       equal distance from both edges however the viewport is sized */
+    --sigh: clamp(24px, 3.15vw, 41px);
+    position: fixed; left: calc((58px - var(--sigh)) / 2); top: 0; z-index: 65;
     height: 58px; display: flex; align-items: center;
     font-family: var(--sans); font-weight: 400;
     font-size: clamp(15px, 1.6vw, 24px); letter-spacing: -0.01em;
     color: var(--accent); white-space: nowrap;
     pointer-events: none;
   }
-  @media (min-width: 821px) { .name { height: var(--gx); } }
+  @media (min-width: 821px) {
+    .name { height: var(--gx); left: calc((var(--gx) - var(--sigh)) / 2); }
+  }
   .name img {
-    height: clamp(24px, 3.15vw, 41px); width: auto; display: block;
+    height: var(--sigh); width: auto; display: block;
     /* a soft paper halo keeps the handwriting legible over the work */
     filter: drop-shadow(0 0 8px var(--paper)) drop-shadow(0 0 20px var(--paper));
   }
