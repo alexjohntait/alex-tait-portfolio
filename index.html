@@ -641,16 +641,18 @@ function tune() {
   const w = innerWidth, h = innerHeight;
   const small = w < 820;
   PERSP = small ? 720 : 900;
-  SPACING = small ? 380 : 430;
-  MINR = small ? 70 : 95;
-  SPREAD = small ? 175 : 255;
-  MINW = small ? 165 : 245;
-  MAXW = small ? 250 : 420;
-  TRUCKX = small ? 0.30 : 0.36;
+  SPACING = small ? 300 : 340;
+  MINR = small ? 80 : 120;
+  SPREAD = small ? 210 : 330;
+  MINW = small ? 190 : 300;
+  MAXW = small ? 300 : 520;
+  TRUCKX = small ? 0.26 : 0.30;
   PER = clamp(h * 0.24, 150, 260);
   space.style.setProperty('--persp', PERSP + 'px');
-  NEAR = PERSP * 0.69;
-  NEARFADE = PERSP * 0.42;
+  /* let cards swell right up to the lens before they go — the reference
+     lets them fill half the frame, so the dissolve has to start late */
+  NEAR = PERSP * 0.79;
+  NEARFADE = PERSP * 0.60;
 }
 
 function mediaHTML(p) {
