@@ -70,6 +70,8 @@
     --drop: cubic-bezier(0.3, 1.25, 0.45, 1);
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
+    --sigh: clamp(24px, 3.15vw, 41px);   /* the signature mark's height */
+    --bar: 58px;                          /* the header band it is centred in */
   }
   @property --tx { syntax: '<length>'; inherits: false; initial-value: 0px; }
   @property --ty { syntax: '<length>'; inherits: false; initial-value: 0px; }
@@ -185,9 +187,8 @@
   .name {
     /* the left inset is derived from the gap above it, so the mark sits an
        equal distance from both edges however the viewport is sized */
-    --sigh: clamp(24px, 3.15vw, 41px);
-    position: fixed; left: calc((58px - var(--sigh)) / 2); top: 0; z-index: 65;
-    height: 58px; display: flex; align-items: center;
+    position: fixed; left: calc((var(--bar) - var(--sigh)) / 2); top: 0; z-index: 65;
+    height: var(--bar); display: flex; align-items: center;
     font-family: var(--sans); font-weight: 400;
     font-size: clamp(15px, 1.6vw, 24px); letter-spacing: -0.01em;
     color: var(--accent); white-space: nowrap;
@@ -200,6 +201,19 @@
     height: var(--sigh); width: auto; display: block;
     /* a soft paper halo keeps the handwriting legible over the work */
     filter: drop-shadow(0 0 8px var(--paper)) drop-shadow(0 0 20px var(--paper));
+  }
+
+  /* the one line that says what this is — without it the page's only visible
+     copy is the word "scroll". The paper halo carries it over passing work. */
+  .tagline {
+    position: fixed; z-index: 65; pointer-events: none;
+    left: calc((var(--bar) - var(--sigh)) / 2); top: var(--bar);
+    font-size: 11.5px; font-weight: 500; letter-spacing: 0.05em;
+    color: var(--ink); max-width: 22ch; line-height: 1.5;
+    text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
+  }
+  @media (min-width: 821px) {
+    .tagline { left: calc((var(--gx) - var(--sigh)) / 2); top: var(--gx); max-width: none; }
   }
 
   /* a quiet nudge that the page wants scrolling — leaves after first move */
@@ -227,7 +241,7 @@
   .cloud-cap .m {
     display: block; margin-top: 6px;
     font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--accent);
+    color: var(--ink);
   }
 
   /* how far through the work you have flown */
@@ -342,13 +356,33 @@
     font-weight: 600; font-size: clamp(36px, 4.1vw, 62px); letter-spacing: -0.02em;
   }
   /* meta + body copy share one scale with the popup's mono content */
-  .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--accent); font-style: italic; }
+  /* the plain text index: the cloud is lovely for browsing but poor for
+     finding, so every piece is also reachable as a scannable list */
+  .idx { list-style: none; counter-reset: idx; }
+  .idx li { counter-increment: idx; border-top: 1px solid var(--line); }
+  .idx li:last-child { border-bottom: 1px solid var(--line); }
+  .idx a {
+    display: flex; align-items: baseline; gap: 14px; padding: 11px 2px;
+    text-decoration: none; color: var(--ink); transition: color 0.2s;
+  }
+  .idx a::before {
+    content: counter(idx, decimal-leading-zero);
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em;
+    color: color-mix(in srgb, var(--ink) 45%, transparent); min-width: 2.4em;
+  }
+  .idx .ti { font-family: var(--sans); font-size: clamp(16px, 1.7vw, 20px); letter-spacing: -0.01em; }
+  .idx .cl { margin-left: auto; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink) 55%, transparent); text-align: right; }
+  .idx a:hover { color: var(--accent); }
+  .idx a:hover .cl { color: var(--accent); }
+
+  .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--ink); font-style: italic; }
   .case .meta { grid-column: 1 / 2; }
   .case .meta b, .pop-meta b { font-weight: 500; }
-  .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--accent); max-width: 44ch; }
+  .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--ink); max-width: 44ch; }
   .case .blurb { grid-column: 2 / 4; }
-  .case .blurb a { color: var(--accent); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
-  .case .blurb a:hover { color: var(--ink); }
+  .case .blurb a { color: var(--ink); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
+  .case .blurb a:hover { color: var(--accent); }
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .case > * { animation: caseIn both; animation-timeline: view(); animation-range: entry 5% entry 45%; }
@@ -423,6 +457,7 @@
 <aside class="menu-panel" id="menu-panel" aria-label="Menu">
   <a class="nav" href="index.html">Work</a>
   <a class="nav" href="#case-studies">Case studies</a>
+  <button type="button" class="nav" id="index-btn">All work</button>
   <button type="button" class="nav" id="about-btn">About</button>
   <a class="nav" href="shop.html">Shop</a>
   <div class="m-foot">
@@ -439,6 +474,7 @@
       <div class="cloud-space" id="cloud-space"></div>
       <h1 class="name" id="name"><img src="assets/signature.png" alt="Alex Tait"
         onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></h1>
+      <p class="tagline">Illustrator &amp; motion designer — Bath / London</p>
       <div class="cloud-hint" id="cloud-hint">scroll</div>
     </div>
   </div>
@@ -504,6 +540,16 @@
 </div>
 
 <!-- about overlay: same paper / vermillion / mono language as the rest of the site -->
+<div class="popwrap" id="indexwrap" role="dialog" aria-modal="true" aria-label="All work">
+  <div class="pop" id="index-pop">
+    <button class="pop-x" id="index-x" aria-label="Close">✕</button>
+    <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
+      <h2>All work</h2>
+      <ol class="idx" id="idx"></ol>
+    </div>
+  </div>
+</div>
+
 <div class="popwrap" id="aboutwrap" role="dialog" aria-modal="true" aria-label="About Alex Tait">
   <div class="pop" id="about-pop" style="width:min(720px, 94vw)">
     <button class="pop-x" id="about-x" aria-label="Close">✕</button>
@@ -559,6 +605,32 @@ const COLS = 6;
   ax.addEventListener('click', closeAbout);
   awrap.addEventListener('click', e => { if (e.target === awrap) closeAbout(); });
   addEventListener('keydown', e => { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
+
+  /* the index: built from the same data the cloud uses, so it never drifts */
+  const iwrap = document.getElementById('indexwrap'), ix = document.getElementById('index-x');
+  let listBuilt = false;
+  /* built on first open — PROJECTS is declared further down this script,
+     so it cannot be read while this runs */
+  const buildIndex = () => {
+    if (listBuilt) return;
+    listBuilt = true;
+    document.getElementById('idx').innerHTML = PROJECTS.map(p => {
+      const client = p.client && p.client !== 'Personal' ? p.client : 'Personal';
+      const meta = [client, p.year].filter(Boolean).join(' · ');
+      return `<li><a href="work/${p.id}.html"><span class="ti">${p.title}</span><span class="cl">${meta}</span></a></li>`;
+    }).join('');
+  };
+  document.getElementById('index-btn').addEventListener('click', () => {
+    buildIndex();
+    toggle(false);
+    iwrap.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    ix.focus();
+  });
+  const closeIndex = () => { iwrap.classList.remove('open'); document.body.style.overflow = ''; };
+  ix.addEventListener('click', closeIndex);
+  iwrap.addEventListener('click', e => { if (e.target === iwrap) closeIndex(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && iwrap.classList.contains('open')) closeIndex(); });
 })();
 
 /* ─── flood + ghost ─── */
