@@ -203,15 +203,18 @@
 
   /* the one line that says what this is — without it the page's only visible
      copy is the word "scroll". The paper halo carries it over passing work. */
+  /* the signature PNG carries 6.47% transparent padding down its left edge,
+     so matching the box insets leaves the text hanging left of the actual
+     ink. 0.26 of the rendered height puts it under the A of Alex. */
   .tagline {
     position: fixed; z-index: 65; pointer-events: none;
-    left: calc((var(--bar) - var(--sigh)) / 2); top: var(--bar);
+    left: calc((var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: var(--bar);
     font-size: 11.5px; font-weight: 500; letter-spacing: 0.05em;
     color: var(--ink); max-width: 22ch; line-height: 1.5;
     text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
   }
   @media (min-width: 821px) {
-    .tagline { left: calc((var(--gx) - var(--sigh)) / 2); top: var(--gx); max-width: none; }
+    .tagline { left: calc((var(--gx) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: var(--gx); max-width: none; }
   }
 
   /* a quiet nudge that the page wants scrolling — leaves after first move */
@@ -226,7 +229,8 @@
 
   /* the caption names whatever is nearest the camera right now */
   .cloud-cap {
-    position: fixed; right: var(--gx); bottom: 4vh; z-index: 40;
+    /* clears the index toggle sitting in the corner */
+    position: fixed; right: calc(var(--gx) + 14px); bottom: 4vh; z-index: 40;
     text-align: right; max-width: 44ch; pointer-events: none;
     opacity: 0; transition: opacity 0.45s var(--out);
   }
@@ -241,6 +245,19 @@
     font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--ink);
   }
+
+  /* the index toggle: four marks, answering the menu rules from the
+     opposite corner. Opens the full text list of the work. */
+  .idx-btn {
+    position: fixed; right: 0; bottom: 0; z-index: 45;
+    width: var(--bar); height: var(--bar);
+    border: 0; background: none; cursor: pointer;
+    display: grid; grid-template-columns: repeat(2, 6px); grid-auto-rows: 6px;
+    gap: 4px; place-content: center;
+  }
+  @media (min-width: 821px) { .idx-btn { width: var(--gx); height: var(--gx); } }
+  .idx-btn i { display: block; width: 6px; height: 6px; background: var(--accent); transition: background 0.25s; }
+  .idx-btn:hover i { background: var(--ink); }
 
   /* how far through the work you have flown */
   .cloud-prog {
