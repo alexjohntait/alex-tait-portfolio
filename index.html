@@ -447,9 +447,8 @@
     /* every fixed control clears the notch and the home indicator */
     .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
             top: env(safe-area-inset-top); }
-    .tagline { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
-               top: calc(env(safe-area-inset-top) + var(--bar));
-               font-size: 10.5px; letter-spacing: 0.03em; max-width: calc(100vw - 30px); }
+    /* the phone keeps the mark alone — the line lives in About there */
+    .tagline { display: none; }
     header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
     .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
     /* caption sits above the filter bar rather than beside it */
