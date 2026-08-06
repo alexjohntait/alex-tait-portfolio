@@ -444,9 +444,21 @@
     /* the ruled lines only describe the six-column case layout */
     .ruled { background-image: none; }
     .cloud-stage { cursor: auto; }
+    /* every fixed control clears the notch and the home indicator */
+    .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+            top: env(safe-area-inset-top); }
+    .tagline { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+               top: calc(env(safe-area-inset-top) + var(--bar));
+               font-size: 10.5px; letter-spacing: 0.03em; max-width: calc(100vw - 30px); }
+    header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
+    .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
     /* caption sits above the filter bar rather than beside it */
-    .cloud-cap { left: 12px; right: 12px; bottom: 62px; text-align: left; max-width: none; }
-    .cloud-hint { bottom: 104px; }
+    .cloud-cap {
+      left: calc(env(safe-area-inset-left) + 14px); right: calc(env(safe-area-inset-right) + 14px);
+      bottom: calc(env(safe-area-inset-bottom) + 74px); text-align: left; max-width: none;
+    }
+    .cloud-cap .t { font-size: 21px; }
+    .cloud-hint { bottom: calc(env(safe-area-inset-bottom) + 118px); }
     .ghost, #ink { display: none; }
     .case-head { padding: 56px 16px 0; }
     .case { display: block; padding: 8vh 16px; min-height: 0; }
@@ -455,10 +467,14 @@
     .case-num { margin-bottom: 12px; }
     .case h2 { margin: 0 0 16px; }
     .case .meta { margin-bottom: 16px; }
-    /* compact enough to sit on one line on a phone */
-    .pill { left: 12px; bottom: 12px; padding: 4px 10px 4px 9px; gap: 2px; }
-    .pill::before { width: 7px; height: 7px; margin-right: 7px; }
-    .pill button { font-size: 10.5px; padding: 7px 4px; letter-spacing: 0.06em; }
+    /* one line on a phone, but the buttons still clear 44px of thumb */
+    .pill {
+      left: calc(env(safe-area-inset-left) + 12px);
+      bottom: calc(env(safe-area-inset-bottom) + 12px);
+      padding: 0 12px 0 10px; gap: 2px;
+    }
+    .pill::before { width: 7px; height: 7px; margin-right: 8px; }
+    .pill button { font-size: 10.5px; padding: 14px 5px; letter-spacing: 0.06em; min-height: 44px; }
     .pill .sep { font-size: 10.5px; }
     .menu-panel { width: min(84vw, 340px); }
   }
@@ -726,7 +742,10 @@ let SPACING = 165,    /* gap between cards along the sideways track   */
 
 const cards = [];
 const HOVER = 1.26;   /* how much a card swells under the pointer */
-let hovered = null;
+/* a phone should still show motion, but never on a metered or slow link */
+const CONN = navigator.connection || {};
+const DATA_OK = !CONN.saveData && !/(^|-)2g$/.test(CONN.effectiveType || '');
+let hovered = null, playing = null, dwellT = null;
 let span = 0, travel = 0, aim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
 let currentF = 'all', capId = null, started = false;
 let running = false, scrollerTop = 0, scrollerH = 0, stageH = 0;
@@ -734,13 +753,15 @@ let running = false, scrollerTop = 0, scrollerH = 0, stageH = 0;
 function tune() {
   const w = innerWidth, h = innerHeight;
   const small = w < 820;
-  SPACING = small ? 105 : 165;
-  MINR = small ? 60 : 90;
-  SPREAD = small ? 175 : 300;
-  MINW = small ? 175 : 300;
-  MAXW = small ? 280 : 540;
-  RANGE = w * (small ? 0.60 : 0.50);
-  PER = clamp(h * 0.24, 150, 260);
+  /* a phone gets a denser, larger field over a shorter run — at the desktop
+     ratios it showed three small cards across eleven screens of scrolling */
+  SPACING = small ? 76 : 165;
+  MINR = small ? 52 : 90;
+  SPREAD = small ? 150 : 300;
+  MINW = small ? 215 : 300;
+  MAXW = small ? 330 : 540;
+  RANGE = w * (small ? 0.66 : 0.50);
+  PER = small ? clamp(h * 0.17, 120, 180) : clamp(h * 0.24, 150, 260);
 }
 
 function mediaHTML(p) {
@@ -766,6 +787,14 @@ function wakeVideo(c) {
     c.vid = v;
   }
   c.vid.play().catch(() => {});
+}
+
+/* on a phone the clip is dropped, not just paused — leaving each one
+   attached as it drifts past would re-download the whole library */
+function restVideo(c) {
+  if (!c || !c.vid) return;
+  c.vid.pause();
+  if (MOBILE.matches) { c.vid.removeAttribute('src'); c.vid.load(); c.vid.remove(); c.vid = null; }
 }
 
 function buildCloud() {
@@ -815,7 +844,7 @@ function buildCloud() {
       el.addEventListener('pointerenter', () => { hovered = c; wakeVideo(c); start(); });
       el.addEventListener('pointerleave', () => {
         if (hovered === c) hovered = null;
-        if (c.vid) c.vid.pause();
+        restVideo(c);
         start();
       });
       /* keyboard focus gets the same treatment as hover */
@@ -863,7 +892,7 @@ function hide(c) {
   c.shown = false;
   c.hs = 1;
   if (hovered === c) hovered = null;   /* it left under the pointer */
-  if (c.vid) c.vid.pause();
+  restVideo(c);
 }
 
 /* one frame. Nothing travels in depth: the whole field slides sideways at
@@ -934,6 +963,19 @@ function frame() {
 
   /* the signature is a standing mark now — it stays put the whole way */
   progEl.style.width = (prog * 100).toFixed(2) + '%';
+
+  /* no hover on a phone, so the piece you settle on plays itself. It waits
+     for you to stop scrolling — playing every card as it drifts past would
+     pull the entire video library down over one journey. */
+  if (MOBILE.matches && DATA_OK && near !== playing) {
+    clearTimeout(dwellT);
+    restVideo(playing);
+    playing = null;
+    const target = near;
+    dwellT = setTimeout(() => {
+      if (target && target.shown) { playing = target; wakeVideo(target); }
+    }, 650);
+  }
 
   /* the caption follows the pointer when there is one, and otherwise names
      whatever is crossing the middle */

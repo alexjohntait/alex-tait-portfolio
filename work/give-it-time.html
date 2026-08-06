@@ -58,7 +58,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     color-scheme: light;
-    --paper: #f6f5ec;
+    --paper: #ffffff;
     --ink: #16120f;
     --accent: #ff4a1d;
     --line: rgba(22, 18, 15, 0.28);
@@ -442,9 +442,21 @@
     /* the ruled lines only describe the six-column case layout */
     .ruled { background-image: none; }
     .cloud-stage { cursor: auto; }
+    /* every fixed control clears the notch and the home indicator */
+    .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+            top: env(safe-area-inset-top); }
+    .tagline { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+               top: calc(env(safe-area-inset-top) + var(--bar));
+               font-size: 10.5px; letter-spacing: 0.03em; max-width: calc(100vw - 30px); }
+    header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
+    .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
     /* caption sits above the filter bar rather than beside it */
-    .cloud-cap { left: 12px; right: 12px; bottom: 62px; text-align: left; max-width: none; }
-    .cloud-hint { bottom: 104px; }
+    .cloud-cap {
+      left: calc(env(safe-area-inset-left) + 14px); right: calc(env(safe-area-inset-right) + 14px);
+      bottom: calc(env(safe-area-inset-bottom) + 74px); text-align: left; max-width: none;
+    }
+    .cloud-cap .t { font-size: 21px; }
+    .cloud-hint { bottom: calc(env(safe-area-inset-bottom) + 118px); }
     .ghost, #ink { display: none; }
     .case-head { padding: 56px 16px 0; }
     .case { display: block; padding: 8vh 16px; min-height: 0; }
@@ -453,10 +465,14 @@
     .case-num { margin-bottom: 12px; }
     .case h2 { margin: 0 0 16px; }
     .case .meta { margin-bottom: 16px; }
-    /* compact enough to sit on one line on a phone */
-    .pill { left: 12px; bottom: 12px; padding: 4px 10px 4px 9px; gap: 2px; }
-    .pill::before { width: 7px; height: 7px; margin-right: 7px; }
-    .pill button { font-size: 10.5px; padding: 7px 4px; letter-spacing: 0.06em; }
+    /* one line on a phone, but the buttons still clear 44px of thumb */
+    .pill {
+      left: calc(env(safe-area-inset-left) + 12px);
+      bottom: calc(env(safe-area-inset-bottom) + 12px);
+      padding: 0 12px 0 10px; gap: 2px;
+    }
+    .pill::before { width: 7px; height: 7px; margin-right: 8px; }
+    .pill button { font-size: 10.5px; padding: 14px 5px; letter-spacing: 0.06em; min-height: 44px; }
     .pill .sep { font-size: 10.5px; }
     .menu-panel { width: min(84vw, 340px); }
   }
