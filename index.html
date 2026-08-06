@@ -60,7 +60,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     color-scheme: light;
-    --paper: #f6f5ec;
+    --paper: #ffffff;
     --ink: #16120f;
     --accent: #ff4a1d;
     --line: rgba(22, 18, 15, 0.28);
@@ -70,6 +70,8 @@
     --drop: cubic-bezier(0.3, 1.25, 0.45, 1);
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
+    --sigh: clamp(24px, 3.15vw, 41px);   /* the signature mark's height */
+    --bar: 58px;                          /* the header band it is centred in */
   }
   @property --tx { syntax: '<length>'; inherits: false; initial-value: 0px; }
   @property --ty { syntax: '<length>'; inherits: false; initial-value: 0px; }
@@ -90,38 +92,37 @@
     background-image:
       linear-gradient(to right, var(--line) 1px, transparent 1px),
       linear-gradient(to right, var(--line) 1px, transparent 1px);
-    background-size: var(--colw, 240px) 100%, 1px 100%;
+    background-size: calc((100% - var(--gx) * 2) / 6) 100%, 1px 100%;
     background-position: var(--gx) 0, calc(100% - var(--gx)) 0;
     background-repeat: repeat-x, no-repeat;
   }
 
-  /* ─── menu: ink square top-left; panel opens to the SECOND line ─── */
-  header { position: fixed; top: 0; left: 0; z-index: 70; }
+  /* ─── menu: bare vermillion rules, top right ─── */
+  header { position: fixed; top: 0; right: 0; z-index: 70; }
   .menu-btn {
     width: 58px; height: 58px; border: 0; cursor: pointer;
-    background: var(--ink); display: grid; place-items: center;
-    transition: background .25s var(--out);
+    background: none; display: grid; place-items: center;
   }
-  /* desktop: butt the square right up to the first column line */
   @media (min-width: 821px) {
     .menu-btn { width: var(--gx); height: var(--gx); }
   }
-  .menu-btn:hover { background: var(--accent); }
-  .menu-btn i { display: block; width: 22px; height: 2px; background: #fff;
-    box-shadow: 0 6px 0 #fff, 0 -6px 0 #fff; transition: box-shadow .25s, transform .35s var(--spring); }
+  .menu-btn i { display: block; width: 24px; height: 2px; background: var(--accent);
+    box-shadow: 0 6px 0 var(--accent), 0 -6px 0 var(--accent);
+    transition: box-shadow .25s, transform .35s var(--spring); }
+  .menu-btn:hover i { background: var(--ink); box-shadow: 0 6px 0 var(--ink), 0 -6px 0 var(--ink); }
   body.menu-open .menu-btn i { box-shadow: none; transform: rotate(45deg); }
 
   .menu-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(22,18,15,0.4);
     opacity: 0; pointer-events: none; transition: opacity .4s var(--out); }
   body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; }
+  /* opens from the right, out of the corner the button now lives in */
   .menu-panel {
-    position: fixed; top: 0; left: 0; z-index: 61; height: 100dvh;
-    width: calc(var(--gx, 60px) + var(--colw, 240px) * 2);   /* flush to the second column line */
-    min-width: 280px;
+    position: fixed; top: 0; right: 0; z-index: 61; height: 100dvh;
+    width: min(430px, 86vw);
     background: var(--ink); color: var(--paper);
     display: flex; flex-direction: column; justify-content: center; gap: 26px;
     padding: 80px clamp(24px, 2.5vw, 44px);
-    transform: translateX(-101%); visibility: hidden;
+    transform: translateX(101%); visibility: hidden;
     transition: transform .55s var(--out), visibility 0s linear .55s;
   }
   body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform .55s var(--out); }
@@ -140,75 +141,144 @@
   .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px;
     color: color-mix(in srgb, var(--paper) 65%, transparent); }
   .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
-  /* marginalia: sketchbook doodles tucked into the gaps, behind the work.
-     multiply drops their white grounds out onto the paper — the gifs have
-     no real alpha, so the blend mode does the knocking-out for us */
-  .doodle { position: absolute; z-index: 0; pointer-events: none; mix-blend-mode: multiply; }
-  .doodle img, .doodle video { width: 100%; height: auto; display: block; }
+  /* ─── the image cloud: a linear flight through the work ───
+     Every card sits at a fixed point in 3D space — scattered on a
+     golden-angle spiral around one long Z axis, so nothing ever clumps.
+     Scrolling dollies the camera forward: cards swell, drift outward
+     under perspective, and sail past the edges of the frame. */
+  .cloud-scroll { position: relative; }
+  .cloud-stage {
+    position: sticky; top: 0; height: 100svh; overflow: hidden;
+    background-color: var(--paper); cursor: crosshair;
+  }
+  .cloud-space {
+    position: absolute; inset: 0;
+    perspective: var(--persp, 900px);
+    perspective-origin: 50% 50%;
+  }
+  .card {
+    position: absolute; left: 50%; top: 50%;
+    width: var(--w, 300px);
+    transform-origin: 0 0;   /* the transform chain does its own centring */
+    text-decoration: none; color: var(--ink);
+    opacity: 0; pointer-events: none;
+    backface-visibility: hidden;
+  }
+  .card.hit { pointer-events: auto; }
+  .card img {
+    width: 100%; height: auto; display: block;
+    border-radius: 10px; background: var(--bg, transparent);
+    transition: box-shadow 0.3s var(--out);
+  }
+  /* the clip lies over its poster once hover has fetched it */
+  .card .vid {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block; border-radius: 10px;
+  }
+  /* the sketchbook gifs ride along as small asides, whites knocked out */
+  .card.sketch { mix-blend-mode: multiply; }
+  .card.sketch img { border-radius: 0; }
+  @media (hover: hover) {
+    .card.hit:hover img, .card.hit:hover .vid { box-shadow: 0 26px 64px -24px rgba(0,0,0,0.5); }
+  }
 
-  /* ─── the board: every project, on the lines ─── */
-  /* background-color (longhand — never the shorthand, it would wipe .ruled's
-     lines) gives the doodles an opaque paper backdrop to multiply against */
-  .board { position: relative; z-index: 1; cursor: crosshair; background-color: var(--paper); }
-
+  /* the signature is a standing mark now: small, top left, always there —
+     it sits opposite the menu rules and holds the corner */
   .name {
-    position: absolute; left: 50%; top: 50vh; z-index: 30;
-    transform: translate(-50%, -50%);
+    /* the left inset is derived from the gap above it, so the mark sits an
+       equal distance from both edges however the viewport is sized */
+    position: fixed; left: calc((var(--bar) - var(--sigh)) / 2); top: 0; z-index: 65;
+    height: var(--bar); display: flex; align-items: center;
     font-family: var(--sans); font-weight: 400;
-    font-size: clamp(44px, 5.2vw, 78px); letter-spacing: -0.01em;
+    font-size: clamp(15px, 1.6vw, 24px); letter-spacing: -0.01em;
     color: var(--accent); white-space: nowrap;
     pointer-events: none;
   }
+  @media (min-width: 821px) {
+    .name { height: var(--gx); left: calc((var(--gx) - var(--sigh)) / 2); }
+  }
   .name img {
-    height: clamp(80px, 10.5vw, 138px); width: auto; display: block;
+    height: var(--sigh); width: auto; display: block;
     /* a soft paper halo keeps the handwriting legible over the work */
-    filter: drop-shadow(0 0 12px var(--paper)) drop-shadow(0 0 30px var(--paper));
+    filter: drop-shadow(0 0 8px var(--paper)) drop-shadow(0 0 20px var(--paper));
   }
 
-  /* mono text set straight into the flow of the grid */
-  .cell { font-size: 13px; line-height: 1.75; color: var(--accent); padding: 22px; }
-  .cell em { font-style: italic; }
-  .cell .u { text-decoration: underline; text-underline-offset: 3px; }
-  .cell ul { list-style: none; }
+  /* the one line that says what this is — without it the page's only visible
+     copy is the word "scroll". The paper halo carries it over passing work. */
+  /* the signature PNG carries 6.47% transparent padding down its left edge,
+     so matching the box insets leaves the text hanging left of the actual
+     ink. 0.26 of the rendered height puts it under the A of Alex. */
+  .tagline {
+    position: fixed; z-index: 65; pointer-events: none;
+    left: calc((var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: var(--bar);
+    font-size: 11.5px; font-weight: 500; letter-spacing: 0.05em;
+    color: var(--ink); max-width: 22ch; line-height: 1.5;
+    text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
+  }
+  @media (min-width: 821px) {
+    .tagline { left: calc((var(--gx) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: var(--gx); max-width: none; }
+  }
 
-  .sticker {
-    position: absolute; left: 0; top: 0; z-index: 5;
-    width: var(--w, 200px);
-    text-decoration: none; color: var(--ink);
-    background: var(--bg, transparent);
-    cursor: grab; touch-action: none; user-select: none;
-    transform: translate(calc(var(--tx) + var(--dx, 0px)), calc(var(--ty) + var(--dy, 0px)))
-               scale(calc(var(--s, 1) * var(--hs, 1)));
-    transition: --tx 0.7s var(--out), --ty 0.7s var(--out),
-                --s 0.5s var(--out), --hs 0.35s var(--spring),
-                box-shadow 0.25s, opacity 0.4s;
+  /* a quiet nudge that the page wants scrolling — leaves after first move */
+  .cloud-hint {
+    position: absolute; left: 50%; bottom: 5vh; z-index: 20;
+    transform: translateX(-50%);
+    font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink) 45%, transparent);
+    pointer-events: none; transition: opacity 0.6s var(--out);
   }
-  .sticker.txt { cursor: default; }
-  @media (hover: hover) {
-    .sticker:not(.grabbed):not(.txt):hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
-  }
-  .sticker.tidying { transition: --tx 0.7s var(--out), --ty 0.7s var(--out), --dx 0.55s var(--out), --dy 0.55s var(--out), --s 0.5s var(--out), box-shadow 0.25s, opacity 0.4s; }
-  .sticker.grabbed { cursor: grabbing; transition: box-shadow 0.25s; box-shadow: 0 30px 54px -16px rgba(0,0,0,0.4); }
-  .sticker img, .sticker video { width: 100%; height: auto; display: block; pointer-events: none; }
-  .sticker video { aspect-ratio: auto 4 / 3; }
-  .sticker.out { opacity: 0; pointer-events: none; --s: 0.92; }
+  .cloud-hint.gone { opacity: 0; }
 
-  /* the drop: tiles fall in from above the page, with a settle */
-  @media (prefers-reduced-motion: no-preference) {
-    /* the flurry: tiles tumble in from above — swaying, slightly rotated,
-       in loose (not sequential) order — and settle onto the lines */
-    .sticker.deal { animation: dropIn 1.05s var(--drop) both; animation-delay: var(--dd, 0s); }
-    @keyframes dropIn {
-      from { opacity: 0; transform: translate(calc(var(--tx) + var(--fx, 0px)), calc(var(--ty) - 118vh)) rotate(var(--fr, 0deg)); }
-      30%  { opacity: 1; }
-      70%  { transform: translate(calc(var(--tx) + var(--fx, 0px) * -0.25), calc(var(--ty) + 6px)) rotate(calc(var(--fr, 0deg) * -0.3)); }
-      to   { opacity: 1; transform: translate(var(--tx), var(--ty)) rotate(0deg); }
-    }
-    .name, .board .cell { animation: fadeIn 1s var(--out) 0.5s both; }
-    @keyframes fadeIn { from { opacity: 0; } }
+  /* the caption names whatever is nearest the camera right now */
+  .cloud-cap {
+    /* clears the index toggle sitting in the corner */
+    position: fixed; right: calc(var(--gx) + 14px); bottom: 4vh; z-index: 40;
+    text-align: right; max-width: 44ch; pointer-events: none;
+    opacity: 0; transition: opacity 0.45s var(--out);
   }
+  .cloud-cap.on { opacity: 1; }
+  .cloud-cap .t {
+    display: block; font-family: var(--sans); font-weight: 400;
+    font-size: clamp(19px, 2.1vw, 30px); letter-spacing: -0.01em; line-height: 1.05;
+    color: var(--ink);
+  }
+  .cloud-cap .m {
+    display: block; margin-top: 6px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  /* the index toggle: four marks, answering the menu rules from the
+     opposite corner. Opens the full text list of the work. */
+  .idx-btn {
+    position: fixed; right: 0; bottom: 0; z-index: 45;
+    width: var(--bar); height: var(--bar);
+    border: 0; background: none; cursor: pointer;
+    display: grid; grid-template-columns: repeat(2, 6px); grid-auto-rows: 6px;
+    gap: 4px; place-content: center;
+  }
+  @media (min-width: 821px) { .idx-btn { width: var(--gx); height: var(--gx); } }
+  .idx-btn i { display: block; width: 6px; height: 6px; background: var(--accent); transition: background 0.25s; }
+  .idx-btn:hover i { background: var(--ink); }
+
+  /* how far through the work you have flown */
+  .cloud-prog {
+    position: fixed; top: 0; left: 0; z-index: 75;
+    height: 2px; width: 0; background: var(--accent);
+  }
+
+  /* reduced motion: no flight, no depth — just the work in a plain grid */
   @media (prefers-reduced-motion: reduce) {
-    .sticker, .sticker.tidying { transition: opacity 0.3s, box-shadow 0.25s; }
+    .cloud-stage { position: static; height: auto; overflow: visible; padding: 96px var(--gx) 40px; }
+    .cloud-space {
+      position: static; perspective: none;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 22px;
+    }
+    .card {
+      position: static; width: auto !important; opacity: 1 !important;
+      transform: none !important; pointer-events: auto;
+    }
+    .cloud-cap, .cloud-prog, .cloud-hint { display: none; }
   }
 
   #ink { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
@@ -303,13 +373,33 @@
     font-weight: 600; font-size: clamp(36px, 4.1vw, 62px); letter-spacing: -0.02em;
   }
   /* meta + body copy share one scale with the popup's mono content */
-  .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--accent); font-style: italic; }
+  /* the plain text index: the cloud is lovely for browsing but poor for
+     finding, so every piece is also reachable as a scannable list */
+  .idx { list-style: none; counter-reset: idx; }
+  .idx li { counter-increment: idx; border-top: 1px solid var(--line); }
+  .idx li:last-child { border-bottom: 1px solid var(--line); }
+  .idx a {
+    display: flex; align-items: baseline; gap: 14px; padding: 11px 2px;
+    text-decoration: none; color: var(--ink); transition: color 0.2s;
+  }
+  .idx a::before {
+    content: counter(idx, decimal-leading-zero);
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em;
+    color: color-mix(in srgb, var(--ink) 45%, transparent); min-width: 2.4em;
+  }
+  .idx .ti { font-family: var(--sans); font-size: clamp(16px, 1.7vw, 20px); letter-spacing: -0.01em; }
+  .idx .cl { margin-left: auto; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink) 55%, transparent); text-align: right; }
+  .idx a:hover { color: var(--accent); }
+  .idx a:hover .cl { color: var(--accent); }
+
+  .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--ink); font-style: italic; }
   .case .meta { grid-column: 1 / 2; }
   .case .meta b, .pop-meta b { font-weight: 500; }
-  .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--accent); max-width: 44ch; }
+  .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--ink); max-width: 44ch; }
   .case .blurb { grid-column: 2 / 4; }
-  .case .blurb a { color: var(--accent); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
-  .case .blurb a:hover { color: var(--ink); }
+  .case .blurb a { color: var(--ink); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
+  .case .blurb a:hover { color: var(--accent); }
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .case > * { animation: caseIn both; animation-timeline: view(); animation-range: entry 5% entry 45%; }
@@ -351,24 +441,24 @@
 
   /* ─── mobile ─── */
   @media (max-width: 820px) {
-    /* no column concept on the stacked mobile layout — a stale-width
-       ruled background would just draw stray misaligned lines */
+    /* the ruled lines only describe the six-column case layout */
     .ruled { background-image: none; }
-    .board { cursor: auto; padding: 84px 14px 30px; }
-    .name { position: static; transform: none; white-space: normal; display: block; margin-bottom: 20px; }
-    .name img { margin: 0 auto; }   /* centred, like it is on the big board */
-    /* a true two-column masonry: no row-alignment holes, room to breathe */
-    .grid-m { display: block; columns: 2; column-gap: 12px; }
-    .sticker {
-      position: relative; display: block; width: auto !important; margin-bottom: 12px;
-      break-inside: avoid; touch-action: auto; transform: none !important; transition: none;
+    .cloud-stage { cursor: auto; }
+    /* every fixed control clears the notch and the home indicator */
+    .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+            top: env(safe-area-inset-top); }
+    /* the phone keeps the mark alone — the line lives in About there */
+    .tagline { display: none; }
+    header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
+    .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
+    /* caption sits above the filter bar rather than beside it */
+    .cloud-cap {
+      left: calc(env(safe-area-inset-left) + 14px); right: calc(env(safe-area-inset-right) + 14px);
+      bottom: calc(env(safe-area-inset-bottom) + 74px); text-align: left; max-width: none;
     }
-    /* the about / clients notes span the full page — editorial pauses in the flow */
-    .sticker.txt { column-span: all; }
-    .board .cell { padding: 22px 4px 26px; }
-    .sticker.deal { animation: none; }
-    .sticker.out { display: none; }
-    .ghost, #ink, .doodle { display: none; }
+    .cloud-cap .t { font-size: 21px; }
+    .cloud-hint { bottom: calc(env(safe-area-inset-bottom) + 118px); }
+    .ghost, #ink { display: none; }
     .case-head { padding: 56px 16px 0; }
     .case { display: block; padding: 8vh 16px; min-height: 0; }
     .case-text { display: block; padding: 24px 0 0; }
@@ -376,10 +466,14 @@
     .case-num { margin-bottom: 12px; }
     .case h2 { margin: 0 0 16px; }
     .case .meta { margin-bottom: 16px; }
-    /* compact enough to sit on one line on a phone */
-    .pill { left: 12px; bottom: 12px; padding: 4px 10px 4px 9px; gap: 2px; }
-    .pill::before { width: 7px; height: 7px; margin-right: 7px; }
-    .pill button { font-size: 10.5px; padding: 7px 4px; letter-spacing: 0.06em; }
+    /* one line on a phone, but the buttons still clear 44px of thumb */
+    .pill {
+      left: calc(env(safe-area-inset-left) + 12px);
+      bottom: calc(env(safe-area-inset-bottom) + 12px);
+      padding: 0 12px 0 10px; gap: 2px;
+    }
+    .pill::before { width: 7px; height: 7px; margin-right: 8px; }
+    .pill button { font-size: 10.5px; padding: 14px 5px; letter-spacing: 0.06em; min-height: 44px; }
     .pill .sep { font-size: 10.5px; }
     .menu-panel { width: min(84vw, 340px); }
   }
@@ -406,11 +500,17 @@
 </aside>
 
 <main>
-  <section class="board ruled" id="board" aria-label="Alex Tait — illustrator and motion designer">
-    <h1 class="name"><img src="assets/signature.png" alt="Alex Tait"
-      onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></h1>
-    <div class="grid-m" id="pieces"></div>
-  </section>
+  <div class="cloud-scroll" id="cloud-scroll">
+    <div class="cloud-stage" id="cloud-stage" aria-label="Alex Tait — illustrator and motion designer">
+      <div class="cloud-space" id="cloud-space"></div>
+      <h1 class="name" id="name"><img src="assets/signature.png" alt="Alex Tait"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></h1>
+      <p class="tagline">Illustrator &amp; motion designer — Bath / London</p>
+      <div class="cloud-hint" id="cloud-hint">scroll</div>
+    </div>
+  </div>
+  <div class="cloud-cap" id="cloud-cap" aria-live="polite"></div>
+  <div class="cloud-prog" id="cloud-prog" aria-hidden="true"></div>
 
   <div class="case-wrap ruled">
     <div class="case-head" id="case-studies">
@@ -456,6 +556,10 @@
   <button data-f="personal" aria-pressed="false">Personal</button>
 </div>
 
+<button class="idx-btn" id="index-btn" type="button" aria-label="All work" aria-haspopup="dialog">
+  <i></i><i></i><i></i><i></i>
+</button>
+
 <!-- project popup -->
 <div class="popwrap" id="popwrap" role="dialog" aria-modal="true" aria-label="Project">
   <div class="pop" id="pop">
@@ -471,6 +575,16 @@
 </div>
 
 <!-- about overlay: same paper / vermillion / mono language as the rest of the site -->
+<div class="popwrap" id="indexwrap" role="dialog" aria-modal="true" aria-label="All work">
+  <div class="pop" id="index-pop">
+    <button class="pop-x" id="index-x" aria-label="Close">✕</button>
+    <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
+      <h2>All work</h2>
+      <ol class="idx" id="idx"></ol>
+    </div>
+  </div>
+</div>
+
 <div class="popwrap" id="aboutwrap" role="dialog" aria-modal="true" aria-label="About Alex Tait">
   <div class="pop" id="about-pop" style="width:min(720px, 94vw)">
     <button class="pop-x" id="about-x" aria-label="Close">✕</button>
@@ -483,7 +597,8 @@
         broadcast, social, packaging and print.
       </p>
       <div class="pop-meta" style="margin-bottom:26px">
-        <b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial
+        <b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial<br />
+        <b>SELECTED CLIENTS</b> Apple, Google, Spotify, Adidas, The Telegraph, First Bus, AO, Kueski
       </div>
       <div class="pop-meta">
         <b>INSTAGRAM</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
@@ -525,18 +640,37 @@ const COLS = 6;
   ax.addEventListener('click', closeAbout);
   awrap.addEventListener('click', e => { if (e.target === awrap) closeAbout(); });
   addEventListener('keydown', e => { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
+
+  /* the index: built from the same data the cloud uses, so it never drifts */
+  const iwrap = document.getElementById('indexwrap'), ix = document.getElementById('index-x');
+  let listBuilt = false;
+  /* built on first open — PROJECTS is declared further down this script,
+     so it cannot be read while this runs */
+  const buildIndex = () => {
+    if (listBuilt) return;
+    listBuilt = true;
+    document.getElementById('idx').innerHTML = PROJECTS.map(p => {
+      const client = p.client && p.client !== 'Personal' ? p.client : 'Personal';
+      const meta = [client, p.year].filter(Boolean).join(' · ');
+      return `<li><a href="work/${p.id}.html"><span class="ti">${p.title}</span><span class="cl">${meta}</span></a></li>`;
+    }).join('');
+  };
+  document.getElementById('index-btn').addEventListener('click', () => {
+    buildIndex();
+    toggle(false);
+    iwrap.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    ix.focus();
+  });
+  const closeIndex = () => { iwrap.classList.remove('open'); document.body.style.overflow = ''; };
+  ix.addEventListener('click', closeIndex);
+  iwrap.addEventListener('click', e => { if (e.target === iwrap) closeIndex(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && iwrap.classList.contains('open')) closeIndex(); });
 })();
 
 /* ─── flood + ghost ─── */
 const ghost = document.getElementById('ghost');
 let ghostT;
-function floodOn(colour, name) {
-  clearTimeout(ghostT);
-  ghost.textContent = name; ghost.classList.add('on');
-}
-function floodOff() {
-  ghost.classList.remove('on');
-}
 function announce(text) {
   ghost.textContent = text;
   ghost.classList.add('on');
@@ -581,218 +715,312 @@ const PROJECTS = [
 const ASSETS = {"app-store":{"file":"app-store.jpg","kind":"img"},"humantold-nyc":{"file":"humantold-nyc.mp4","kind":"video"},"pepper":{"file":"pepper.mp4","kind":"video"},"hiit-workout":{"file":"hiit-workout.jpg","kind":"img"},"tarot-cards":{"file":"tarot-cards.png","kind":"img"},"saying-goodbye-to-friends":{"file":"saying-goodbye-to-friends.gif","kind":"img"},"yoga-x-oceans":{"file":"yoga-x-oceans.png","kind":"img"},"jellyfish":{"file":"jellyfish.mp4","kind":"video"},"fruit-snacks":{"file":"fruit-snacks.mp4","kind":"video"},"clear":{"file":"clear.mp4","kind":"video"},"alice-in-wonderland":{"file":"alice-in-wonderland.jpg","kind":"img"},"mantis":{"file":"mantis.mp4","kind":"video"},"kueski-pay":{"file":"kueski-pay.png","kind":"img"},"thinkartfully":{"file":"thinkartfully.gif","kind":"img"},"tiger":{"file":"tiger.mp4","kind":"video"},"ao-driver-booklet":{"file":"ao-driver-booklet.png","kind":"img"},"type-1-of-a-kind":{"file":"type-1-of-a-kind.mp4","kind":"video"},"tap-on-tap-off":{"file":"tap-on-tap-off.png","kind":"img"},"cooking-for-cats":{"file":"cooking-for-cats.png","kind":"img"},"offline-dating":{"file":"offline-dating.png","kind":"img"},"urban-living":{"file":"urban-living.jpg","kind":"img"},"apo-discounter":{"file":"apo-discounter.mp4","kind":"video"},"give-it-time":{"file":"give-it-time.mp4","kind":"video"},"eco-living":{"file":"eco-living.jpg","kind":"img"},"paws-for-thought":{"file":"paws-for-thought.jpg","kind":"img"},"window-display":{"file":"window-display.png","kind":"img"},"wallpaper-pack":{"file":"wallpaper-pack.jpg","kind":"img"},"dreams":{"file":"dreams.mp4","kind":"video"},"special-edition-royal-wedding":{"file":"special-edition-royal-wedding.jpg","kind":"img"},"cadooz":{"file":"cadooz.jpg","kind":"img"}};
 const GALLERY = {"app-store":[{"file":"app-store-m1.png","kind":"img","w":1920,"h":1080},{"file":"app-store-m2.png","kind":"img","w":1920,"h":1080}],"humantold-nyc":[{"file":"humantold-nyc-m1.mp4","kind":"video","w":0,"h":0},{"file":"humantold-nyc-m2.mp4","kind":"video","w":0,"h":0},{"file":"humantold-nyc-m3.jpg","kind":"img","w":2700,"h":1519},{"file":"humantold-nyc-m4.jpg","kind":"img","w":2500,"h":1406},{"file":"humantold-nyc-m5.png","kind":"img","w":2148,"h":1269},{"file":"humantold-nyc-m6.png","kind":"img","w":2149,"h":1269}],"pepper":[{"file":"pepper-m1.mp4","kind":"video","w":0,"h":0}],"hiit-workout":[{"file":"hiit-workout-m1.mp4","kind":"video","w":0,"h":0},{"file":"hiit-workout-m2.jpg","kind":"img","w":2000,"h":1500},{"file":"hiit-workout-m3.jpg","kind":"img","w":2500,"h":1974},{"file":"hiit-workout-m4.jpg","kind":"img","w":3000,"h":2000},{"file":"hiit-workout-m5.webp","kind":"img","w":2560,"h":1909}],"tarot-cards":[{"file":"tarot-cards-m1.png","kind":"img","w":794,"h":1361},{"file":"tarot-cards-m2.png","kind":"img","w":794,"h":1361},{"file":"tarot-cards-m3.png","kind":"img","w":794,"h":1361},{"file":"tarot-cards-m4.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m5.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m6.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m7.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m8.png","kind":"img","w":795,"h":1361}],"saying-goodbye-to-friends":[{"file":"saying-goodbye-to-friends-m1.gif","kind":"img","w":1000,"h":1000},{"file":"saying-goodbye-to-friends-m2.gif","kind":"img","w":1000,"h":1000},{"file":"saying-goodbye-to-friends-m3.gif","kind":"img","w":1920,"h":1080}],"yoga-x-oceans":[{"file":"yoga-x-oceans-m1.jpg","kind":"img","w":2500,"h":1667},{"file":"yoga-x-oceans-m2.jpg","kind":"img","w":1440,"h":1440}],"fruit-snacks":[{"file":"fruit-snacks-m1.png","kind":"img","w":8193,"h":8124},{"file":"fruit-snacks-m2.jpg","kind":"img","w":2500,"h":1666},{"file":"fruit-snacks-m3.png","kind":"img","w":2500,"h":2100}],"clear":[{"file":"clear-m1.jpg","kind":"img","w":2880,"h":1800},{"file":"clear-m2.png","kind":"img","w":3902,"h":2000},{"file":"clear-m3.png","kind":"img","w":3902,"h":2000}],"alice-in-wonderland":[{"file":"alice-in-wonderland-m1.jpg","kind":"img","w":1000,"h":667},{"file":"alice-in-wonderland-m2.jpg","kind":"img","w":1000,"h":667}],"kueski-pay":[{"file":"kueski-pay-m1.jpg","kind":"img","w":4500,"h":3000},{"file":"kueski-pay-m2.mp4","kind":"video","w":0,"h":0},{"file":"kueski-pay-m3.png","kind":"img","w":4500,"h":3000}],"thinkartfully":[{"file":"thinkartfully-m1.gif","kind":"img","w":1080,"h":1080},{"file":"thinkartfully-m2.gif","kind":"img","w":1080,"h":1080},{"file":"thinkartfully-m3.gif","kind":"img","w":1080,"h":1080},{"file":"thinkartfully-m4.gif","kind":"img","w":1080,"h":1080}],"ao-driver-booklet":[{"file":"ao-driver-booklet-m1.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m2.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m3.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m4.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m5.png","kind":"img","w":10251,"h":10251},{"file":"ao-driver-booklet-m6.png","kind":"img","w":10251,"h":10251}],"type-1-of-a-kind":[{"file":"type-1-of-a-kind-m1.mp4","kind":"video","w":0,"h":0}],"tap-on-tap-off":[{"file":"tap-on-tap-off-m1.png","kind":"img","w":2500,"h":1768},{"file":"tap-on-tap-off-m2.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m3.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m4.png","kind":"img","w":3509,"h":2481},{"file":"tap-on-tap-off-m5.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m6.png","kind":"img","w":3509,"h":2481}],"offline-dating":[{"file":"offline-dating-m1.png","kind":"img","w":4501,"h":5625},{"file":"offline-dating-m2.png","kind":"img","w":4501,"h":5625}],"urban-living":[{"file":"urban-living-m1.jpg","kind":"img","w":2553,"h":3261},{"file":"urban-living-m2.png","kind":"img","w":2466,"h":2484},{"file":"urban-living-m3.jpg","kind":"img","w":3000,"h":2250}],"eco-living":[{"file":"eco-living-m1.jpg","kind":"img","w":900,"h":900}],"window-display":[{"file":"window-display-m1.jpg","kind":"img","w":2560,"h":1600}],"wallpaper-pack":[{"file":"wallpaper-pack-m1.jpg","kind":"img","w":4500,"h":3000},{"file":"wallpaper-pack-m2.png","kind":"img","w":5120,"h":2880},{"file":"wallpaper-pack-m3.jpg","kind":"img","w":4500,"h":3000},{"file":"wallpaper-pack-m4.png","kind":"img","w":2048,"h":2732},{"file":"wallpaper-pack-m5.png","kind":"img","w":5120,"h":2880}],"special-edition-royal-wedding":[{"file":"special-edition-royal-wedding-m1.jpg","kind":"img","w":2500,"h":2500},{"file":"special-edition-royal-wedding-m2.jpg","kind":"img","w":3000,"h":2000}],"cadooz":[{"file":"cadooz-m1.png","kind":"img","w":7681,"h":7680},{"file":"cadooz-m2.png","kind":"img","w":7680,"h":7681},{"file":"cadooz-m3.png","kind":"img","w":7681,"h":7681},{"file":"cadooz-m4.png","kind":"img","w":7680,"h":7680}]};
 
-/* ─── the board: every non-case project + the two text cells ─── */
-const board = document.getElementById('board');
-const holder = document.getElementById('pieces');
-const stickers = [];
-let zTop = 10;
+/* ─── the image cloud: build the cards, then fly the camera through ─── */
+const stage = document.getElementById('cloud-stage');
+const space = document.getElementById('cloud-space');
+const scroller = document.getElementById('cloud-scroll');
+const capEl = document.getElementById('cloud-cap');
+const progEl = document.getElementById('cloud-prog');
+const hintEl = document.getElementById('cloud-hint');
+const nameEl = document.getElementById('name');
+
+/* the golden angle spreads successive cards evenly around the axis —
+   consecutive pieces never stack up in the same corner of the frame */
+const GOLD = Math.PI * (3 - Math.sqrt(5));
+/* a stable hash-random: the scatter is scattered, but identical every visit */
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+
+let SPACING = 165,    /* gap between cards along the sideways track   */
+    SMIN = 0.14,      /* how small a card is as it appears            */
+    SMAX = 1.0,       /* and how big it gets crossing the middle      */
+    MINR = 90, SPREAD = 300,  /* scatter off the track                */
+    MINW = 300, MAXW = 540,   /* card widths at full size             */
+    RANGE = 660,      /* how far out of centre a card lives before it goes */
+    PER = 230;        /* scroll pixels spent on each card             */
+
+const cards = [];
+const HOVER = 1.26;   /* how much a card swells under the pointer */
+/* a phone should still show motion, but never on a metered or slow link */
+const CONN = navigator.connection || {};
+const DATA_OK = !CONN.saveData && !/(^|-)2g$/.test(CONN.effectiveType || '');
+let hovered = null, playing = null, dwellT = null;
+let span = 0, travel = 0, aim = 0, px = 0, py = 0, aimX = 0, aimY = 0;
+let currentF = 'all', capId = null, started = false;
+let running = false, scrollerTop = 0, scrollerH = 0, stageH = 0;
+
+function tune() {
+  const w = innerWidth, h = innerHeight;
+  const small = w < 820;
+  /* a phone gets a denser, larger field over a shorter run — at the desktop
+     ratios it showed three small cards across eleven screens of scrolling */
+  SPACING = small ? 76 : 165;
+  MINR = small ? 52 : 90;
+  SPREAD = small ? 150 : 300;
+  MINW = small ? 215 : 300;
+  MAXW = small ? 330 : 540;
+  RANGE = w * (small ? 0.66 : 0.50);
+  PER = small ? clamp(h * 0.17, 120, 180) : clamp(h * 0.24, 150, 260);
+}
 
 function mediaHTML(p) {
   const a = ASSETS[p.id] || {};
-  return a.kind === 'video'
-    ? `<video src="images/${a.file}#t=0.1" ${REDUCE ? '' : 'autoplay '}muted loop playsinline preload="metadata" aria-label="${p.title}"></video>`
-    : `<img src="images/${a.file}" alt="${p.title}" draggable="false" loading="eager" />`;
+  /* a video project shows its poster here. The clip itself is only fetched
+     when you point at the card — otherwise simply scrolling the cloud pulls
+     every mp4 on the site, which measured ~25MB of video on one visit. */
+  const src = a.kind === 'video' ? `images/posters/${p.id}.jpg` : `images/${a.file}`;
+  return `<img src="${src}" alt="${p.title}" draggable="false" loading="lazy" />`;
 }
 
-function buildBoard() {
+/* the clip is attached the first time you point at a card, then paused
+   rather than destroyed, so a second look starts instantly */
+function wakeVideo(c) {
+  if (!c.clip || REDUCE) return;
+  if (!c.vid) {
+    const v = document.createElement('video');
+    v.className = 'vid';
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('aria-hidden', 'true');
+    v.src = 'images/' + c.clip;
+    c.el.appendChild(v);
+    c.vid = v;
+  }
+  c.vid.play().catch(() => {});
+}
+
+/* on a phone the clip is dropped, not just paused — leaving each one
+   attached as it drifts past would re-download the whole library */
+function restVideo(c) {
+  if (!c || !c.vid) return;
+  c.vid.pause();
+  if (MOBILE.matches) { c.vid.removeAttribute('src'); c.vid.load(); c.vid.remove(); c.vid = null; }
+}
+
+function buildCloud() {
   const works = PROJECTS.filter(p => !BESPOKE.has(p.id));
-  const items = [];
-  works.forEach((p, i) => {
-    items.push({ kind: 'work', p });
-    if (i === 3) items.push({ kind: 'about' });
-    if (i === 9) items.push({ kind: 'clients' });
+  const items = works.map(p => ({ kind: 'work', p }));
+  /* thread the sketchbook gifs through the flight as little asides */
+  SKETCHES.forEach((s, i) => {
+    const at = Math.min(items.length, 6 + i * 6);
+    items.splice(at, 0, { kind: 'sketch', s });
   });
 
   items.forEach(item => {
-    let el;
-    if (item.kind === 'about') {
+    let el, cats = 'advertising editorial personal', p = null, small = false, clip = null;
+    if (item.kind === 'sketch') {
       el = document.createElement('div');
-      el.className = 'sticker txt cell';
-      el.dataset.cats = 'advertising editorial personal';
-      el.innerHTML = `<em>Alex Tait</em> is an illustrator and motion designer with a simple style
-        focused on expression and movement. He specialises in character design, creating work
-        that is surreal and spirited, bursting with colour and energy.`;
-    } else if (item.kind === 'clients') {
-      el = document.createElement('div');
-      el.className = 'sticker txt cell';
-      el.dataset.cats = 'advertising editorial personal';
-      el.innerHTML = `<span class="u">Clients include</span>
-        <ul><li>Apple</li><li>Google</li><li>Spotify</li><li>Adidas</li></ul>`;
+      el.className = 'card sketch';
+      el.innerHTML = `<img src="images/sketchbook/${item.s.f}" alt="" loading="lazy" />`;
+      small = true;
     } else {
-      const p = item.p;
+      p = item.p;
+      const a = ASSETS[p.id] || {};
+      clip = a.kind === 'video' ? a.file : null;
       el = document.createElement('a');
-      el.className = 'sticker';
+      el.className = 'card';
       el.href = 'work/' + p.id + '.html';
-      el.dataset.cats = String(p.category || '');
       el.dataset.id = p.id;
       el.style.setProperty('--bg', p.bg);
       el.innerHTML = mediaHTML(p);
-      el.addEventListener('mouseenter', () => floodOn(p.bg, p.title));
-      el.addEventListener('mouseleave', floodOff);
-      wireDrag(el, p);
+      cats = String(p.category || '');
+      el.addEventListener('click', e => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        openPop(p, el);
+      });
     }
-    holder.appendChild(el);
-    stickers.push({ el, p: item.p || null });
-  });
-
-  /* relayout when media reveals its true height */
-  let t;
-  const nudge = () => { clearTimeout(t); t = setTimeout(layout, 140); };
-  holder.querySelectorAll('img').forEach(m => m.addEventListener('load', nudge));
-  holder.querySelectorAll('video').forEach(m => m.addEventListener('loadedmetadata', nudge));
-}
-
-function wireDrag(el, p) {
-  let dx = 0, dy = 0, vx = 0, vy = 0, lx = 0, ly = 0, dragging = false, raf = null, moved = 0;
-  const setD = () => { el.style.setProperty('--dx', dx + 'px'); el.style.setProperty('--dy', dy + 'px'); };
-  const glide = () => {
-    if (dragging) return;
-    dx += vx; dy += vy; vx *= 0.94; vy *= 0.94;
-    setD();
-    if (Math.abs(vx) > 0.2 || Math.abs(vy) > 0.2) raf = requestAnimationFrame(glide);
-  };
-  el.addEventListener('pointerdown', e => {
-    if (MOBILE.matches) return;
-    dragging = true; moved = 0;
-    el.classList.remove('deal', 'tidying');
-    el.classList.add('grabbed');
-    el.style.zIndex = ++zTop;
-    el.setPointerCapture(e.pointerId);
-    lx = e.clientX; ly = e.clientY; vx = vy = 0;
-    cancelAnimationFrame(raf);
-  });
-  el.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    const mx = e.clientX - lx, my = e.clientY - ly;
-    dx += mx; dy += my; vx = mx; vy = my;
-    moved += Math.abs(mx) + Math.abs(my);
-    lx = e.clientX; ly = e.clientY;
-    setD();
-  });
-  const drop = () => {
-    if (!dragging) return;
-    dragging = false; el.classList.remove('grabbed');
-    if (!REDUCE) raf = requestAnimationFrame(glide);
-  };
-  el.addEventListener('pointerup', drop);
-  el.addEventListener('pointercancel', drop);
-  el._resetDrag = () => { dx = dy = vx = vy = 0; cancelAnimationFrame(raf); setD(); };
-  /* a drag is not a click; a click opens the project right here */
-  el.addEventListener('click', e => {
-    if (moved > 6) { e.preventDefault(); return; }
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;   // real link behaviours stay
-    e.preventDefault();
-    openPop(p, el);
+    el.dataset.cats = cats;
+    /* out of frame means out of the tab order too — otherwise all 28 links
+       stay keyboard-reachable and screen-readable while invisible */
+    el.tabIndex = -1;
+    el.setAttribute('aria-hidden', 'true');
+    space.appendChild(el);
+    const c = { el, p, small, clip, vid: null, vis: true,
+                ox: 0, oy: 0, st: 0, dy: 0, w: 0, hs: 1, shown: false };
+    cards.push(c);
+    /* only the work responds to the pointer — the sketches are just texture */
+    if (p) {
+      el.addEventListener('pointerenter', () => { hovered = c; wakeVideo(c); start(); });
+      el.addEventListener('pointerleave', () => {
+        if (hovered === c) hovered = null;
+        restVideo(c);
+        start();
+      });
+      /* keyboard focus gets the same treatment as hover */
+      el.addEventListener('focus', () => { hovered = c; start(); });
+      el.addEventListener('blur', () => { if (hovered === c) hovered = null; start(); });
+    }
   });
 }
 
-/* ─── marginalia: sketchbook doodles dotted through the sheet's margins ───
-   Non-interactive, behind the tiles, a fresh random handful each visit. */
-const doodles = [];
-if (SKETCHES.length && !MOBILE.matches) {
-  const picks = SKETCHES.slice().sort(() => Math.random() - 0.5).slice(0, 8);
-  const gm = document.getElementById('pieces');
-  picks.forEach(s => {
-    const d = document.createElement('div');
-    d.className = 'doodle';
-    d.innerHTML = s.k === 'video'
-      ? `<video src="images/sketchbook/${s.f}#t=0.1" muted loop ${REDUCE ? '' : 'autoplay '}playsinline preload="metadata"></video>`
-      : `<img src="images/sketchbook/${s.f}" alt="" loading="lazy" />`;
-    board.insertBefore(d, gm);   /* before the grid → paints behind the work */
-    doodles.push(d);
+/* every card takes a station on the sideways track, with a little scatter
+   off it. The scatter is multiplied by the card's scale at render time, so
+   a group opens out as it grows and closes up again as it shrinks. */
+function place() {
+  const live = cards.filter(c => c.vis);
+  live.forEach((c, i) => {
+    const ang = i * GOLD;
+    const rad = MINR + rnd(i) * SPREAD;
+    c.ox = Math.cos(ang) * rad;
+    c.oy = Math.sin(ang) * rad * 0.95;
+    c.st = -i * SPACING;
+    c.dy = (rnd(i + 41) - 0.5) * 150;   /* a little vertical travel as it crosses */
+    c.w = c.small ? MINW * 0.84 : MINW + rnd(i + 99) * (MAXW - MINW);
+    c.el.style.setProperty('--w', Math.round(c.w) + 'px');
   });
+  span = Math.max(0, (live.length - 1) * SPACING);
+  scroller.style.height = (stage.offsetHeight + (live.length + 2) * PER) + 'px';
+  /* measured once here rather than every frame, so the render loop never
+     has to read layout back out of the document */
+  stageH = stage.offsetHeight;
+  scrollerH = scroller.offsetHeight;
+  scrollerTop = scroller.getBoundingClientRect().top + scrollY;
 }
-/* ─── masonry on the lines: everything fits, nothing overlaps ─── */
-let currentF = 'all';
-function matches(el) {
-  return currentF === 'all' || el.dataset.cats.includes(currentF);
+
+function matches(c) {
+  return currentF === 'all' || c.el.dataset.cats.includes(currentF);
 }
-function layout() {
-  if (MOBILE.matches) {
-    stickers.forEach(({ el }) => el.classList.toggle('out', !matches(el)));
+
+function hide(c) {
+  const el = c.el;
+  if (!c.shown) return;
+  el.style.opacity = '0'; c._op = '0';
+  el.classList.remove('hit');
+  el.tabIndex = -1;
+  el.setAttribute('aria-hidden', 'true');
+  c.shown = false;
+  c.hs = 1;
+  if (hovered === c) hovered = null;   /* it left under the pointer */
+  restVideo(c);
+}
+
+/* one frame. Nothing travels in depth: the whole field slides sideways at
+   a constant distance, and each card's scale is a function of how far it
+   is from the middle of the frame — so it appears small at one edge, opens
+   out as it crosses, and closes down again on its way off the other side. */
+function frame() {
+  const total = scrollerH - stageH;
+  const prog = total > 0 ? clamp((scrollY - scrollerTop) / total, 0, 1) : 0;
+
+  /* asleep whenever the stage is nowhere near the viewport */
+  if (scrollY + innerHeight < scrollerTop || scrollY > scrollerTop + scrollerH) {
+    running = false;
     return;
   }
-  const W = board.offsetWidth;
-  const gx = Math.min(Math.max(W * 0.05, 28), 96);   /* matches the CSS --gx clamp */
-  const colw = (W - gx * 2) / COLS;
-  document.documentElement.style.setProperty('--colw', colw + 'px');
-  /* snap every column boundary to a whole pixel FIRST, then size each
-     tile as the gap between its own boundary and the next one — so a
-     tile's right edge always lands exactly on the next rule, with no
-     drift from rounding the same width for every column */
-  const colX = Array.from({ length: COLS + 1 }, (_, i) => Math.round(gx + i * colw));
-  /* staggered column starts — one column touches the very top of the
-     window, the rest step down for a sporadic top edge */
-  const colY = [0, 118, 42, 132, 20, 96];
-  /* the gap between tiles grows with the window, so a large screen gets
-     noticeably more empty space rather than the same fixed breathing room */
-  const gap = Math.min(168 + Math.max(W - 1200, 0) * 0.28, 340);
 
-  /* keep the signature mostly clear: only let tiles graze its edge,
-     never sit fully behind it */
-  const boardTop = board.getBoundingClientRect().top;
-  const nameImg = document.querySelector('.name img');
-  const PEEK = 44;   /* px of intentional overlap a tile is allowed to have */
-  let sigTop = -1, sigBottom = -1, sigLeft = -1, sigRight = -1;
-  if (nameImg) {
-    const r = nameImg.getBoundingClientRect();
-    const pad = 44; /* rough allowance for the paper halo around the strokes */
-    sigTop = (r.top - boardTop) - pad;
-    sigBottom = (r.bottom - boardTop) + pad;
-    sigLeft = r.left - pad;
-    sigRight = r.right + pad;
-  }
-  const sigCols = new Set();
-  if (nameImg) {
-    for (let c = 0; c < COLS; c++) {
-      if (colX[c] < sigRight && colX[c + 1] > sigLeft) sigCols.add(c);
+  aim = prog * (span + RANGE * 2);
+  travel += (aim - travel) * 0.14;          /* a glide, never a snap */
+  px += (aimX - px) * 0.06;
+  py += (aimY - py) * 0.06;
+  space.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`;
+
+  /* keep animating only while something is actually still moving */
+  let busy = Math.abs(aim - travel) > 0.3 ||
+             Math.abs(aimX - px) > 0.3 || Math.abs(aimY - py) > 0.3;
+  let near = null, nearX = Infinity;
+
+  for (const c of cards) {
+    const el = c.el;
+    if (!c.vis) { hide(c); continue; }
+
+    const bx = c.st + travel;               /* where its station has slid to */
+    const t = bx / RANGE;                   /* -1 at one edge, +1 at the other */
+
+    if (t <= -1 || t >= 1) { hide(c); continue; }
+
+    /* ease the crossing: a card hurries in from the edge, eases through the
+       middle where it is biggest, then slides away again. The blend keeps a
+       little linear motion in it, so nothing ever stalls dead centre. */
+    const te = 0.45 * t + 0.55 * Math.sign(t) * Math.pow(Math.abs(t), 1.6);
+    const ease = 1 - Math.abs(te);          /* 0 at the edges, 1 in the middle */
+    const s = SMIN + (SMAX - SMIN) * Math.pow(ease, 0.7);
+    const x = RANGE * te + c.ox * s;        /* the group opens out as it grows */
+    const y = c.oy * s + c.dy * te;
+
+    /* the pointer swells a card in place — hover multiplies the visual scale
+       only, never the layout offsets, so it grows without shifting */
+    const hTarget = hovered === c ? HOVER : 1;
+    if (Math.abs(hTarget - c.hs) > 0.002) busy = true;
+    c.hs += (hTarget - c.hs) * 0.18;
+    const vs = s * c.hs;
+
+    /* only touch the DOM when the value actually changed */
+    const tf = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${vs.toFixed(4)}) translate(-50%, -50%)`;
+    if (tf !== c._tf) { el.style.transform = tf; c._tf = tf; }
+    const op = clamp(ease / 0.20, 0, 1).toFixed(3);
+    if (op !== c._op) { el.style.opacity = op; c._op = op; }
+    /* bigger reads as nearer, so it stacks in front — and the hovered card wins */
+    const zi = String(Math.round(vs * 100) + (hovered === c ? 500 : 0));
+    if (zi !== c._zi) { el.style.zIndex = zi; c._zi = zi; }
+
+    if (!c.shown) {
+      c.shown = true;
+      if (c.p) { el.classList.add('hit'); el.tabIndex = 0; el.removeAttribute('aria-hidden'); }
     }
+    if (c.p && Math.abs(bx) < Math.abs(nearX)) { nearX = bx; near = c; }
   }
 
-  let n = 0;
-  const spots = [];   /* the gap under each placed tile — where doodles live */
-  stickers.forEach(({ el }) => {
-    const on = matches(el);
-    el.classList.toggle('out', !on);
-    if (!on) return;
-    el.classList.add('tidying');
-    clearTimeout(el._tt);
-    el._tt = setTimeout(() => el.classList.remove('tidying'), 760);
-    /* shortest column takes the next piece */
-    let c = 0;
-    for (let k = 1; k < COLS; k++) if (colY[k] < colY[c]) c = k;
-    /* never start a tile inside — or just above — the signature's band;
-       that's how one ends up sunk deep behind it. jump straight past,
-       leaving only a small deliberate peek at the seam */
-    if (sigCols.has(c) && colY[c] <= sigBottom && colY[c] > sigTop - 220) {
-      colY[c] = sigBottom - PEEK;
+  /* the signature is a standing mark now — it stays put the whole way */
+  progEl.style.width = (prog * 100).toFixed(2) + '%';
+
+  /* no hover on a phone, so the piece you settle on plays itself. It waits
+     for you to stop scrolling — playing every card as it drifts past would
+     pull the entire video library down over one journey. */
+  if (MOBILE.matches && DATA_OK && near !== playing) {
+    clearTimeout(dwellT);
+    restVideo(playing);
+    playing = null;
+    const target = near;
+    dwellT = setTimeout(() => {
+      if (target && target.shown) { playing = target; wakeVideo(target); }
+    }, 650);
+  }
+
+  /* the caption follows the pointer when there is one, and otherwise names
+     whatever is crossing the middle */
+  const inFlight = prog > 0.005 && prog < 0.995;
+  const pick = (hovered && hovered.shown) ? hovered : (inFlight ? near : null);
+  if (pick) {
+    if (pick.p.id !== capId) {
+      capId = pick.p.id;
+      const p = pick.p;
+      const bits = [p.client && p.client !== 'Personal' ? p.client : 'Personal', p.year].filter(Boolean);
+      capEl.innerHTML = `<span class="t">${p.title}</span><span class="m">${bits.join(' · ')}</span>`;
     }
-    el.style.setProperty('--w', (colX[c + 1] - colX[c]) + 'px');
-    el.style.setProperty('--tx', colX[c] + 'px');
-    el.style.setProperty('--ty', Math.round(colY[c]) + 'px');
-    el.style.setProperty('--s', 1);
-    el.style.zIndex = '';
-    el._resetDrag && el._resetDrag();
-    /* advance the column: tile height + a steady breathing gap */
-    const h = el.offsetHeight || colw;
-    spots.push({ x: colX[c], w: colX[c + 1] - colX[c], y: colY[c] + h + 22 });
-    colY[c] += h + gap;
-    n++;
-  });
-  board.style.height = Math.max(...colY) + 60 + 'px';
-
-  /* marginalia: spread the doodles through the gaps, off-grid on purpose */
-  if (doodles.length && spots.length) {
-    doodles.forEach((d, i) => {
-      const sp = spots[Math.min(spots.length - 1, Math.floor((i + 0.5) * spots.length / doodles.length))];
-      const w = Math.round(Math.min(170, sp.w * 0.5));
-      d.style.width = w + 'px';
-      d.style.left = Math.round(sp.x + sp.w * (0.15 + ((i * 37) % 5) / 12)) + 'px';
-      d.style.top = Math.round(sp.y) + 'px';
-      d.style.transform = `rotate(${((i * 53) % 11) - 5}deg)`;
-    });
+    capEl.classList.add('on');
+  } else {
+    capEl.classList.remove('on');
+    capId = null;
   }
+
+  if (busy) requestAnimationFrame(frame);
+  else running = false;
 }
+
+/* the loop sleeps once everything has settled; anything that could move the
+   field wakes it again */
+function start() {
+  if (running || REDUCE) return;
+  running = true;
+  requestAnimationFrame(frame);
+}
+
+/* pointer nudges the camera off-axis — a little life while you read */
+if (!REDUCE) {
+  addEventListener('pointermove', e => {
+    if (MOBILE.matches) return;
+    aimX = (e.clientX / innerWidth - 0.5) * -70;
+    aimY = (e.clientY / innerHeight - 0.5) * -50;
+    start();
+  }, { passive: true });
+}
+
+addEventListener('scroll', () => {
+  start();
+  if (started) return;
+  started = true;
+  hintEl.classList.add('gone');
+}, { passive: true });
 
 /* pill filters: click a category; click it again for everything */
 document.querySelectorAll('.pill button').forEach(b => {
@@ -803,24 +1031,21 @@ document.querySelectorAll('.pill button').forEach(b => {
       x.classList.toggle('active', on);
       x.setAttribute('aria-pressed', on);
     });
-    layout();
-    const n = stickers.filter(s => s.p && matches(s.el)).length;
+    cards.forEach(c => { c.vis = matches(c); });
+    place();
+    start();
+    const n = cards.filter(c => c.vis && c.p).length;
     announce(currentF === 'all' ? `everything · ${n}` : `${currentF} · ${n}`);
+    /* back to the start of the newly filtered run */
+    if (scrollY > scrollerTop) scrollTo({ top: scrollerTop, behavior: REDUCE ? 'auto' : 'smooth' });
   });
 });
 
-/* the drop: everything falls in from above, staggered */
-function firstDeal() {
-  layout();
-  if (REDUCE || MOBILE.matches) return;
-  stickers.forEach(({ el }) => {
-    el.style.setProperty('--dd', (0.06 + Math.random() * 0.85).toFixed(2) + 's');
-    el.style.setProperty('--fx', (Math.random() * 120 - 60).toFixed(0) + 'px');
-    el.style.setProperty('--fr', (Math.random() * 14 - 7).toFixed(1) + 'deg');
-    el.classList.add('deal');
-    el.addEventListener('animationend', () => el.classList.remove('deal'), { once: true });
-  });
-}
+let rt;
+addEventListener('resize', () => {
+  clearTimeout(rt);
+  rt = setTimeout(() => { tune(); place(); start(); }, 150);
+});
 
 /* ─── the popup: a project opens FROM its tile ─── */
 const popwrap = document.getElementById('popwrap');
@@ -882,7 +1107,7 @@ function observeVideos() {
   const io = new IntersectionObserver(es => es.forEach(e => {
     const v = e.target; if (e.isIntersecting) v.play().catch(()=>{}); else v.pause();
   }), { threshold: 0.25 });
-  document.querySelectorAll('.sticker video, .case video').forEach(v => io.observe(v));
+  document.querySelectorAll('.case video').forEach(v => io.observe(v));
 }
 
 /* ─── INK TRAIL ─── */
@@ -925,9 +1150,8 @@ function observeVideos() {
 })();
 
 /* boot */
-buildBoard(); firstDeal(); observeVideos();
-addEventListener('resize', () => layout());
-MOBILE.addEventListener?.('change', () => layout());
+tune(); buildCloud(); place(); observeVideos();
+start();
 </script>
 </body>
 </html>
