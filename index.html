@@ -837,7 +837,7 @@ function place() {
     c.oy = Math.sin(ang) * rad * 0.95;
     c.st = -i * SPACING;
     c.dy = (rnd(i + 41) - 0.5) * 150;   /* a little vertical travel as it crosses */
-    c.w = c.small ? MINW * 0.6 : MINW + rnd(i + 99) * (MAXW - MINW);
+    c.w = c.small ? MINW * 0.84 : MINW + rnd(i + 99) * (MAXW - MINW);
     c.el.style.setProperty('--w', Math.round(c.w) + 'px');
   });
   span = Math.max(0, (live.length - 1) * SPACING);
