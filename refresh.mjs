@@ -85,7 +85,14 @@ async function refreshSketchbook() {
         if (!a || typeof a !== 'object' || !a.url || !a.type) continue;
         if (!/^(image|video)\//.test(a.type)) continue;
         const ext = extFor(a);
-        const file = `${r.id}-${i++}.${ext}`;
+        /* name the file after the ATTACHMENT, not the record's position.
+           Keying on position meant swapping an image on an existing record
+           produced the same filename, so the skip below treated it as
+           already-downloaded and the change never reached the site. An
+           attachment id changes whenever the file does. */
+        const stamp = String(a.id || i).replace(/[^a-zA-Z0-9]/g, '') || String(i);
+        i++;
+        const file = `${r.id}-${stamp}.${ext}`;
         const kind = a.type.startsWith('video') ? 'video' : 'img';
         // gifs/videos must come from the original url (thumbnails are static);
         // stills can use the large thumbnail to keep the repo light
@@ -100,7 +107,9 @@ async function refreshSketchbook() {
   let fresh = 0;
   for (const s of sketches) {
     const dest = `${DIR}/${s.f}`;
-    if (fs.existsSync(dest)) continue;   // record ids are stable; skip re-downloads
+    /* safe to skip now: the filename identifies the attachment itself, so an
+       existing file can only be that exact image */
+    if (fs.existsSync(dest)) continue;
     try {
       const res = await fetch(s.src);
       if (!res.ok) throw new Error(res.status);
