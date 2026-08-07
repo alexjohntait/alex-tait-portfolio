@@ -845,13 +845,18 @@ function buildCloud() {
     el.setAttribute('aria-hidden', 'true');
     space.appendChild(el);
     const c = { el, p, small, clip, vid: null, vis: true,
-                ox: 0, oy: 0, st: 0, dy: 0, w: 0, hs: 1, shown: false };
+                ox: 0, oy: 0, st: 0, dy: 0, w: 0, ar: 1, hs: 1, shown: false };
     cards.push(c);
-    /* belt and braces: if a poster is ever missing the card would otherwise
-       collapse to a broken-image icon, so fall back to the clip itself */
-    if (clip) {
-      const im = el.querySelector('img');
-      if (im) im.addEventListener('error', () => { el.classList.add('noposter'); wakeVideo(c); }, { once: true });
+    const im = el.querySelector('img');
+    if (im) {
+      /* the corner anchor needs the card's real height, which only the
+         image's own proportions can give; square until it loads */
+      im.addEventListener('load', () => {
+        if (im.naturalWidth) { c.ar = im.naturalHeight / im.naturalWidth; start(); }
+      }, { once: true });
+      /* belt and braces: if a poster is ever missing the card would otherwise
+         collapse to a broken-image icon, so fall back to the clip itself */
+      if (clip) im.addEventListener('error', () => { el.classList.add('noposter'); wakeVideo(c); }, { once: true });
     }
     /* only the work responds to the pointer — the sketches are just texture */
     if (p) {
@@ -955,6 +960,15 @@ function frame() {
     const x = RANGE * te + c.ox * s;        /* the group opens out as it grows */
     const y = c.oy * s + c.dy * te;
 
+    /* grow from the top-right rather than the middle: the corner stays put
+       and the card unfolds down and to the left, so the scale reads as
+       travel instead of a pulse. Expressed as a moving centre so the hover
+       swell below can still grow about the middle — corner-anchoring that
+       too would slide the card out from under the pointer. */
+    const ch = c.w * (c.ar || 1);
+    const cx = x + (c.w * (SMAX - s)) / 2;
+    const cy = y - (ch * (SMAX - s)) / 2;
+
     /* the pointer swells a card in place — hover multiplies the visual scale
        only, never the layout offsets, so it grows without shifting */
     const hTarget = hovered === c ? HOVER : 1;
@@ -963,7 +977,7 @@ function frame() {
     const vs = s * c.hs;
 
     /* only touch the DOM when the value actually changed */
-    const tf = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${vs.toFixed(4)}) translate(-50%, -50%)`;
+    const tf = `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px) scale(${vs.toFixed(4)}) translate(-50%, -50%)`;
     if (tf !== c._tf) { el.style.transform = tf; c._tf = tf; }
     const op = clamp(ease / 0.20, 0, 1).toFixed(3);
     if (op !== c._op) { el.style.opacity = op; c._op = op; }
