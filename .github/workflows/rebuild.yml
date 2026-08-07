@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    # editing this file is a deliberate "run me now" — a no-UI manual trigger
+    # editing this file is a deliberate "run me now" — a no-UI manual trigger (rerun)
     paths: ['.github/workflows/rebuild.yml']
 
 jobs:
