@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
 <!-- ── SEO ─────────────────────────────────────────────────── -->
 <title>Alex Tait — Illustrator &amp; Motion Designer, Bath &amp; London</title>
@@ -737,6 +737,7 @@ let SPACING = 165,    /* gap between cards along the sideways track   */
     MINR = 90, SPREAD = 300,  /* scatter off the track                */
     MINW = 300, MAXW = 540,   /* card widths at full size             */
     RANGE = 660,      /* how far out of centre a card lives before it goes */
+    YMUL = 0.95,      /* vertical stretch of the scatter — portrait needs more */
     PER = 230;        /* scroll pixels spent on each card             */
 
 const cards = [];
@@ -752,14 +753,18 @@ let running = false, scrollerTop = 0, scrollerH = 0, stageH = 0;
 function tune() {
   const w = innerWidth, h = innerHeight;
   const small = w < 820;
-  /* a phone gets a denser, larger field over a shorter run — at the desktop
-     ratios it showed three small cards across eleven screens of scrolling */
-  SPACING = small ? 76 : 165;
-  MINR = small ? 52 : 90;
-  SPREAD = small ? 150 : 300;
-  MINW = small ? 215 : 300;
-  MAXW = small ? 330 : 540;
-  RANGE = w * (small ? 0.66 : 0.50);
+  /* a phone sizes its cards from the viewport, not in fixed pixels: at a
+     flat 330px a piece filled 81% of a 375px screen and everything around
+     it was clipped, so you read fragments instead of a composition */
+  SPACING = small ? 66 : 165;
+  MINR = small ? 34 : 90;
+  SPREAD = small ? 96 : 300;
+  MINW = small ? Math.round(w * 0.40) : 300;
+  MAXW = small ? Math.round(w * 0.60) : 540;
+  SMIN = small ? 0.26 : 0.14;   /* arrivals read as work, not as specks */
+  /* fill the portrait frame rather than a band across its middle */
+  YMUL = small ? Math.min(2.4, (h / w) * 1.05) : 0.95;
+  RANGE = w * (small ? 0.62 : 0.50);
   PER = small ? clamp(h * 0.17, 120, 180) : clamp(h * 0.24, 150, 260);
 }
 
@@ -862,7 +867,10 @@ function place() {
     const ang = i * GOLD;
     const rad = MINR + rnd(i) * SPREAD;
     c.ox = Math.cos(ang) * rad;
-    c.oy = Math.sin(ang) * rad * 0.95;
+    /* a phone is tall: with the desktop ratio the whole field collapsed into
+       one narrow band across the middle and left the screen empty top and
+       bottom, so the vertical scatter is stretched to fit the portrait frame */
+    c.oy = Math.sin(ang) * rad * YMUL;
     c.st = -i * SPACING;
     c.dy = (rnd(i + 41) - 0.5) * 150;   /* a little vertical travel as it crosses */
     c.w = c.small ? MINW * 0.84 : MINW + rnd(i + 99) * (MAXW - MINW);
