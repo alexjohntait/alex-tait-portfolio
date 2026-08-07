@@ -166,6 +166,12 @@ function injectData() {
 
     await refreshSketchbook();
 
+    /* a video project needs a still for the cloud; without one its card
+       renders as a broken image until you hover it */
+    console.log('• Filling in posters for any new video projects…');
+    try { execFileSync('node', ['make-posters.mjs'], { stdio: 'inherit' }); }
+    catch (e) { console.warn('  posters step skipped:', e.message.split('\n')[0]); }
+
     console.log('• Rebuilding project pages + sitemap…');
     execFileSync('node', ['build-pages.mjs'], { stdio: 'inherit' });
 

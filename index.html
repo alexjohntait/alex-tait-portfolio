@@ -170,6 +170,9 @@
     border-radius: 10px; background: var(--bg, transparent);
     transition: box-shadow 0.3s var(--out);
   }
+  /* a card whose poster failed still needs a box for the clip to fill,
+     otherwise the broken image collapses it to a sliver */
+  .card.noposter img { aspect-ratio: 4 / 3; background: var(--bg, var(--line)); }
   /* the clip lies over its poster once hover has fetched it */
   .card .vid {
     position: absolute; inset: 0; width: 100%; height: 100%;
@@ -844,6 +847,12 @@ function buildCloud() {
     const c = { el, p, small, clip, vid: null, vis: true,
                 ox: 0, oy: 0, st: 0, dy: 0, w: 0, hs: 1, shown: false };
     cards.push(c);
+    /* belt and braces: if a poster is ever missing the card would otherwise
+       collapse to a broken-image icon, so fall back to the clip itself */
+    if (clip) {
+      const im = el.querySelector('img');
+      if (im) im.addEventListener('error', () => { el.classList.add('noposter'); wakeVideo(c); }, { once: true });
+    }
     /* only the work responds to the pointer — the sketches are just texture */
     if (p) {
       el.addEventListener('pointerenter', () => { hovered = c; wakeVideo(c); start(); });
