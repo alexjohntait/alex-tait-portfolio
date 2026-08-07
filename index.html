@@ -988,6 +988,12 @@ function frame() {
     if (!c.shown) {
       c.shown = true;
       if (c.p) { el.classList.add('hit'); el.tabIndex = 0; el.removeAttribute('aria-hidden'); }
+      /* the clips play as they arrive. Viable only because optimise.mjs
+         re-encodes the masters to web weight — at the 10-20MB originals a
+         single scroll would have pulled well over a hundred megabytes.
+         A phone still plays one at a time: bandwidth is no longer the
+         constraint, but decoding six clips at once on a handset is. */
+      if (c.clip && !MOBILE.matches) wakeVideo(c);
     }
     if (c.p && Math.abs(bx) < Math.abs(nearX)) { nearX = bx; near = c; }
   }
@@ -995,9 +1001,9 @@ function frame() {
   /* the signature is a standing mark now — it stays put the whole way */
   progEl.style.width = (prog * 100).toFixed(2) + '%';
 
-  /* no hover on a phone, so the piece you settle on plays itself. It waits
-     for you to stop scrolling — playing every card as it drifts past would
-     pull the entire video library down over one journey. */
+  /* a phone plays whichever piece is crossing the middle, one at a time.
+     The clips are small now, so the wait is short — it exists to stop the
+     decoder thrashing while you fling the page, not to save bandwidth. */
   if (MOBILE.matches && DATA_OK && near !== playing) {
     clearTimeout(dwellT);
     restVideo(playing);
@@ -1005,7 +1011,7 @@ function frame() {
     const target = near;
     dwellT = setTimeout(() => {
       if (target && target.shown) { playing = target; wakeVideo(target); }
-    }, 650);
+    }, 180);
   }
 
   /* the caption follows the pointer when there is one, and otherwise names
