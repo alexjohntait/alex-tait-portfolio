@@ -253,18 +253,21 @@
     color: var(--ink);
   }
 
-  /* the index toggle: four marks, answering the menu rules from the
-     opposite corner. Opens the full text list of the work. */
+  /* the index toggle: an Aa, set in the headline face, answering the menu
+     rules from the opposite corner. Opens the full text list of the work. */
   .idx-btn {
     position: fixed; right: 0; bottom: 0; z-index: 45;
     width: var(--bar); height: var(--bar);
     border: 0; background: none; cursor: pointer;
-    display: grid; grid-template-columns: repeat(2, 6px); grid-auto-rows: 6px;
-    gap: 4px; place-content: center;
+    display: grid; place-items: center;
+    font-family: var(--sans); font-weight: 400;
+    font-size: 22px; line-height: 1; letter-spacing: -0.015em;
+    color: var(--accent); transition: color 0.25s;
+    /* the cap and the x-height sit low in the box without this */
+    padding-bottom: 2px;
   }
   @media (min-width: 821px) { .idx-btn { width: var(--gx); height: var(--gx); } }
-  .idx-btn i { display: block; width: 6px; height: 6px; background: var(--accent); transition: background 0.25s; }
-  .idx-btn:hover i { background: var(--ink); }
+  .idx-btn:hover { color: var(--ink); }
 
   /* how far through the work you have flown */
   .cloud-prog {
