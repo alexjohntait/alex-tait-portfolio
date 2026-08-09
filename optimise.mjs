@@ -18,8 +18,14 @@ for (const f of files) {
   try {
     const img = sharp(input, { failOn: 'none' });
     const meta = await img.metadata();
-    if (Math.max(meta.width || 0, meta.height || 0) <= MAX) { after += input.length; continue; }
-    const pl = img.resize({ width: MAX, height: MAX, fit: 'inside', withoutEnlargement: true });
+    const oversize = Math.max(meta.width || 0, meta.height || 0) > MAX;
+    /* a file can sit well within the pixel cap and still be megabytes: an
+       illustration flat saved as full-colour PNG. Re-encode those in place. */
+    const heavy = input.length > 900 * 1024;
+    if (!oversize && !heavy) { after += input.length; continue; }
+    const pl = oversize
+      ? img.resize({ width: MAX, height: MAX, fit: 'inside', withoutEnlargement: true })
+      : img;
     const ext = f.toLowerCase();
     let buf;
     if (ext.endsWith('.png')) buf = await pl.png({ compressionLevel: 9, palette: true }).toBuffer();
@@ -31,6 +37,72 @@ for (const f of files) {
 }
 const mb = n => (n / 1048576).toFixed(1) + 'MB';
 console.log(`Optimised ${changed}/${files.length} images: ${mb(before)} → ${mb(after)} (saved ${mb(before - after)})`);
+
+/* ── animated gif ─────────────────────────────────────────────────────────
+   A gif of a 120-frame animation is the worst format on the site: the two
+   hero loops alone were 7.6MB, against 0.3MB as mp4. These are motion
+   pieces by a motion designer, so mp4 is also the honest format for them,
+   and the cloud already treats video properly (poster, then autoplay).
+
+   Converting changes the file, so the data has to move with it: the entry's
+   kind becomes 'video'. Patches _data.json when the pipeline is mid-refresh,
+   and index.html when this is run on its own. */
+const GIF_MIN = 1024 * 1024;
+const gifs = fs.readdirSync(DIR).filter(f => /\.gif$/i.test(f));
+const converted = new Map();   /* old filename -> new filename */
+
+for (const f of gifs) {
+  const p = path.join(DIR, f);
+  const size = fs.statSync(p).size;
+  if (size < GIF_MIN) continue;
+  const outName = f.replace(/\.gif$/i, '.mp4');
+  const out = path.join(DIR, outName);
+  try {
+    execFileSync('ffmpeg', [
+      '-hide_banner', '-loglevel', 'error', '-i', p,
+      '-vf', "scale='min(1000,iw)':-2:flags=lanczos",
+      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26',
+      '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', '-threads', '1',
+      '-y', out
+    ], { stdio: 'inherit' });
+    const got = fs.statSync(out).size;
+    if (got > 0 && got < size) { fs.unlinkSync(p); converted.set(f, outName); }
+    else fs.unlinkSync(out);
+  } catch (e) {
+    try { fs.unlinkSync(out); } catch {}
+    console.warn(`  could not convert ${f}: ${e.message.split('\n')[0]}`);
+  }
+}
+
+if (converted.size) {
+  /* move the data to match the files */
+  const retarget = entry => {
+    if (!entry || !converted.has(entry.file)) return false;
+    entry.file = converted.get(entry.file);
+    entry.kind = 'video';
+    return true;
+  };
+  let touched = 0;
+  if (fs.existsSync('_data.json')) {
+    const d = JSON.parse(fs.readFileSync('_data.json', 'utf8'));
+    for (const a of Object.values(d.ASSETS || {})) if (retarget(a)) touched++;
+    for (const arr of Object.values(d.GALLERY || {})) for (const m of arr) if (retarget(m)) touched++;
+    fs.writeFileSync('_data.json', JSON.stringify(d));
+  } else if (fs.existsSync('index.html')) {
+    let page = fs.readFileSync('index.html', 'utf8');
+    for (const key of ['ASSETS', 'GALLERY']) {
+      const re = new RegExp('const ' + key + ' = (\\{[\\s\\S]*?\\});');
+      const m = page.match(re);
+      if (!m) continue;
+      const obj = JSON.parse(m[1]);
+      if (key === 'ASSETS') { for (const a of Object.values(obj)) if (retarget(a)) touched++; }
+      else { for (const arr of Object.values(obj)) for (const x of arr) if (retarget(x)) touched++; }
+      page = page.replace(re, 'const ' + key + ' = ' + JSON.stringify(obj) + ';');
+    }
+    fs.writeFileSync('index.html', page);
+  }
+  console.log(`Converted ${converted.size} gifs to mp4 (${touched} data entries retargeted)`);
+}
 
 /* ── video ────────────────────────────────────────────────────────────────
    Airtable holds masters at 10-20MB each. The cloud autoplays the clips of

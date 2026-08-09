@@ -17,11 +17,11 @@
   <meta property="og:title" content="Saying goodbye to friends — Alex Tait" />
   <meta property="og:description" content="Illustrations for The Telegraph accompanying an article on ending friendships: the specific difficulty of breaking up with people you've outgrown rather than wronged. The work ran as animated GIFs online and as static images in print, which meant the characters had to carry emotional weight in bo…" />
   <meta property="og:url" content="https://alexjohntait.com/work/saying-goodbye-to-friends.html" />
-  <meta property="og:image" content="https://alexjohntait.com/images/saying-goodbye-to-friends.gif" />
+  <meta property="og:image" content="https://alexjohntait.com/images/saying-goodbye-to-friends.mp4" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Saying goodbye to friends — Alex Tait" />
   <meta name="twitter:description" content="Illustrations for The Telegraph accompanying an article on ending friendships: the specific difficulty of breaking up with people you've outgrown rather than wronged. The work ran as animated GIFs online and as static images in print, which meant the characters had to carry emotional weight in bo…" />
-  <meta name="twitter:image" content="https://alexjohntait.com/images/saying-goodbye-to-friends.gif" />
+  <meta name="twitter:image" content="https://alexjohntait.com/images/saying-goodbye-to-friends.mp4" />
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -35,7 +35,7 @@
   "artMedium": "Illustration, Motion design",
   "genre": "Editorial",
   "dateCreated": "2025",
-  "image": "https://alexjohntait.com/images/saying-goodbye-to-friends.gif",
+  "image": "https://alexjohntait.com/images/saying-goodbye-to-friends.mp4",
   "description": "Illustrations for The Telegraph accompanying an article on ending friendships: the specific difficulty of breaking up with people you've outgrown rather than wronged. The work ran as animated GIFs online and as static images in print, which meant the characters had to carry emotional weight in both a still frame and in motion. Dry, a little melancholy, and precise enough to feel true rather than illustrative.",
   "url": "https://alexjohntait.com/work/saying-goodbye-to-friends.html",
   "copyrightHolder": {
@@ -68,8 +68,7 @@
     --line: rgba(22, 18, 15, 0.28);
     --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
     --mono: 'Roboto Mono', 'Courier New', monospace;
-    --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --drop: cubic-bezier(0.3, 1.25, 0.45, 1);
+    --spring: cubic-bezier(0.22, 1, 0.36, 1);   /* ease-out-quint, no overshoot */
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
     --sigh: clamp(24px, 3.15vw, 41px);   /* the signature mark's height */
@@ -169,7 +168,7 @@
   .card.hit { pointer-events: auto; }
   .card img {
     width: 100%; height: auto; display: block;
-    border-radius: 10px; background: var(--bg, transparent);
+    background: var(--bg, transparent);
     transition: box-shadow 0.3s var(--out);
   }
   /* a card whose poster failed still needs a box for the clip to fill,
@@ -178,7 +177,7 @@
   /* the clip lies over its poster once hover has fetched it */
   .card .vid {
     position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; display: block; border-radius: 10px;
+    object-fit: cover; display: block;
   }
   /* the sketchbook gifs ride along as small asides, whites knocked out */
   .card.sketch { mix-blend-mode: multiply; }
@@ -222,6 +221,27 @@
   }
   @media (min-width: 821px) {
     .tagline { left: calc((var(--gx) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: var(--gx); max-width: none; }
+  }
+
+  /* the way to reach him, on the page rather than behind the menu: the site's
+     whole job is a commission, and the only address used to be two clicks in */
+  .contact {
+    position: fixed; z-index: 65;
+    left: calc((var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+    top: calc(var(--bar) + 17px);
+    font-size: 11.5px; font-weight: 500; letter-spacing: 0.05em;
+    text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
+  }
+  .contact a {
+    color: color-mix(in srgb, var(--ink) 62%, transparent);
+    text-decoration: none; transition: color 0.2s;
+    /* the negative margin cancels the padding's layout shift, so the address
+       stays put visually while the tappable box reaches a thumb's size */
+    display: inline-block; padding: 15px 14px; margin: -15px -14px;
+  }
+  .contact a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  @media (min-width: 821px) {
+    .contact { left: calc((var(--gx) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: calc(var(--gx) + 19px); }
   }
 
   /* a quiet nudge that the page wants scrolling — leaves after first move */
@@ -453,10 +473,16 @@
     .ruled { background-image: none; }
     .cloud-stage { cursor: auto; }
     /* every fixed control clears the notch and the home indicator */
-    .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+    /* no ink offset here: that term aligns text TO the mark, and applying it
+       to the mark itself pushed the signature 6px right of its own margin */
+    .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2);
             top: env(safe-area-inset-top); }
-    /* the phone keeps the mark alone — the line lives in About there */
+    /* the phone keeps the mark alone; the role and location live in About
+       there. The address stays: it is the point of the page, not decoration. */
     .tagline { display: none; }
+    .contact { top: calc(env(safe-area-inset-top) + var(--bar) - 2px);
+               left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
+               font-size: 11px; }
     header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
     .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
     /* caption sits above the filter bar rather than beside it */
@@ -526,13 +552,13 @@
 
   <main class="standalone">
     <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> All work</a>
-    <div class="pop-media" style="--pb:#f6e7de"><img src="../images/saying-goodbye-to-friends.gif" alt="Saying goodbye to friends" loading="lazy" /></div>
+    <div class="pop-media" style="--pb:#f6e7de"><video src="../images/saying-goodbye-to-friends.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Saying goodbye to friends"></video></div>
     <div class="pop-body">
       <h2>Saying goodbye to friends</h2>
       <div class="pop-meta"><b>CLIENT</b> The Telegraph<br /><b>DATE</b> 2025<br /><b>FIELD</b> Editorial</div>
       <p class="pop-desc">Illustrations for The Telegraph accompanying an article on ending friendships: the specific difficulty of breaking up with people you've outgrown rather than wronged. The work ran as animated GIFs online and as static images in print, which meant the characters had to carry emotional weight in both a still frame and in motion. Dry, a little melancholy, and precise enough to feel true rather than illustrative.</p>
     </div>
-    <div class="pop-gal"><img src="../images/saying-goodbye-to-friends-m1.gif" alt="Saying goodbye to friends 2" loading="lazy" width="1000" height="1000" style="aspect-ratio:1000 / 1000" /><img src="../images/saying-goodbye-to-friends-m2.gif" alt="Saying goodbye to friends 3" loading="lazy" width="1000" height="1000" style="aspect-ratio:1000 / 1000" /><img src="../images/saying-goodbye-to-friends-m3.gif" alt="Saying goodbye to friends 4" loading="lazy" width="1920" height="1080" style="aspect-ratio:1920 / 1080" /></div>
+    <div class="pop-gal"><video src="../images/saying-goodbye-to-friends-m1.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Saying goodbye to friends 2" style="aspect-ratio:1000 / 1000"></video><video src="../images/saying-goodbye-to-friends-m2.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Saying goodbye to friends 3" style="aspect-ratio:1000 / 1000"></video><video src="../images/saying-goodbye-to-friends-m3.mp4#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="Saying goodbye to friends 4" style="aspect-ratio:1920 / 1080"></video></div>
     <nav class="pv-nav" aria-label="More projects">
       <a href="tarot-cards.html"><span class="dir">← Previous</span><span class="ti">Tarot Cards</span></a>
       <a class="next" href="yoga-x-oceans.html"><span class="dir">Next →</span><span class="ti">Yoga X Oceans</span></a>
