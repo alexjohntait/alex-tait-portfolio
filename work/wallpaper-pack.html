@@ -208,26 +208,24 @@
   /* the signature PNG carries 6.47% transparent padding down its left edge,
      so matching the box insets leaves the text hanging left of the actual
      ink. 0.26 of the rendered height puts it under the A of Alex. */
-  .tagline {
-    position: fixed; z-index: 65; pointer-events: none;
-    left: calc((var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: var(--bar);
-    font-size: 11.5px; font-weight: 500; letter-spacing: 0.05em;
-    color: var(--ink); max-width: 22ch; line-height: 1.5;
-    text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
-  }
-  @media (min-width: 821px) {
-    .tagline { left: calc((var(--gx) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: var(--gx); max-width: none; }
-  }
-
-  /* the way to reach him, on the page rather than behind the menu: the site's
-     whole job is a commission, and the only address used to be two clicks in */
-  .contact {
+  /* one block, so the two lines share a rhythm. Positioned separately they
+     drifted to a 15px gap under the mark and a 2px gap between themselves,
+     which read as a clump rather than a masthead. */
+  .masthead {
     position: fixed; z-index: 65;
     left: calc((var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
-    top: calc(var(--bar) + 17px);
-    font-size: 11.5px; font-weight: 500; letter-spacing: 0.05em;
+    top: calc(var(--bar) - 6px);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  @media (min-width: 821px) {
+    .masthead { left: calc((var(--gx) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: calc(var(--gx) - 6px); }
+  }
+  .tagline, .contact {
+    font-size: 11.5px; font-weight: 500; letter-spacing: 0.05em; line-height: 1.35;
     text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
   }
+  .tagline { color: var(--ink); pointer-events: none; max-width: 22ch; }
+  @media (min-width: 821px) { .tagline { max-width: none; } }
   .contact a {
     color: color-mix(in srgb, var(--ink) 62%, transparent);
     text-decoration: none; transition: color 0.2s;
@@ -320,21 +318,35 @@
 
   /* the filter bar: a paper card on the sheet, butted to the first rule —
      square corners, hairline edge, mono — same language as the tiles */
+  /* the hairline box read as a default UI chip. The state is carried by a
+     vermillion block that slides between the labels instead: the brand's own
+     mark, doing the work. Ink on vermillion is 5.44:1, where paper would be
+     3.36 and fail at this size. */
   .pill {
     position: fixed; left: var(--gx); bottom: 4vh; z-index: 40;
     display: flex; align-items: center; gap: 4px;
-    background: var(--paper); border: 1px solid var(--line);
-    padding: 6px 16px 6px 14px;
+    background: var(--paper);
+    padding: 5px 14px 5px 12px;
   }
-  .pill::before { content: ''; width: 8px; height: 8px; background: var(--accent); margin-right: 10px; }
+  .pill::before {
+    content: ''; width: 8px; height: 8px; background: var(--accent);
+    margin-right: 10px; transition: opacity 0.3s var(--out);
+  }
+  .pill.picked::before { opacity: 0; }
+  .pill-mark {
+    position: absolute; top: 4px; bottom: 4px; left: 0; width: 0;
+    background: var(--accent); opacity: 0; pointer-events: none;
+    transition: transform 0.5s var(--out), width 0.5s var(--out), opacity 0.3s var(--out);
+  }
   .pill button {
+    position: relative; z-index: 1;
     font-family: var(--mono); font-size: 12px; font-weight: 500;
     letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--ink); background: none; border: 0; cursor: pointer;
-    padding: 8px 6px; transition: color 0.2s;
+    padding: 8px 7px; transition: color 0.2s;
   }
   .pill button:hover { color: var(--accent); }
-  .pill button.active { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+  .pill button.active, .pill button.active:hover { color: var(--ink); }
   .pill .sep { color: color-mix(in srgb, var(--ink) 30%, transparent); font-size: 12px; }
 
   /* ─── case studies (below the board) — same sheet, same system,
@@ -402,8 +414,11 @@
   .idx { list-style: none; counter-reset: idx; }
   .idx li { counter-increment: idx; border-top: 1px solid var(--line); }
   .idx li:last-child { border-bottom: 1px solid var(--line); }
+  /* real columns: right-aligning the client left its column ragged by 60px
+     across the list, which is the one thing an index must not do */
   .idx a {
-    display: flex; align-items: baseline; gap: 14px; padding: 11px 2px;
+    display: grid; grid-template-columns: 2.6em minmax(0, 1fr) 19ch;
+    align-items: baseline; gap: 14px; padding: 11px 2px;
     text-decoration: none; color: var(--ink); transition: color 0.2s;
   }
   .idx a::before {
@@ -412,8 +427,13 @@
     color: color-mix(in srgb, var(--ink) 45%, transparent); min-width: 2.4em;
   }
   .idx .ti { font-family: var(--sans); font-size: clamp(16px, 1.7vw, 20px); letter-spacing: -0.01em; }
-  .idx .cl { margin-left: auto; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: color-mix(in srgb, var(--ink) 55%, transparent); text-align: right; }
+  .idx .cl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--ink) 55%, transparent); }
+  /* the client column has nowhere to go on a phone, so it sits under the title */
+  @media (max-width: 560px) {
+    .idx a { grid-template-columns: 2.4em minmax(0, 1fr); row-gap: 3px; }
+    .idx .cl { grid-column: 2; }
+  }
   .idx a:hover { color: var(--accent); }
   .idx a:hover .cl { color: var(--accent); }
 
@@ -476,9 +496,9 @@
     /* the phone keeps the mark alone; the role and location live in About
        there. The address stays: it is the point of the page, not decoration. */
     .tagline { display: none; }
-    .contact { top: calc(env(safe-area-inset-top) + var(--bar) - 2px);
-               left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26);
-               font-size: 11px; }
+    .masthead { top: calc(env(safe-area-inset-top) + var(--bar) - 4px);
+                left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2 + var(--sigh) * 0.26); }
+    .contact { font-size: 11px; }
     header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
     .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
     /* caption sits above the filter bar rather than beside it */
