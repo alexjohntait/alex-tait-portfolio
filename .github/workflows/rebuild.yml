@@ -30,6 +30,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # optimise.mjs re-encodes video and converts gif animations, and
+      # make-posters.mjs pulls a still for each clip. All three shell out to
+      # ffmpeg, which the runner image does not carry. Without this the steps
+      # warned and carried on, so the job kept reporting success while every
+      # master came back uncompressed.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Refresh from Airtable
         env:
           AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
