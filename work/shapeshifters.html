@@ -236,6 +236,7 @@
     display: inline-block; padding: 15px 14px; margin: -15px -14px;
   }
   .contact a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .contact .dot { color: color-mix(in srgb, var(--ink) 35%, transparent); margin: 0 7px; }
   @media (min-width: 821px) {
     .contact { left: calc((var(--gx) - var(--sigh)) / 2 + var(--sigh) * 0.26); top: calc(var(--gx) + 19px); }
   }
@@ -267,6 +268,15 @@
     display: block; margin-top: 6px;
     font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--ink);
+  }
+
+  /* the reel: the most persuasive forty seconds on the site, and it used to
+     be linked from nowhere at all. Opens full frame, fetched only on demand. */
+  .reelwrap { align-items: center; padding: 4vh 16px; }
+  .reel { position: relative; width: min(1180px, 94vw); }
+  .reel video {
+    width: 100%; height: auto; display: block;
+    border-radius: var(--r); background: var(--ink);
   }
 
   /* the index toggle: an Aa, set in the headline face, answering the menu
@@ -350,6 +360,25 @@
   .pill button:hover { color: var(--accent); }
   .pill button.active, .pill button.active:hover { color: var(--ink); }
   .pill .sep { color: color-mix(in srgb, var(--ink) 30%, transparent); font-size: 12px; }
+
+  /* who has already trusted him, on the page instead of two clicks inside
+     About, and read from the work itself so it cannot go stale */
+  .clients { padding: clamp(70px, 11vh, 130px) var(--gx) clamp(50px, 8vh, 90px); }
+  .clients-kicker {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink);
+  }
+  .clients-kicker::before { content: ''; width: 9px; height: 9px; background: var(--accent); }
+  .clients-list {
+    list-style: none; margin-top: clamp(22px, 3vw, 34px);
+    display: flex; flex-wrap: wrap; gap: 10px clamp(20px, 2.6vw, 40px);
+  }
+  .clients-list li {
+    font-family: var(--sans); font-weight: 400;
+    font-size: clamp(19px, 2.3vw, 33px); letter-spacing: -0.015em;
+    color: var(--ink);
+  }
 
   /* ─── case studies (below the board) — same sheet, same system,
      just gently tinted so the section still reads as its own room ─── */
@@ -557,6 +586,7 @@
   <div class="menu-scrim" id="menu-scrim"></div>
   <aside class="menu-panel" id="menu-panel" aria-label="Menu">
     <a class="nav" href="../index.html">Work</a>
+    <a class="nav" href="../index.html#showreel">Showreel</a>
     <a class="nav" href="../index.html#case-studies">Case studies</a>
     <button type="button" class="nav" id="about-btn">About</button>
     <a class="nav" href="../shop.html">Shop</a>
