@@ -1,0 +1,11 @@
+Last rebuild: 2026-09-08T22:08:14.734Z
+
+Airtable records fetched : 33
+Projects built           : 32
+Hero images              : 32
+Gallery images           : 73
+Failed downloads         : 0
+Sketchbook               : 8 records, 8 sketches, 1 newly downloaded
+
+SKIPPED — these Airtable records are NOT on the site:
+  "Event Guide" — missing hero attachment
