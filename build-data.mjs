@@ -116,6 +116,19 @@ for (const r of rows) {
   console.log('OK  ', r.id, '(+' + gal.length + ' gallery)');
 }
 
-fs.writeFileSync('_data.json', JSON.stringify({ PROJECTS, ASSETS, GALLERY }, null, 2));
+fs.writeFileSync('_data.json', JSON.stringify({
+  PROJECTS, ASSETS, GALLERY,
+  /* carried through so refresh.mjs can write it into the committed report:
+     CI logs need a login to read, a file in the repo does not */
+  _report: {
+    recordsFetched: data.records.length,
+    projectsBuilt: PROJECTS.length,
+    skipped: skipped.map(r => ({
+      title: r.title || '(untitled)',
+      missing: [!r.id && 'Title', !r.heroUrl && 'hero attachment'].filter(Boolean)
+    })),
+    heroOk, galOk, fail
+  }
+}, null, 2));
 console.log('---');
 console.log('Heroes:', heroOk, '| Gallery images:', galOk, '| Failed:', fail);

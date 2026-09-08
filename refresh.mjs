@@ -15,6 +15,7 @@ const TABLE = 'tblY3AdUL6JNOnYcY';
 const SKETCH_TABLE = 'Sketchbook';   // referenced by tab name, not field IDs
 const fileArg = process.argv[2];
 const token = process.env.AIRTABLE_TOKEN;
+let sketchStatus = 'not run';
 
 async function fetchRecords() {
   console.log('• Fetching records from Airtable…');
@@ -46,7 +47,7 @@ async function fetchRecords() {
    Non-fatal on purpose: if the table is missing/renamed the main refresh
    still succeeds — the site just keeps its previous sketches. */
 async function refreshSketchbook() {
-  if (!token) { console.log('• Sketchbook: skipped (no token / file mode)'); return; }
+  if (!token) { console.log('• Sketchbook: skipped (no token / file mode)'); sketchStatus = 'skipped (no token)'; return; }
   let records;
   try {
     records = [];
@@ -63,6 +64,7 @@ async function refreshSketchbook() {
     } while (offset);
   } catch (e) {
     console.warn(`• Sketchbook: skipped (${e.message}) — check the tab is named "${SKETCH_TABLE}"`);
+    sketchStatus = `FAILED to read the "${SKETCH_TABLE}" table: ${e.message}`;
     return;
   }
 
@@ -129,6 +131,35 @@ async function refreshSketchbook() {
     fs.writeFileSync(page, html.replace(/const SKETCHES = \[[\s\S]*?\];/, decl));
   }
   console.log(`• Sketchbook: ${list.length} sketches (${fresh} newly downloaded)`);
+  sketchStatus = `${records.length} records, ${list.length} sketches, ${fresh} newly downloaded`;
+}
+
+/* Committed alongside the rebuild so the state of the last sync can be read
+   from the repo. The CI log needs a login; this does not, and it is the only
+   way a silently-skipped record ever becomes visible. */
+function writeReport() {
+  let d = {};
+  try { d = JSON.parse(fs.readFileSync('_data.json', 'utf8'))._report || {}; } catch {}
+  const lines = [
+    `Last rebuild: ${new Date().toISOString()}`,
+    ``,
+    `Airtable records fetched : ${d.recordsFetched ?? '?'}`,
+    `Projects built           : ${d.projectsBuilt ?? '?'}`,
+    `Hero images              : ${d.heroOk ?? '?'}`,
+    `Gallery images           : ${d.galOk ?? '?'}`,
+    `Failed downloads         : ${d.fail ?? '?'}`,
+    `Sketchbook               : ${sketchStatus}`,
+    ``,
+  ];
+  const skipped = d.skipped || [];
+  if (skipped.length) {
+    lines.push(`SKIPPED — these Airtable records are NOT on the site:`);
+    for (const s of skipped) lines.push(`  "${s.title}" — missing ${s.missing.join(' and ')}`);
+  } else {
+    lines.push(`No records skipped: every Airtable row made it onto the site.`);
+  }
+  fs.writeFileSync('BUILD-REPORT.txt', lines.join('\n') + '\n');
+  console.log('• Wrote BUILD-REPORT.txt');
 }
 
 function injectData() {
@@ -165,6 +196,7 @@ function injectData() {
     injectData();
 
     await refreshSketchbook();
+    writeReport();
 
     /* a video project needs a still for the cloud; without one its card
        renders as a broken image until you hover it */
