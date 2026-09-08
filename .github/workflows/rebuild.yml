@@ -9,7 +9,7 @@ on:
   push:
     branches: [main]
     # editing this file is a deliberate "run me now" — a no-UI manual trigger
-    paths: ['.github/workflows/rebuild.yml']
+    paths: [".github/workflows/rebuild.yml"]
 
 jobs:
   build:
