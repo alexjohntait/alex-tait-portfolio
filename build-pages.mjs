@@ -118,17 +118,18 @@ ${JSON.stringify(jsonld, null, 2)}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>${CSS}${EXTRA_CSS}</style>
 </head>
 <body>
 
   <header>
-    <button class="menu-btn" id="menu-btn" aria-label="Open menu" aria-expanded="false"><i></i></button>
+    <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
   </header>
 
   <div class="menu-scrim" id="menu-scrim"></div>
-  <aside class="menu-panel" id="menu-panel" aria-label="Menu">
+  <aside class="menu-panel" id="menu-panel" aria-label="Information and menu">
+    <p class="menu-role">Illustrator &amp; motion designer &middot; Bath / London</p>
     <a class="nav" href="../index.html">Work</a>
     <a class="nav" href="../index.html#showreel">Showreel</a>
     <a class="nav" href="../index.html#case-studies">Case studies</a>
