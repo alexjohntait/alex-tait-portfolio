@@ -11,6 +11,13 @@ on:
     # editing this file is a deliberate "run me now" — a no-UI manual trigger
     paths: [".github/workflows/rebuild.yml"]
 
+# one rebuild at a time. Two overlapping runs both commit media and the
+# second one's push is rejected, which is how "all jobs have failed" arrives
+# in the inbox after a couple of quick pushes.
+concurrency:
+  group: rebuild-from-airtable
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -52,6 +59,18 @@ jobs:
             echo "Nothing changed, skipping commit"
           else
             git commit -m "Rebuild from Airtable [skip ci]"
-            git push
+            # main can move while a rebuild runs — someone pushes, or the
+            # previous run lands. Rebase onto it and retry rather than
+            # failing the whole rebuild on a non-fast-forward.
+            for attempt in 1 2 3; do
+              if git pull --rebase --autostash origin main && git push; then
+                echo "pushed on attempt $attempt"
+                exit 0
+              fi
+              echo "push attempt $attempt failed; retrying"
+              sleep 5
+            done
+            echo "could not push after 3 attempts"
+            exit 1
           fi
 
