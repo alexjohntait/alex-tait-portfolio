@@ -38,7 +38,24 @@ let rows = data.records.map(r => {
     heroType: hero ? hero.type : null,
     mosaic: mosaic.map(a => ({ url: (a.thumbnails && a.thumbnails.full ? a.thumbnails.full.url : a.url), type: a.type, w: a.width, h: a.height })),
   };
-}).filter(r => r.id && r.heroUrl).sort((a,b) => a.order - b.order);
+});
+
+/* A record with no Title or no hero attachment cannot be built into a page,
+   but dropping it in silence is how a project gets added in Airtable and
+   simply never appears, with a green tick on the rebuild and no clue why.
+   Say what was skipped and what it is missing. */
+const skipped = rows.filter(r => !r.id || !r.heroUrl);
+if (skipped.length) {
+  console.warn(`\n  ${skipped.length} Airtable record(s) skipped — they will NOT appear on the site:`);
+  for (const r of skipped) {
+    const why = [!r.id && 'no Title', !r.heroUrl && 'no hero attachment'].filter(Boolean).join(' and ');
+    console.warn(`    "${r.title || '(untitled)'}" — ${why}`);
+  }
+  console.warn('');
+}
+
+rows = rows.filter(r => r.id && r.heroUrl).sort((a,b) => a.order - b.order);
+console.log(`  ${rows.length} projects built from ${data.records.length} Airtable records`);
 
 // de-dupe ids
 const seen = {};

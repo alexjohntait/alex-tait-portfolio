@@ -63,6 +63,10 @@ for (const f of gifs) {
       '-vf', "scale='min(1000,iw)':-2:flags=lanczos",
       '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26',
       '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', '-threads', '1',
+      /* strip container metadata so the same master always yields the same
+         bytes: the runner's ffmpeg stamps a creation time, which rewrote nine
+         clips into git on every rebuild */
+      '-map_metadata', '-1', '-fflags', '+bitexact', '-flags:v', '+bitexact',
       '-y', out
     ], { stdio: 'inherit' });
     const got = fs.statSync(out).size;
@@ -134,6 +138,10 @@ for (const f of vids) {
          the masters are re-downloaded every refresh, and a nondeterministic
          encode would rewrite all 25 clips into git every six hours */
       '-threads', '1',
+      /* strip container metadata so the same master always yields the same
+         bytes: the runner's ffmpeg stamps a creation time, which rewrote nine
+         clips into git on every rebuild */
+      '-map_metadata', '-1', '-fflags', '+bitexact', '-flags:v', '+bitexact',
       '-y', tmp
     ], { stdio: 'inherit' });
     const got = fs.statSync(tmp).size;
