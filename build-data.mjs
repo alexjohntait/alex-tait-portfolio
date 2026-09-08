@@ -1,7 +1,6 @@
 // Rebuilds PROJECTS + ASSETS + GALLERY from a fresh Airtable pull, downloads all media locally.
 import fs from 'fs';
 import path from 'path';
-import https from 'https';
 
 const SRC = process.argv[2]; // path to the list_records tool-result JSON
 const DIR = path.resolve('images');
@@ -64,15 +63,16 @@ rows.forEach(r => {
   else seen[r.id] = 1;
 });
 
-function download(url, dest) {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(dest);
-    https.get(url, res => {
-      if (res.statusCode !== 200) { file.close(); fs.unlink(dest,()=>{}); return reject(res.statusCode); }
-      res.pipe(file);
-      file.on('finish', () => file.close(() => resolve()));
-    }).on('error', e => { file.close(); fs.unlink(dest,()=>{}); reject(e.message); });
-  });
+/* fetch, not https.get: https.get does not follow redirects, so an Airtable
+   attachment served via a 302 failed here — and a failed hero drops the whole
+   project below. The sketchbook has always used fetch, which is why it never
+   hit this. */
+async function download(url, dest) {
+  const res = await fetch(url, { redirect: 'follow' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+  if (!buf.length) throw new Error('empty response');
+  fs.writeFileSync(dest, buf);
 }
 
 const extFor = type => {
@@ -86,6 +86,7 @@ const GALLERY = {};
 const PROJECTS = [];
 
 let heroOk = 0, galOk = 0, fail = 0;
+const heroFailed = [];
 console.log('Downloading hero + gallery for', rows.length, 'projects...');
 
 for (const r of rows) {
@@ -96,7 +97,14 @@ for (const r of rows) {
     await download(r.heroUrl, path.join(DIR, hFile));
     ASSETS[r.id] = { file: hFile, kind: kindFor(r.heroType) };
     heroOk++;
-  } catch(e) { fail++; console.log('FAIL hero', r.id, e); continue; }
+  } catch(e) {
+    /* no hero on disk means no card, so the project cannot be built — but it
+       must say so by name, not vanish into a passing log line */
+    fail++;
+    heroFailed.push({ title: r.title || r.id, why: String(e && e.message || e) });
+    console.log('FAIL hero', r.id, e);
+    continue;
+  }
 
   // gallery (mosaic)
   const gal = [];
@@ -127,7 +135,8 @@ fs.writeFileSync('_data.json', JSON.stringify({
       title: r.title || '(untitled)',
       missing: [!r.id && 'Title', !r.heroUrl && 'hero attachment'].filter(Boolean)
     })),
-    heroOk, galOk, fail
+    heroOk, galOk, fail,
+    heroFailed
   }
 }, null, 2));
 console.log('---');

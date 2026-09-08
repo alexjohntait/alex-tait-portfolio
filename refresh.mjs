@@ -155,8 +155,15 @@ function writeReport() {
   if (skipped.length) {
     lines.push(`SKIPPED — these Airtable records are NOT on the site:`);
     for (const s of skipped) lines.push(`  "${s.title}" — missing ${s.missing.join(' and ')}`);
-  } else {
-    lines.push(`No records skipped: every Airtable row made it onto the site.`);
+  }
+  const hf = d.heroFailed || [];
+  if (hf.length) {
+    lines.push('');
+    lines.push('HERO DOWNLOAD FAILED — these projects were dropped:');
+    for (const s of hf) lines.push('  "' + s.title + '" — ' + s.why);
+  }
+  if (!skipped.length && !hf.length) {
+    lines.push('No records skipped: every Airtable row made it onto the site.');
   }
   fs.writeFileSync('BUILD-REPORT.txt', lines.join('\n') + '\n');
   console.log('• Wrote BUILD-REPORT.txt');
