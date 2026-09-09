@@ -879,7 +879,9 @@ function place() {
     c.oy = Math.sin(ang) * rad * YMUL;
     c.st = -i * SPACING;
     c.dy = (rnd(i + 41) - 0.5) * 150;   /* a little vertical travel as it crosses */
-    c.w = c.small ? MINW * 0.84 : MINW + rnd(i + 99) * (MAXW - MINW);
+    /* the sketches sit a quarter larger than they did: at 0.84 of the
+       narrowest work they read as specks beside it rather than as asides */
+    c.w = c.small ? MINW * 1.05 : MINW + rnd(i + 99) * (MAXW - MINW);
     c.el.style.setProperty('--w', Math.round(c.w) + 'px');
   });
   span = Math.max(0, (live.length - 1) * SPACING);
