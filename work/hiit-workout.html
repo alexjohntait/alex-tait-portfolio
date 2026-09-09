@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,31 +60,10 @@
     a { color: inherit; }
 
     header { position: fixed; top: 0; right: 0; z-index: 70; }
-    .menu-btn { height: 58px; border: 0; cursor: pointer; padding: 0 16px; background: var(--accent); color: var(--paper); display: grid; place-items: center;
-      font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; transition: background .25s, color .25s; }
-    @media (min-width: 821px) { .menu-btn { height: var(--gx, clamp(28px, 5vw, 96px)); padding: 0 clamp(18px, 1.6vw, 26px); } }
-    .menu-btn:hover, body.menu-open .menu-btn { background: var(--ink); color: var(--paper); }
-    .menu-role { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
-      color: color-mix(in srgb, var(--paper) 60%, transparent); line-height: 1.6; }
-    .menu-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(22,18,15,.4); opacity: 0; pointer-events: none; transition: opacity .4s var(--out); }
-    body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; }
-    .menu-panel {
-      position: fixed; top: 0; right: 0; z-index: 61; height: 100dvh; width: min(430px, 86vw);
-      background: var(--ink); color: var(--paper); display: flex; flex-direction: column; justify-content: center; gap: 26px;
-      padding: 80px clamp(24px, 2.5vw, 44px); transform: translateX(101%); visibility: hidden;
-      transition: transform .55s var(--out), visibility 0s linear .55s;
-    }
-    body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform .55s var(--out); }
-    .menu-panel a.nav, .menu-panel button.nav {
-      font-family: var(--sans); font-weight: 400; font-size: clamp(24px, 2.2vw, 34px); letter-spacing: -.01em;
-      color: var(--paper); text-decoration: none; width: fit-content; background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
-    }
-    .menu-panel a.nav:hover, .menu-panel button.nav:hover { color: var(--accent); }
-    .menu-panel .m-foot { margin-top: 30px; display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; letter-spacing: .04em; }
-    .menu-panel .m-foot a { color: color-mix(in srgb, var(--paper) 65%, transparent); text-decoration: none; }
-    .menu-panel .m-foot a:hover { color: var(--accent); }
-    .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px; color: color-mix(in srgb, var(--paper) 65%, transparent); }
-    .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
+    .menu-btn { height: 58px; border: 0; cursor: pointer; padding: 0 18px; background: none; color: var(--ink); display: grid; place-items: center;
+      font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; transition: color .25s; }
+    @media (min-width: 821px) { .menu-btn { height: var(--gx, clamp(28px, 5vw, 96px)); padding: 0 clamp(20px, 1.8vw, 30px); } }
+    .menu-btn:hover { color: var(--accent); }
 
     .popwrap { position: fixed; inset: 0; z-index: 80; display: none; align-items: flex-start; justify-content: center; overflow-y: auto; overscroll-behavior: contain; background: color-mix(in srgb, var(--ink) 42%, transparent); padding: 6vh 16px 8vh; }
     .popwrap.open { display: flex; }
@@ -136,22 +115,6 @@
   <header>
     <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
   </header>
-
-  <div class="menu-scrim" id="menu-scrim"></div>
-  <aside class="menu-panel" id="menu-panel" aria-label="Information and menu">
-    <p class="menu-role">Illustrator &amp; motion designer &middot; Bath / London</p>
-    <a class="nav" href="../index.html">Work</a>
-    <a class="nav" href="../index.html#showreel">Showreel</a>
-    <a class="nav" href="../index.html#case-studies">Case studies</a>
-    <button type="button" class="nav" id="about-btn">About</button>
-    <a class="nav" href="../shop.html">Shop</a>
-    <div class="m-foot">
-      <a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
-      <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration</a>
-      <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Represented by Jelly ↗</a>
-      <span class="status"><span class="dot"></span> available for commissions</span>
-    </div>
-  </aside>
 
   <main>
     <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> All work</a>
@@ -229,18 +192,16 @@
 
   <script>
     (function () {
-      var btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim');
-      var toggle = function (on) { document.body.classList.toggle('menu-open', on); btn.setAttribute('aria-expanded', on); };
-      btn.addEventListener('click', function () { toggle(!document.body.classList.contains('menu-open')); });
-      scrim.addEventListener('click', function () { toggle(false); });
-      document.querySelectorAll('.menu-panel a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
-      addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
-
+      var btn = document.getElementById('menu-btn');
       var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
-      document.getElementById('about-btn').addEventListener('click', function () {
-        toggle(false); awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
+      btn.addEventListener('click', function () {
+        btn.setAttribute('aria-expanded', 'true');
+        awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
       });
-      var closeAbout = function () { awrap.classList.remove('open'); document.body.style.overflow = ''; };
+      var closeAbout = function () {
+        awrap.classList.remove('open'); document.body.style.overflow = '';
+        btn.setAttribute('aria-expanded', 'false');
+      };
       ax.addEventListener('click', closeAbout);
       awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
       addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
@@ -250,7 +211,7 @@
     var _prev = 'app-store.html', _next = 'pepper.html';
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (document.body.classList.contains('menu-open') || document.getElementById('aboutwrap').classList.contains('open')) return;
+      if (document.getElementById('aboutwrap').classList.contains('open')) return;
       if (e.key === 'ArrowRight' && _next) location.href = _next;
       else if (e.key === 'ArrowLeft' && _prev) location.href = _prev;
       else if (e.key === 'Escape') location.href = '../index.html';

@@ -47,7 +47,7 @@ const EXTRA_CSS = `
     .standalone .pv-nav a { text-decoration: none; color: var(--ink); max-width: 46%; }
     .standalone .pv-nav a:hover { color: var(--accent); }
     .standalone .pv-nav .dir { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-    .standalone .pv-nav .ti { font-family: var(--sans); font-weight: 400; font-size: clamp(17px, 2vw, 22px); letter-spacing: -0.01em; }
+    .standalone .pv-nav .ti { font-family: var(--sans); font-weight: 600; font-size: clamp(18px, 2.1vw, 24px); letter-spacing: -0.03em; }
     .standalone .pv-nav .next { text-align: right; margin-left: auto; }
 `;
 
@@ -117,7 +117,7 @@ ${JSON.stringify(jsonld, null, 2)}
   <link rel="preconnect" href="https://api.fontshare.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>${CSS}${EXTRA_CSS}</style>
 </head>
@@ -126,22 +126,6 @@ ${JSON.stringify(jsonld, null, 2)}
   <header>
     <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
   </header>
-
-  <div class="menu-scrim" id="menu-scrim"></div>
-  <aside class="menu-panel" id="menu-panel" aria-label="Information and menu">
-    <p class="menu-role">Illustrator &amp; motion designer &middot; Bath / London</p>
-    <a class="nav" href="../index.html">Work</a>
-    <a class="nav" href="../index.html#showreel">Showreel</a>
-    <a class="nav" href="../index.html#case-studies">Case studies</a>
-    <button type="button" class="nav" id="about-btn">About</button>
-    <a class="nav" href="../shop.html">Shop</a>
-    <div class="m-foot">
-      <a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
-      <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration</a>
-      <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Represented by Jelly ↗</a>
-      <span class="status"><span class="dot"></span> available for commissions</span>
-    </div>
-  </aside>
 
   <main class="standalone">
     <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> All work</a>
@@ -182,20 +166,18 @@ ${JSON.stringify(jsonld, null, 2)}
   </div>
 
   <script>
-    // menu
+    // info
     (function () {
-      var btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim');
-      var toggle = function (on) { document.body.classList.toggle('menu-open', on); btn.setAttribute('aria-expanded', on); };
-      btn.addEventListener('click', function () { toggle(!document.body.classList.contains('menu-open')); });
-      scrim.addEventListener('click', function () { toggle(false); });
-      document.querySelectorAll('.menu-panel a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
-      addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
-
+      var btn = document.getElementById('menu-btn');
       var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
-      document.getElementById('about-btn').addEventListener('click', function () {
-        toggle(false); awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
+      btn.addEventListener('click', function () {
+        btn.setAttribute('aria-expanded', 'true');
+        awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
       });
-      var closeAbout = function () { awrap.classList.remove('open'); document.body.style.overflow = ''; };
+      var closeAbout = function () {
+        awrap.classList.remove('open'); document.body.style.overflow = '';
+        btn.setAttribute('aria-expanded', 'false');
+      };
       ax.addEventListener('click', closeAbout);
       awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
       addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
@@ -212,7 +194,7 @@ ${JSON.stringify(jsonld, null, 2)}
     var _prev = ${prev ? `'${prev.id}.html'` : 'null'}, _next = ${next ? `'${next.id}.html'` : 'null'};
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (document.body.classList.contains('menu-open') || document.getElementById('aboutwrap').classList.contains('open')) return;
+      if (document.getElementById('aboutwrap').classList.contains('open')) return;
       if (e.key === 'ArrowRight' && _next) location.href = _next;
       else if (e.key === 'ArrowLeft' && _prev) location.href = _prev;
       else if (e.key === 'Escape') location.href = '../index.html';

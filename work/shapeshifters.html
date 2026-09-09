@@ -52,7 +52,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -102,56 +102,19 @@
      behind it where a hamburger only says "something". Blocked in vermillion
      to match the filter bar at the other end of the sheet. */
   .menu-btn {
-    height: 58px; border: 0; cursor: pointer; padding: 0 16px;
-    background: var(--accent); color: var(--paper);
+    height: 58px; border: 0; cursor: pointer; padding: 0 18px;
+    background: none; color: var(--ink);
     display: grid; place-items: center;
     font-family: var(--mono); font-size: 13px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase;
-    transition: background .25s, color .25s;
+    transition: color .25s;
+    /* the halo the signature wears, so the word stays readable over the work */
+    text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
   }
   @media (min-width: 821px) {
-    .menu-btn { height: var(--gx); padding: 0 clamp(18px, 1.6vw, 26px); }
+    .menu-btn { height: var(--gx); padding: 0 clamp(20px, 1.8vw, 30px); }
   }
-  .menu-btn:hover { background: var(--ink); color: var(--paper); }
-  body.menu-open .menu-btn { background: var(--ink); }
-  /* the panel it opens is the info overlay: role and location head it, the
-     address and the reel sit in the foot with everything else */
-  .menu-role {
-    font-family: var(--mono); font-size: 12px; font-weight: 500;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: color-mix(in srgb, var(--paper) 60%, transparent);
-    line-height: 1.6;
-  }
-
-  .menu-scrim { position: fixed; inset: 0; z-index: 60; background: rgba(22,18,15,0.4);
-    opacity: 0; pointer-events: none; transition: opacity .4s var(--out); }
-  body.menu-open .menu-scrim { opacity: 1; pointer-events: auto; }
-  /* opens from the right, out of the corner the button now lives in */
-  .menu-panel {
-    position: fixed; top: 0; right: 0; z-index: 61; height: 100dvh;
-    width: min(430px, 86vw);
-    background: var(--ink); color: var(--paper);
-    display: flex; flex-direction: column; justify-content: center; gap: 26px;
-    padding: 80px clamp(24px, 2.5vw, 44px);
-    transform: translateX(101%); visibility: hidden;
-    transition: transform .55s var(--out), visibility 0s linear .55s;
-  }
-  body.menu-open .menu-panel { transform: none; visibility: visible; transition: transform .55s var(--out); }
-  .menu-panel a.nav, .menu-panel button.nav {
-    font-family: var(--sans); font-weight: 400; font-size: clamp(24px, 2.2vw, 34px);
-    letter-spacing: -0.01em; color: var(--paper); text-decoration: none; width: fit-content;
-    background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
-  }
-  .menu-panel a.nav:hover, .menu-panel button.nav:hover { color: var(--accent); }
-  .menu-panel .m-foot {
-    margin-top: 30px; display: flex; flex-direction: column; gap: 6px;
-    font-size: 11.5px; letter-spacing: 0.04em;
-  }
-  .menu-panel .m-foot a { color: color-mix(in srgb, var(--paper) 65%, transparent); text-decoration: none; }
-  .menu-panel .m-foot a:hover { color: var(--accent); }
-  .menu-panel .m-foot .status { display: inline-flex; align-items: center; gap: 7px;
-    color: color-mix(in srgb, var(--paper) 65%, transparent); }
-  .menu-panel .m-foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #02b34b; }
+  .menu-btn:hover { color: var(--accent); }
   /* ─── the image cloud: a linear flight through the work ───
      Every card sits at a fixed point in 3D space — scattered on a
      golden-angle spiral around one long Z axis, so nothing ever clumps.
@@ -241,8 +204,8 @@
   }
   .cloud-cap.on { opacity: 1; }
   .cloud-cap .t {
-    display: block; font-family: var(--sans); font-weight: 400;
-    font-size: clamp(24px, 2.9vw, 42px); letter-spacing: -0.015em; line-height: 1.02;
+    display: block; font-family: var(--sans); font-weight: 700;
+    font-size: clamp(26px, 3.2vw, 48px); letter-spacing: -0.035em; line-height: 0.96;
     color: var(--ink);
   }
   .cloud-cap .m {
@@ -267,8 +230,8 @@
     width: var(--bar); height: var(--bar);
     border: 0; background: none; cursor: pointer;
     display: grid; place-items: center;
-    font-family: var(--sans); font-weight: 400;
-    font-size: 27px; line-height: 1; letter-spacing: -0.015em;
+    font-family: var(--sans); font-weight: 700;
+    font-size: 29px; line-height: 1; letter-spacing: -0.04em;
     color: var(--accent); transition: color 0.25s;
     /* the cap and the x-height sit low in the box without this */
     padding-bottom: 2px;
@@ -363,8 +326,8 @@
     display: flex; flex-wrap: wrap; gap: 10px clamp(20px, 2.6vw, 40px);
   }
   .clients-list li {
-    font-family: var(--sans); font-weight: 400;
-    font-size: clamp(23px, 2.9vw, 42px); letter-spacing: -0.015em;
+    font-family: var(--sans); font-weight: 600;
+    font-size: clamp(24px, 3vw, 44px); letter-spacing: -0.03em;
     color: var(--ink);
   }
 
@@ -417,15 +380,15 @@
   }
   /* headline shares the popup's scale — one "project title" moment site-wide */
   .case h2, .pop-body h2 {
-    font-family: var(--sans); font-weight: 400;
-    font-size: clamp(32px, 3.6vw, 54px); letter-spacing: -0.01em; line-height: 1.05;
+    font-family: var(--sans); font-weight: 700;
+    font-size: clamp(38px, 4.4vw, 66px); letter-spacing: -0.035em; line-height: 0.95;
     color: var(--accent); text-wrap: balance;
   }
   /* the case-study headline carries more weight than the popup's — it's
      a section opener and should read with real presence */
   .case h2 {
     grid-column: 1 / 4; margin: 0 0 30px;
-    font-weight: 600; font-size: clamp(36px, 4.1vw, 62px); letter-spacing: -0.02em;
+    font-weight: 700; font-size: clamp(44px, 5.2vw, 82px); letter-spacing: -0.04em;
   }
   /* meta + body copy share one scale with the popup's mono content */
   /* the plain text index: the cloud is lovely for browsing but poor for
@@ -445,7 +408,7 @@
     font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em;
     color: color-mix(in srgb, var(--ink) 45%, transparent); min-width: 2.4em;
   }
-  .idx .ti { font-family: var(--sans); font-size: clamp(16px, 1.7vw, 20px); letter-spacing: -0.01em; }
+  .idx .ti { font-family: var(--sans); font-weight: 600; font-size: clamp(17px, 1.8vw, 22px); letter-spacing: -0.025em; }
   .idx .cl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
     color: color-mix(in srgb, var(--ink) 55%, transparent); }
   /* the client column has nowhere to go on a phone, so it sits under the title */
@@ -513,7 +476,7 @@
     .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2);
             top: env(safe-area-inset-top); }
     header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
-    .menu-btn { font-size: 12px; padding: 0 14px; }
+    .menu-btn { font-size: 12px; padding: 0 16px; }
     .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
     /* caption sits above the filter bar rather than beside it */
     .cloud-cap {
@@ -538,7 +501,6 @@
     }
     .pill::before { width: 13px; }
     .pill button { font-size: 11.5px; padding: 14px 10px; letter-spacing: 0.06em; min-height: 46px; }
-    .menu-panel { width: min(84vw, 340px); }
   }
 
     .standalone { max-width: 900px; margin: 0 auto; padding: clamp(90px, 11vw, 130px) var(--pad, 20px) 40px; }
@@ -555,7 +517,7 @@
     .standalone .pv-nav a { text-decoration: none; color: var(--ink); max-width: 46%; }
     .standalone .pv-nav a:hover { color: var(--accent); }
     .standalone .pv-nav .dir { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-    .standalone .pv-nav .ti { font-family: var(--sans); font-weight: 400; font-size: clamp(17px, 2vw, 22px); letter-spacing: -0.01em; }
+    .standalone .pv-nav .ti { font-family: var(--sans); font-weight: 600; font-size: clamp(18px, 2.1vw, 24px); letter-spacing: -0.03em; }
     .standalone .pv-nav .next { text-align: right; margin-left: auto; }
 </style>
 </head>
@@ -564,22 +526,6 @@
   <header>
     <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
   </header>
-
-  <div class="menu-scrim" id="menu-scrim"></div>
-  <aside class="menu-panel" id="menu-panel" aria-label="Information and menu">
-    <p class="menu-role">Illustrator &amp; motion designer &middot; Bath / London</p>
-    <a class="nav" href="../index.html">Work</a>
-    <a class="nav" href="../index.html#showreel">Showreel</a>
-    <a class="nav" href="../index.html#case-studies">Case studies</a>
-    <button type="button" class="nav" id="about-btn">About</button>
-    <a class="nav" href="../shop.html">Shop</a>
-    <div class="m-foot">
-      <a href="mailto:alexjohntait@gmail.com">alexjohntait@gmail.com</a>
-      <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration</a>
-      <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Represented by Jelly ↗</a>
-      <span class="status"><span class="dot"></span> available for commissions</span>
-    </div>
-  </aside>
 
   <main class="standalone">
     <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> All work</a>
@@ -620,20 +566,18 @@
   </div>
 
   <script>
-    // menu
+    // info
     (function () {
-      var btn = document.getElementById('menu-btn'), scrim = document.getElementById('menu-scrim');
-      var toggle = function (on) { document.body.classList.toggle('menu-open', on); btn.setAttribute('aria-expanded', on); };
-      btn.addEventListener('click', function () { toggle(!document.body.classList.contains('menu-open')); });
-      scrim.addEventListener('click', function () { toggle(false); });
-      document.querySelectorAll('.menu-panel a').forEach(function (a) { a.addEventListener('click', function () { toggle(false); }); });
-      addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
-
+      var btn = document.getElementById('menu-btn');
       var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
-      document.getElementById('about-btn').addEventListener('click', function () {
-        toggle(false); awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
+      btn.addEventListener('click', function () {
+        btn.setAttribute('aria-expanded', 'true');
+        awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
       });
-      var closeAbout = function () { awrap.classList.remove('open'); document.body.style.overflow = ''; };
+      var closeAbout = function () {
+        awrap.classList.remove('open'); document.body.style.overflow = '';
+        btn.setAttribute('aria-expanded', 'false');
+      };
       ax.addEventListener('click', closeAbout);
       awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
       addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
@@ -650,7 +594,7 @@
     var _prev = 'cadooz.html', _next = null;
     addEventListener('keydown', function (e) {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (document.body.classList.contains('menu-open') || document.getElementById('aboutwrap').classList.contains('open')) return;
+      if (document.getElementById('aboutwrap').classList.contains('open')) return;
       if (e.key === 'ArrowRight' && _next) location.href = _next;
       else if (e.key === 'ArrowLeft' && _prev) location.href = _prev;
       else if (e.key === 'Escape') location.href = '../index.html';
