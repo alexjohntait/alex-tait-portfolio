@@ -159,10 +159,21 @@ async function refreshSiteLogo() {
     if (!res.ok) throw new Error(`Airtable ${res.status}`);
     const { records } = await res.json();
 
-    let att = null;
+    /* Every attachment in every Site Logo cell, in order. Taking v[0] meant a
+       gif dropped in beside an existing png never won: the png was still
+       first, so the cell looked unchanged and the logo never moved. An
+       animated file is the more deliberate choice of the two, so it wins;
+       otherwise the first one still does. */
+    const found = [];
     for (const r of records) {
       const v = (r.fields || {})['Site Logo'];
-      if (Array.isArray(v) && v.length && v[0] && v[0].url) { att = v[0]; break; }
+      if (Array.isArray(v)) for (const a of v) if (a && a.url) found.push(a);
+    }
+    const animatedByName = a => /\.(gif|webp|apng)(\?|$)/i.test(a.filename || a.url || '')
+      || /gif|webp/i.test(a.type || '');
+    const att = found.find(animatedByName) || found[0] || null;
+    if (found.length > 1) {
+      console.log(`  ${found.length} attachments in Site Logo — chose "${att.filename}"`);
     }
     if (!att) {
       console.log('• Site logo: no "Site Logo" attachment found — keeping the current signature');
