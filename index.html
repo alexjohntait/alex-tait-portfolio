@@ -736,16 +736,23 @@ function tune() {
   /* a phone sizes its cards from the viewport, not in fixed pixels: at a
      flat 330px a piece filled 81% of a 375px screen and everything around
      it was clipped, so you read fragments instead of a composition */
-  SPACING = small ? 66 : 165;
-  MINR = small ? 34 : 90;
-  SPREAD = small ? 96 : 300;
+  /* more air, two ways. SPACING opens the run along the track, so fewer
+     pieces share the frame at once. MINR pushes them off the centreline,
+     which is where they were stacking — the outer bound barely moves,
+     because a card that scatters much further than this is half off the
+     screen at the moment it is biggest. */
+  SPACING = small ? 86 : 215;
+  MINR = small ? 48 : 130;
+  SPREAD = small ? 96 : 290;
   MINW = small ? Math.round(w * 0.40) : 300;
   MAXW = small ? Math.round(w * 0.60) : 540;
   SMIN = small ? 0.26 : 0.14;   /* arrivals read as work, not as specks */
   /* fill the portrait frame rather than a band across its middle */
   YMUL = small ? Math.min(2.4, (h / w) * 1.05) : 0.95;
   RANGE = w * (small ? 0.62 : 0.50);
-  PER = small ? clamp(h * 0.17, 120, 180) : clamp(h * 0.24, 150, 260);
+  /* scaled with SPACING: leave it alone and the wider run would simply be
+     travelled faster, which reads as the same crowding going by quicker */
+  PER = small ? clamp(h * 0.22, 156, 235) : clamp(h * 0.31, 195, 340);
 }
 
 function mediaHTML(p) {
