@@ -147,7 +147,7 @@ ${JSON.stringify(jsonld, null, 2)}
     <div class="pop" id="about-pop" style="width:min(720px, 94vw)">
       <button class="pop-x" id="about-x" aria-label="Close">✕</button>
       <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
-        <h2>I draw characters, and make them <em style="font-style:normal">move</em>.</h2>
+        <h2>Wide awake</h2>
         <p class="pop-desc" style="margin-bottom:26px">
           I'm an illustrator and motion designer based between Bath and London, making bold
           character work for brands alongside a personal series of dark, gradient creatures.
