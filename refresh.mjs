@@ -183,15 +183,31 @@ async function refreshSiteLogo() {
 
     let out, ext, note;
     if (frames > 1) {
-      /* An animated logo is passed through byte for byte. Re-encoding it as a
-         still PNG is exactly what flattened the last one to its first frame,
-         and the background knockout cannot run either — it works on one
-         raster, and flood-filling frame 1 would leave the rest untouched. So
-         an animated logo has to arrive with its own transparency. */
-      out = src;
-      ext = meta.format === 'gif' ? 'gif' : meta.format === 'webp' ? 'webp' : meta.format;
-      note = `animated, ${frames} frames — passed through unchanged`;
-      console.log(`  animated ${meta.format}: ${frames} frames, kept as-is`);
+      /* Never re-encode an animated logo as a still PNG — that is exactly
+         what flattened the last one to its first frame. Try to knock its
+         background out frame by frame, which yields an animated WebP with a
+         real alpha channel; if there is no flat background to remove, pass
+         the original through byte for byte rather than touching it. */
+      const passthroughExt = meta.format === 'gif' ? 'gif'
+        : meta.format === 'webp' ? 'webp' : meta.format;
+      let ko = { buf: null, reason: 'not attempted' };
+      try {
+        const { knockOutAnimated } = await import('./logo-knockout.mjs');
+        ko = await knockOutAnimated(src, '.logo-frames');
+      } catch (e) {
+        ko = { buf: null, reason: `knockout failed: ${e.message.split('\n')[0]}` };
+      } finally {
+        try { fs.rmSync('.logo-frames', { recursive: true, force: true }); } catch {}
+      }
+      if (ko.buf) {
+        out = ko.buf; ext = ko.ext;
+        note = `animated, ${ko.frames} frames, ${ko.pct}% cleared at ${ko.bg}`;
+        console.log(`  animated ${meta.format} → webp: ${ko.srcFrames} frames in, ${ko.frames} out, cleared ${ko.pct}% at ${ko.bg}`);
+      } else {
+        out = src; ext = passthroughExt;
+        note = `animated, ${frames} frames — passed through (${ko.reason})`;
+        console.log(`  animated ${meta.format}: ${frames} frames, kept as-is (${ko.reason})`);
+      }
     } else {
       out = await sharp(src, { failOn: 'none' }).png({ compressionLevel: 9 }).toBuffer();
       /* an export with a flat backdrop shows up as a tile on the white page —
