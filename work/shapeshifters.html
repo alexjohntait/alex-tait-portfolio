@@ -68,6 +68,7 @@
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
     --sigh: clamp(24px, 3.15vw, 41px);   /* the signature mark's height */
+    --sigk: 2;                           /* aspect correction, set on rebuild */
     --r: 25px;                            /* the corner on every piece of work */
     --bar: 58px;                          /* the header band it is centred in */
   }
@@ -179,10 +180,11 @@
     pointer-events: none;
   }
   @media (min-width: 821px) {
-    .name { height: var(--gx); left: calc((var(--gx) - var(--sigh)) / 2); }
+    .name { height: var(--gx); left: calc((var(--gx) - var(--sigh)) / 2); --sigbar: var(--gx); }
   }
   .name img {
-    height: var(--sigh); width: auto; display: block;
+    height: min(calc(var(--sigh) * var(--sigk, 1)), calc(var(--sigbar, var(--bar)) - 14px));
+    width: auto; display: block;
     /* a soft paper halo keeps the handwriting legible over the work */
     filter: drop-shadow(0 0 8px var(--paper)) drop-shadow(0 0 20px var(--paper));
   }
@@ -422,6 +424,24 @@
     font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -0.035em;
     line-height: 1.05; color: var(--ink); max-width: 26ch;
   }
+  /* disciplines and clients, side by side and set in the same type as the
+     opener. The field labels are gone: two short stacks of proper nouns
+     announce what they are without being told. */
+  .about-cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px clamp(20px, 4vw, 56px);
+    margin: 30px 0 26px;
+  }
+  .about-cols ul { list-style: none; }
+  .about-cols li {
+    font-family: var(--sans); font-weight: 700;
+    font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -0.035em;
+    line-height: 1.15; color: var(--ink);
+  }
+  /* a phone has no room for two columns of display type */
+  @media (max-width: 560px) {
+    .about-cols { grid-template-columns: 1fr; gap: 22px; }
+  }
   #aboutwrap .pop-x:hover { background: color-mix(in srgb, var(--ink) 62%, transparent); }
   #aboutwrap ::selection { background: var(--ink); color: var(--paper); }
   #aboutwrap :focus-visible { outline-color: var(--ink); }
@@ -522,7 +542,7 @@
           My work has been commissioned by Apple, Google, Spotify and Adidas, spanning
           broadcast, social, packaging and print.
         </p>
-        <div class="pop-meta" style="margin-bottom:26px"><b>DISCIPLINES</b> Illustration, Motion Design, Art Direction, Editorial<br /><b>SELECTED CLIENTS</b> Apple, Google, Spotify, Adidas, The Telegraph, First Bus, AO, Kueski</div>
+        <div class="about-cols"><ul><li>Illustration</li><li>Motion Design</li><li>Art Direction</li><li>Editorial</li></ul><ul><li>Spotify</li><li>Apple</li><li>Google</li><li>Adidas</li><li>Levi's</li></ul></div>
         <div class="pop-meta">
           <b>INSTAGRAM</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
           <b>EMAIL</b> <a href="mailto:alexjohntait@gmail.com" style="color:inherit">alexjohntait@gmail.com</a><br />

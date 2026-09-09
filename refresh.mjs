@@ -186,8 +186,19 @@ async function refreshSiteLogo() {
     }
     fs.writeFileSync(DEST, png);
     const m = await sharp(png).metadata();
-    console.log(`• Site logo: wrote ${DEST} from "${att.filename}" (${m.width}x${m.height})`);
-    logoStatus = `updated from "${att.filename}" (${m.width}x${m.height})`;
+    /* the CSS sizes the mark by HEIGHT, which was written for a 4:1
+       handwritten signature. A square logo under that rule is a 41px speck,
+       so carry the aspect correction into the page: 1 for a wide signature,
+       2 for a square one, so the two cover roughly the same area. The CSS
+       caps the result to the bar the mark stands in. */
+    const REF_AR = 2627 / 653;
+    const k = Math.min(2.4, Math.max(1, Math.sqrt(REF_AR / (m.width / m.height))));
+    let page = fs.readFileSync('index.html', 'utf8');
+    const re = /--sigk: [d.]+;/;
+    if (re.test(page)) fs.writeFileSync('index.html', page.replace(re, `--sigk: ${k.toFixed(2)};`));
+    else console.warn('  no --sigk in index.html to update');
+    console.log(`• Site logo: wrote ${DEST} from "${att.filename}" (${m.width}x${m.height}, sigk ${k.toFixed(2)})`);
+    logoStatus = `updated from "${att.filename}" (${m.width}x${m.height}, sigk ${k.toFixed(2)})`;
   } catch (e) {
     console.warn(`• Site logo: skipped (${e.message}) — keeping the current signature`);
     logoStatus = `FAILED: ${e.message} (kept existing)`;
