@@ -176,7 +176,17 @@ async function refreshSiteLogo() {
     if (!src.length) throw new Error('empty response');
 
     const sharp = (await import('sharp')).default;
-    const png = await sharp(src, { failOn: 'none' }).png({ compressionLevel: 9 }).toBuffer();
+    let png = await sharp(src, { failOn: 'none' }).png({ compressionLevel: 9 }).toBuffer();
+
+    /* an export with a flat backdrop shows up as a tile on the white page —
+       busker.png arrived 100% opaque on rgb(235,235,235). Take the backdrop
+       out on the way in rather than asking for a particular export every
+       time. Leaves the file alone if it already has transparency, or if the
+       corners disagree and there is no flat background to remove. */
+    const { knockOut } = await import('./logo-knockout.mjs');
+    const ko = await knockOut(png);
+    if (ko.buf) { png = ko.buf; console.log(`  knocked out ${ko.pct}% at ${ko.bg}`); }
+    else console.log(`  background left alone (${ko.reason})`);
 
     const before = fs.existsSync(DEST) ? fs.readFileSync(DEST) : null;
     if (before && before.equals(png)) {
@@ -186,19 +196,8 @@ async function refreshSiteLogo() {
     }
     fs.writeFileSync(DEST, png);
     const m = await sharp(png).metadata();
-    /* the CSS sizes the mark by HEIGHT, which was written for a 4:1
-       handwritten signature. A square logo under that rule is a 41px speck,
-       so carry the aspect correction into the page: 1 for a wide signature,
-       2 for a square one, so the two cover roughly the same area. The CSS
-       caps the result to the bar the mark stands in. */
-    const REF_AR = 2627 / 653;
-    const k = Math.min(2.4, Math.max(1, Math.sqrt(REF_AR / (m.width / m.height))));
-    let page = fs.readFileSync('index.html', 'utf8');
-    const re = /--sigk: [d.]+;/;
-    if (re.test(page)) fs.writeFileSync('index.html', page.replace(re, `--sigk: ${k.toFixed(2)};`));
-    else console.warn('  no --sigk in index.html to update');
-    console.log(`• Site logo: wrote ${DEST} from "${att.filename}" (${m.width}x${m.height}, sigk ${k.toFixed(2)})`);
-    logoStatus = `updated from "${att.filename}" (${m.width}x${m.height}, sigk ${k.toFixed(2)})`;
+    console.log(`• Site logo: wrote ${DEST} from "${att.filename}" (${m.width}x${m.height})`);
+    logoStatus = `updated from "${att.filename}" (${m.width}x${m.height})`;
   } catch (e) {
     console.warn(`• Site logo: skipped (${e.message}) — keeping the current signature`);
     logoStatus = `FAILED: ${e.message} (kept existing)`;

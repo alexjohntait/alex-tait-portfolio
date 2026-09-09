@@ -69,8 +69,8 @@
     --spring: cubic-bezier(0.22, 1, 0.36, 1);   /* ease-out-quint, no overshoot */
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
-    --sigh: clamp(24px, 3.15vw, 41px);   /* the signature mark's height */
-    --sigk: 2;                           /* aspect correction, set on rebuild */
+    --sigh: clamp(24px, 3.15vw, 41px);   /* the mark's inset, still */
+    --sigsz: clamp(120px, 20vw, 300px);  /* the mark's longest side */
     --r: 25px;                            /* the corner on every piece of work */
     --bar: 58px;                          /* the header band it is centred in */
   }
@@ -88,18 +88,11 @@
   ::selection { background: var(--accent); color: #fff; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-  /* the ruled grid: one continuous sheet, board and case studies alike */
-  .ruled {
-    background-image:
-      linear-gradient(to right, var(--line) 1px, transparent 1px),
-      linear-gradient(to right, var(--line) 1px, transparent 1px);
-    background-size: calc((100% - var(--gx) * 2) / 6) 100%, 1px 100%;
-    background-position: var(--gx) 0, calc(100% - var(--gx)) 0;
-    background-repeat: repeat-x, no-repeat;
-  }
 
   /* ─── menu: bare vermillion rules, top right ─── */
-  header { position: fixed; top: 0; right: 0; z-index: 70; }
+  /* the same margin the filter bar keeps on the left and the caption on the
+     right, rather than an inset of its own */
+  header { position: fixed; top: 0; right: var(--gx); z-index: 70; }
   /* the corner control is a word now, not three rules: the panel it opens
      carries the role, the location and the address, so "Info" says what is
      behind it where a hamburger only says "something". Blocked in vermillion
@@ -114,7 +107,7 @@
        title on this page — rather than the popup's larger one */
     font-family: var(--sans); font-weight: 700;
     font-size: clamp(26px, 3.2vw, 48px); letter-spacing: -0.035em; line-height: 0.96;
-    padding: 0 clamp(14px, 1.4vw, 26px);
+    padding: 0;
     /* the same bar the signature stands in, so both corners share a line */
     height: var(--bar);
     transition: color .25s;
@@ -172,21 +165,27 @@
   /* the signature is a standing mark now: small, top left, always there —
      it sits opposite the menu rules and holds the corner */
   .name {
-    /* the left inset is derived from the gap above it, so the mark sits an
-       equal distance from both edges however the viewport is sized */
-    position: fixed; left: calc((var(--bar) - var(--sigh)) / 2); top: 0; z-index: 65;
-    height: var(--bar); display: flex; align-items: center;
+    /* an equal inset on both axes: the mark is far taller than the bar it
+       used to sit in, so it is anchored to the corner rather than centred
+       in a row */
+    position: fixed; z-index: 65;
+    left: calc((var(--bar) - var(--sigh)) / 2);
+    top: calc((var(--bar) - var(--sigh)) / 2);
+    display: block;
     font-family: var(--sans); font-weight: 400;
     font-size: clamp(15px, 1.6vw, 24px); letter-spacing: -0.01em;
     color: var(--accent); white-space: nowrap;
     pointer-events: none;
   }
   @media (min-width: 821px) {
-    .name { height: var(--gx); left: calc((var(--gx) - var(--sigh)) / 2); --sigbar: var(--gx); }
+    .name {
+      left: calc((var(--gx) - var(--sigh)) / 2);
+      top: calc((var(--gx) - var(--sigh)) / 2);
+    }
   }
   .name img {
-    height: min(calc(var(--sigh) * var(--sigk, 1)), calc(var(--sigbar, var(--bar)) - 14px));
-    width: auto; display: block;
+    max-width: var(--sigsz); max-height: var(--sigsz);
+    width: auto; height: auto; display: block;
     /* a soft paper halo keeps the handwriting legible over the work */
     filter: drop-shadow(0 0 8px var(--paper)) drop-shadow(0 0 20px var(--paper));
   }
@@ -315,82 +314,7 @@
     color: var(--ink);
   }
 
-  /* ─── case studies (below the board) — same sheet, same system,
-     just gently tinted so the section still reads as its own room ─── */
-  .case-wrap {
-    position: relative; z-index: 1;
-    /* background-color only — a `background` shorthand here would wipe
-       out .ruled's background-image (same specificity, later in source) */
-    background-color: color-mix(in srgb, #ffc9da 20%, var(--paper));
-  }
-  /* a quiet threshold before the first case — the section announces itself */
-  .case-head { padding: clamp(70px, 12vh, 130px) var(--gx) 0; }
-  .case-kicker {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-size: 13px; font-weight: 400; line-height: 1.8;
-    color: var(--ink);
-  }
-  .case-kicker::before { content: ''; width: 9px; height: 9px; background: var(--accent); }
-  .case {
-    position: relative;
-    display: grid; grid-template-columns: repeat(6, 1fr);
-    min-height: 92vh; align-content: center;
-    padding: 10vh var(--gx);
-  }
-  .case .media {
-    grid-column: 1 / 4; grid-row: 1; align-self: start; display: block;
-    background: var(--cb, #ddd);
-    transition: box-shadow 0.25s;
-  }
-  /* every other case mirrors — media right, text left — so the section
-     reads as a spread, not the same page twice */
-  .case:nth-of-type(even) .media { grid-column: 4 / 7; }
-  .case:nth-of-type(even) .case-text { grid-column: 1 / 4; }
-  @media (hover: hover) {
-    .case .media:hover { box-shadow: 0 14px 34px -16px rgba(0,0,0,0.22); }
-  }
-  .case .media img, .case .media video { width: 100%; height: auto; display: block; }
-  /* text sits beside the media, in its own column, top-aligned with it —
-     never floating above it — and stacks title/meta/blurb internally */
-  .case-text {
-    grid-column: 4 / 7; grid-row: 1; align-self: start; padding: 34px 22px 0;
-    display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 22px;
-  }
-  /* the index number ties the section to the case-study pages' "01 ·" system */
-  .case-num {
-    grid-column: 1 / 4; display: block;
-    font-size: 13px; font-weight: 400; line-height: 1.8;
-    color: var(--ink); margin-bottom: 16px;
-  }
-  /* headline shares the popup's scale — one "project title" moment site-wide */
-  .case h2, .pop-body h2 {
-    font-family: var(--sans); font-weight: 700;
-    font-size: clamp(38px, 4.4vw, 66px); letter-spacing: -0.035em; line-height: 0.95;
-    color: var(--accent); text-wrap: balance;
-  }
-  /* the case-study headline carries more weight than the popup's — it's
-     a section opener and should read with real presence */
-  .case h2 {
-    grid-column: 1 / 4; margin: 0 0 30px;
-    font-weight: 700; font-size: clamp(44px, 5.2vw, 82px); letter-spacing: -0.04em;
-  }
-  /* meta + body copy share one scale with the popup's mono content */
-
-  .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--ink); font-style: italic; }
-  .case .meta { grid-column: 1 / 2; }
-  .case .meta b, .pop-meta b { font-weight: 500; }
-  .case .blurb, .pop-desc { font-size: 13px; line-height: 1.75; color: var(--ink); max-width: 44ch; }
-  .case .blurb { grid-column: 2 / 4; }
-  .case .blurb a { color: var(--ink); display: inline-block; margin-top: 18px; text-underline-offset: 3px; }
-  .case .blurb a:hover { color: var(--accent); }
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .case > * { animation: caseIn both; animation-timeline: view(); animation-range: entry 5% entry 45%; }
-      @keyframes caseIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
-    }
-  }
-
-  /* ─── project popup: the page IS the grid; projects open over it ─── */
+: the page IS the grid; projects open over it ─── */
   .popwrap {
     position: fixed; inset: 0; z-index: 80;
     display: none; align-items: flex-start; justify-content: center;
@@ -450,23 +374,29 @@
   .pop-media { background: var(--pb, #ddd); }
   .pop-media img, .pop-media video, .pop-gal img, .pop-gal video { width: 100%; height: auto; display: block; }
   .pop-body { padding: clamp(22px, 3.5vw, 44px); }
-  .pop-body h2 { margin-bottom: 20px; }   /* scale shared with .case h2, above */
-  .pop-meta { margin-bottom: 20px; }      /* scale shared with .case .meta, above */
-  .pop-desc { line-height: 1.8; max-width: 62ch; }   /* wider column than the case blurb */
+  .pop-body h2 {
+    font-family: var(--sans); font-weight: 700;
+    font-size: clamp(38px, 4.4vw, 66px); letter-spacing: -0.035em; line-height: 0.95;
+    color: var(--accent); text-wrap: balance; margin-bottom: 20px;
+  }
+  .pop-meta {
+    font-size: 13px; line-height: 2; color: var(--ink); font-style: italic;
+    margin-bottom: 20px;
+  }
+  .pop-meta b { font-weight: 500; }
+  .pop-desc { font-size: 13px; line-height: 1.8; color: var(--ink); max-width: 62ch; }
   .pop-gal { display: grid; gap: 2px; margin-top: 2px; }
 
   /* ─── mobile ─── */
   @media (max-width: 820px) {
-    /* the ruled lines only describe the six-column case layout */
-    .ruled { background-image: none; }
     .cloud-stage { cursor: auto; }
     /* every fixed control clears the notch and the home indicator */
     /* no ink offset here: that term aligns text TO the mark, and applying it
        to the mark itself pushed the signature 6px right of its own margin */
     .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2);
             top: env(safe-area-inset-top); }
-    header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
-    .menu-btn { padding: 0 12px; }
+    header { top: env(safe-area-inset-top); right: calc(env(safe-area-inset-right) + 16px); }
+    .menu-btn { padding: 0; }
     /* caption sits above the filter bar rather than beside it */
     .cloud-cap {
       left: calc(env(safe-area-inset-left) + 14px); right: calc(env(safe-area-inset-right) + 14px);
@@ -475,13 +405,6 @@
     .cloud-cap .t { font-size: 26px; }
     .cloud-hint { bottom: calc(env(safe-area-inset-bottom) + 134px); }
     .ghost, #ink { display: none; }
-    .case-head { padding: 56px 16px 0; }
-    .case { display: block; padding: 8vh 16px; min-height: 0; }
-    .case-text { display: block; padding: 24px 0 0; }
-    .case h2, .case .meta, .case .blurb { padding: 0; }
-    .case-num { margin-bottom: 12px; }
-    .case h2 { margin: 0 0 16px; }
-    .case .meta { margin-bottom: 16px; }
     /* one line on a phone, but the buttons still clear 44px of thumb */
     .pill {
       left: calc(env(safe-area-inset-left) + 12px);
@@ -517,42 +440,6 @@
     <ul class="clients-list" id="clients-list"></ul>
   </section>
 
-  <div class="case-wrap ruled">
-    <div class="case-head" id="case-studies">
-      <span class="case-kicker">Case studies</span>
-    </div>
-    <section class="case" id="cs-humantold" style="--cb:#ec482c">
-      <a class="media" href="work/humantold-nyc.html" aria-label="Humantold NYC case study">
-        <video src="images/humantold-nyc.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
-      </a>
-      <div class="case-text">
-        <span class="case-num">01 / 02</span>
-        <h2>Making therapy feel reachable</h2>
-        <div class="meta"><b>DATE</b> 2024<br /><b>CLIENT</b> Humantold</div>
-        <div class="blurb">
-          A cast of city-stressed characters for Humantold's subway campaign, rolled out
-          across the New York underground — making therapy feel human, and reachable.
-          <br /><a href="work/humantold-nyc.html">Read the case study →</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="case" id="cs-hiit" style="--cb:#509bf6">
-      <a class="media" href="work/hiit-workout.html" aria-label="HIIT Workout case study">
-        <img src="images/hiit-workout.jpg" alt="HIIT Workout for Spotify" loading="lazy" />
-      </a>
-      <div class="case-text">
-        <span class="case-num">02 / 02</span>
-        <h2>A coach timed to the beat</h2>
-        <div class="meta"><b>DATE</b> 2020<br /><b>CLIENT</b> Spotify</div>
-        <div class="blurb">
-          An interactive campaign for Spotify — animated coaches keeping the workout on the
-          beat, timed to whatever the listener is playing.
-          <br /><a href="work/hiit-workout.html">Read the case study →</a>
-        </div>
-      </div>
-    </section>
-  </div>
 </main>
 
 <div class="pill" role="toolbar" aria-label="Filter the work">
@@ -629,7 +516,7 @@
 <script>
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOBILE = matchMedia('(max-width: 820px)');
-const BESPOKE = new Set(['humantold-nyc', 'hiit-workout']);
+
 const COLS = 6;
 
 /* ─── INFO ─── */
@@ -834,7 +721,7 @@ function buildCloud() {
   /* a different piece leads every visit, so a second look at the site is not
      a second look at the same five things. Shuffles a copy: PROJECTS keeps
      its Airtable order for the index and for the prev/next on each page. */
-  const works = PROJECTS.filter(p => !BESPOKE.has(p.id));
+  const works = PROJECTS.slice();
   for (let i = works.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [works[i], works[j]] = [works[j], works[i]];
@@ -1179,15 +1066,6 @@ document.getElementById('pop-x').addEventListener('click', closePop);
 popwrap.addEventListener('click', e => { if (e.target === popwrap) closePop(); });
 addEventListener('keydown', e => { if (e.key === 'Escape' && popwrap.classList.contains('open')) closePop(); });
 
-/* every video plays while on screen, rests when scrolled away */
-function observeVideos() {
-  if (REDUCE || !('IntersectionObserver' in window)) return;
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    const v = e.target; if (e.isIntersecting) v.play().catch(()=>{}); else v.pause();
-  }), { threshold: 0.25 });
-  document.querySelectorAll('.case video').forEach(v => io.observe(v));
-}
-
 /* ─── INK TRAIL ─── */
 (() => {
   if (REDUCE) return;
@@ -1228,7 +1106,7 @@ function observeVideos() {
 })();
 
 /* boot */
-tune(); buildCloud(); place(); observeVideos();
+tune(); buildCloud(); place();
 start();
 </script>
 </body>
