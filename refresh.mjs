@@ -16,6 +16,7 @@ const SKETCH_TABLE = 'Sketchbook';   // referenced by tab name, not field IDs
 const fileArg = process.argv[2];
 const token = process.env.AIRTABLE_TOKEN;
 let sketchStatus = 'not run';
+let logoStatus = 'not run';
 
 async function fetchRecords() {
   console.log('• Fetching records from Airtable…');
@@ -134,6 +135,65 @@ async function refreshSketchbook() {
   sketchStatus = `${records.length} records, ${list.length} sketches, ${fresh} newly downloaded`;
 }
 
+/* ── site logo ──
+   The signature in the top-left corner was a static file in the repo for
+   its whole life, so editing it in Airtable changed nothing. It comes from
+   the "Site Logo" attachment column on the Projects table now: whichever
+   row carries one wins, since it describes the site rather than a project.
+
+   Fetched by field NAME, not id — this column was added after the field-id
+   map in build-data.mjs was written, and a name needs no lookup to keep in
+   step. Re-encoded to PNG so the markup can keep pointing at one filename
+   whatever gets attached, and only written when the bytes actually differ,
+   so a rebuild that changes nothing does not commit a new binary.
+
+   Non-fatal: a missing column or a failed download leaves the previous
+   signature in place rather than taking the site's masthead down. */
+async function refreshSiteLogo() {
+  if (!token) { console.log('• Site logo: skipped (no token / file mode)'); logoStatus = 'skipped (no token)'; return; }
+  const DEST = 'assets/signature.png';
+  try {
+    const url = new URL(`https://api.airtable.com/v0/${BASE}/${TABLE}`);
+    url.searchParams.set('pageSize', '100');
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) throw new Error(`Airtable ${res.status}`);
+    const { records } = await res.json();
+
+    let att = null;
+    for (const r of records) {
+      const v = (r.fields || {})['Site Logo'];
+      if (Array.isArray(v) && v.length && v[0] && v[0].url) { att = v[0]; break; }
+    }
+    if (!att) {
+      console.log('• Site logo: no "Site Logo" attachment found — keeping the current signature');
+      logoStatus = 'no attachment found (kept existing)';
+      return;
+    }
+
+    const got = await fetch(att.url, { redirect: 'follow' });
+    if (!got.ok) throw new Error(`HTTP ${got.status}`);
+    const src = Buffer.from(await got.arrayBuffer());
+    if (!src.length) throw new Error('empty response');
+
+    const sharp = (await import('sharp')).default;
+    const png = await sharp(src, { failOn: 'none' }).png({ compressionLevel: 9 }).toBuffer();
+
+    const before = fs.existsSync(DEST) ? fs.readFileSync(DEST) : null;
+    if (before && before.equals(png)) {
+      console.log(`• Site logo: "${att.filename}" already current`);
+      logoStatus = `"${att.filename}" unchanged`;
+      return;
+    }
+    fs.writeFileSync(DEST, png);
+    const m = await sharp(png).metadata();
+    console.log(`• Site logo: wrote ${DEST} from "${att.filename}" (${m.width}x${m.height})`);
+    logoStatus = `updated from "${att.filename}" (${m.width}x${m.height})`;
+  } catch (e) {
+    console.warn(`• Site logo: skipped (${e.message}) — keeping the current signature`);
+    logoStatus = `FAILED: ${e.message} (kept existing)`;
+  }
+}
+
 /* Committed alongside the rebuild so the state of the last sync can be read
    from the repo. The CI log needs a login; this does not, and it is the only
    way a silently-skipped record ever becomes visible. */
@@ -149,6 +209,7 @@ function writeReport() {
     `Gallery images           : ${d.galOk ?? '?'}`,
     `Failed downloads         : ${d.fail ?? '?'}`,
     `Sketchbook               : ${sketchStatus}`,
+    `Site logo                : ${logoStatus}`,
     ``,
   ];
   const skipped = d.skipped || [];
@@ -203,6 +264,7 @@ function injectData() {
     injectData();
 
     await refreshSketchbook();
+    await refreshSiteLogo();
     writeReport();
 
     /* a video project needs a still for the cloud; without one its card
