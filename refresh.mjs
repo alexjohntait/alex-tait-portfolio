@@ -151,7 +151,7 @@ async function refreshSketchbook() {
    signature in place rather than taking the site's masthead down. */
 async function refreshSiteLogo() {
   if (!token) { console.log('• Site logo: skipped (no token / file mode)'); logoStatus = 'skipped (no token)'; return; }
-  const DEST = 'assets/signature.png';
+  const DIR = 'assets', STEM = 'signature';
   try {
     const url = new URL(`https://api.airtable.com/v0/${BASE}/${TABLE}`);
     url.searchParams.set('pageSize', '100');
@@ -176,28 +176,59 @@ async function refreshSiteLogo() {
     if (!src.length) throw new Error('empty response');
 
     const sharp = (await import('sharp')).default;
-    let png = await sharp(src, { failOn: 'none' }).png({ compressionLevel: 9 }).toBuffer();
+    /* { animated: true } or metadata reports a single page for every gif and
+       the animation is invisible to us */
+    const meta = await sharp(src, { failOn: 'none', animated: true }).metadata();
+    const frames = meta.pages || 1;
 
-    /* an export with a flat backdrop shows up as a tile on the white page —
-       busker.png arrived 100% opaque on rgb(235,235,235). Take the backdrop
-       out on the way in rather than asking for a particular export every
-       time. Leaves the file alone if it already has transparency, or if the
-       corners disagree and there is no flat background to remove. */
-    const { knockOut } = await import('./logo-knockout.mjs');
-    const ko = await knockOut(png);
-    if (ko.buf) { png = ko.buf; console.log(`  knocked out ${ko.pct}% at ${ko.bg}`); }
-    else console.log(`  background left alone (${ko.reason})`);
+    let out, ext, note;
+    if (frames > 1) {
+      /* An animated logo is passed through byte for byte. Re-encoding it as a
+         still PNG is exactly what flattened the last one to its first frame,
+         and the background knockout cannot run either — it works on one
+         raster, and flood-filling frame 1 would leave the rest untouched. So
+         an animated logo has to arrive with its own transparency. */
+      out = src;
+      ext = meta.format === 'gif' ? 'gif' : meta.format === 'webp' ? 'webp' : meta.format;
+      note = `animated, ${frames} frames — passed through unchanged`;
+      console.log(`  animated ${meta.format}: ${frames} frames, kept as-is`);
+    } else {
+      out = await sharp(src, { failOn: 'none' }).png({ compressionLevel: 9 }).toBuffer();
+      /* an export with a flat backdrop shows up as a tile on the white page —
+         busker.png arrived 100% opaque on rgb(235,235,235) */
+      const { knockOut } = await import('./logo-knockout.mjs');
+      const ko = await knockOut(out);
+      if (ko.buf) { out = ko.buf; console.log(`  knocked out ${ko.pct}% at ${ko.bg}`); }
+      else console.log(`  background left alone (${ko.reason})`);
+      ext = 'png';
+      note = 'still';
+    }
 
-    const before = fs.existsSync(DEST) ? fs.readFileSync(DEST) : null;
-    if (before && before.equals(png)) {
+    const dest = `${DIR}/${STEM}.${ext}`;
+    const before = fs.existsSync(dest) ? fs.readFileSync(dest) : null;
+    if (before && before.equals(out)) {
       console.log(`• Site logo: "${att.filename}" already current`);
-      logoStatus = `"${att.filename}" unchanged`;
+      logoStatus = `"${att.filename}" unchanged (${note})`;
       return;
     }
-    fs.writeFileSync(DEST, png);
-    const m = await sharp(png).metadata();
-    console.log(`• Site logo: wrote ${DEST} from "${att.filename}" (${m.width}x${m.height})`);
-    logoStatus = `updated from "${att.filename}" (${m.width}x${m.height})`;
+    fs.writeFileSync(dest, out);
+
+    /* the extension can change under us — a gif today, a png tomorrow — so
+       clear the other one out and point the markup at whatever landed */
+    for (const f of fs.readdirSync(DIR)) {
+      if (/^signature\.(png|gif|webp)$/.test(f) && f !== `${STEM}.${ext}`) fs.unlinkSync(`${DIR}/${f}`);
+    }
+    let repointed = 0;
+    for (const page of ['index.html', '404.html']) {
+      if (!fs.existsSync(page)) continue;
+      const html = fs.readFileSync(page, 'utf8');
+      const next = html.replace(/assets\/signature\.(png|gif|webp)/g, `assets/${STEM}.${ext}`);
+      if (next !== html) { fs.writeFileSync(page, next); repointed++; }
+    }
+
+    const dim = `${meta.width}x${meta.pageHeight || meta.height}`;
+    console.log(`• Site logo: wrote ${dest} from "${att.filename}" (${dim}, ${note})`);
+    logoStatus = `updated from "${att.filename}" (${dim}, ${note})` + (repointed ? `, markup repointed` : '');
   } catch (e) {
     console.warn(`• Site logo: skipped (${e.message}) — keeping the current signature`);
     logoStatus = `FAILED: ${e.message} (kept existing)`;
