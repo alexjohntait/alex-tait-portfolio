@@ -71,8 +71,9 @@
     a { color: inherit; }
 
     header { position: fixed; top: 0; right: 0; z-index: 70; }
+    /* set as the project descriptions are: 13px mono, ink, no case of its own */
     .menu-btn { height: 58px; border: 0; cursor: pointer; padding: 0 18px; background: none; color: var(--ink); display: grid; place-items: center;
-      font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; transition: color .25s; }
+      font-family: var(--mono); font-size: 13px; font-weight: 400; line-height: 1.8; transition: color .25s; }
     @media (min-width: 821px) { .menu-btn { height: var(--gx); padding: 0 clamp(20px, 1.8vw, 30px); } }
     .menu-btn:hover { color: var(--accent); }
 

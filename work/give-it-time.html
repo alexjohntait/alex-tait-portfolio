@@ -101,14 +101,15 @@
      carries the role, the location and the address, so "Info" says what is
      behind it where a hamburger only says "something". Blocked in vermillion
      to match the filter bar at the other end of the sheet. */
+  /* set exactly as the project descriptions are — 13px mono, ink, no case
+     or tracking of its own. The halo is the signature's, so the word stays
+     readable when a card passes under it. */
   .menu-btn {
     height: 58px; border: 0; cursor: pointer; padding: 0 18px;
     background: none; color: var(--ink);
     display: grid; place-items: center;
-    font-family: var(--mono); font-size: 13px; font-weight: 700;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    transition: color .25s;
-    /* the halo the signature wears, so the word stays readable over the work */
+    font-family: var(--mono); font-size: 13px; font-weight: 400;
+    line-height: 1.8; transition: color .25s;
     text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
   }
   @media (min-width: 821px) {
@@ -197,8 +198,7 @@
 
   /* the caption names whatever is nearest the camera right now */
   .cloud-cap {
-    /* clears the index toggle sitting in the corner */
-    position: fixed; right: calc(var(--gx) + 14px); bottom: 4vh; z-index: 40;
+    position: fixed; right: var(--gx); bottom: 4vh; z-index: 40;
     text-align: right; max-width: 44ch; pointer-events: none;
     opacity: 0; transition: opacity 0.45s var(--out);
   }
@@ -222,22 +222,6 @@
     width: 100%; height: auto; display: block;
     border-radius: var(--r); background: var(--ink);
   }
-
-  /* the index toggle: an Aa, set in the headline face, answering the menu
-     rules from the opposite corner. Opens the full text list of the work. */
-  .idx-btn {
-    position: fixed; right: 0; bottom: 0; z-index: 45;
-    width: var(--bar); height: var(--bar);
-    border: 0; background: none; cursor: pointer;
-    display: grid; place-items: center;
-    font-family: var(--sans); font-weight: 700;
-    font-size: 29px; line-height: 1; letter-spacing: -0.04em;
-    color: var(--accent); transition: color 0.25s;
-    /* the cap and the x-height sit low in the box without this */
-    padding-bottom: 2px;
-  }
-  @media (min-width: 821px) { .idx-btn { width: var(--gx); height: var(--gx); } }
-  .idx-btn:hover { color: var(--ink); }
 
   /* how far through the work you have flown */
   .cloud-prog {
@@ -278,39 +262,26 @@
      vermillion block that slides between the labels instead: the brand's own
      mark, doing the work. Ink on vermillion is 5.44:1, where paper would be
      3.36 and fail at this size. */
-  /* blocked up: a hard ink outline, full-height cells, and the vermillion
-     mark filling a whole cell rather than floating inside one. Outline, not
-     border, so the box model is untouched and the mark's JS offsets (which
-     are measured against the bar's own rect) stay exact. */
+  /* nothing but the three words, in the same 13px mono the project
+     descriptions are set in. The one that is on turns vermillion; the halo
+     is what keeps them readable where a card passes behind. */
   .pill {
     position: fixed; left: var(--gx); bottom: 4vh; z-index: 40;
-    display: flex; align-items: stretch; gap: 0;
-    background: var(--paper);
-    outline: 2px solid var(--ink);
-    padding: 0;
-  }
-  /* the "showing everything" block — a solid slab until a filter is picked */
-  .pill::before {
-    content: ''; flex: none; width: 20px; background: var(--accent);
-    transition: opacity 0.3s var(--out);
-  }
-  .pill.picked::before { opacity: 0; }
-  .pill-mark {
-    position: absolute; top: 0; bottom: 0; left: 0; width: 0;
-    background: var(--accent); opacity: 0; pointer-events: none;
-    transition: transform 0.5s var(--out), width 0.5s var(--out), opacity 0.3s var(--out);
+    display: flex; align-items: baseline; gap: 0;
+    background: none; padding: 0;
+    text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
   }
   .pill button {
-    position: relative; z-index: 1;
-    font-family: var(--mono); font-size: 14px; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
+    font-family: var(--mono); font-size: 13px; font-weight: 400; line-height: 1.8;
     color: var(--ink); background: none; border: 0; cursor: pointer;
-    padding: 14px 17px; transition: color 0.2s;
+    padding: 6px 0; transition: color 0.2s;
   }
   .pill button:hover { color: var(--accent); }
-  .pill button.active, .pill button.active:hover { color: var(--ink); }
-  /* the slash became a rule: at this weight a glyph read as a fourth label */
-  .pill .sep { flex: none; width: 2px; background: var(--ink); font-size: 0; }
+  .pill button.active, .pill button.active:hover { color: var(--accent); }
+  .pill .sep {
+    color: color-mix(in srgb, var(--ink) 35%, transparent);
+    font-size: 13px; padding: 0 9px;
+  }
 
   /* who has already trusted him, on the page instead of two clicks inside
      About, and read from the work itself so it cannot go stale */
@@ -391,33 +362,6 @@
     font-weight: 700; font-size: clamp(44px, 5.2vw, 82px); letter-spacing: -0.04em;
   }
   /* meta + body copy share one scale with the popup's mono content */
-  /* the plain text index: the cloud is lovely for browsing but poor for
-     finding, so every piece is also reachable as a scannable list */
-  .idx { list-style: none; counter-reset: idx; }
-  .idx li { counter-increment: idx; border-top: 1px solid var(--line); }
-  .idx li:last-child { border-bottom: 1px solid var(--line); }
-  /* real columns: right-aligning the client left its column ragged by 60px
-     across the list, which is the one thing an index must not do */
-  .idx a {
-    display: grid; grid-template-columns: 2.6em minmax(0, 1fr) 19ch;
-    align-items: baseline; gap: 14px; padding: 11px 2px;
-    text-decoration: none; color: var(--ink); transition: color 0.2s;
-  }
-  .idx a::before {
-    content: counter(idx, decimal-leading-zero);
-    font-size: 10.5px; font-weight: 500; letter-spacing: 0.1em;
-    color: color-mix(in srgb, var(--ink) 45%, transparent); min-width: 2.4em;
-  }
-  .idx .ti { font-family: var(--sans); font-weight: 600; font-size: clamp(17px, 1.8vw, 22px); letter-spacing: -0.025em; }
-  .idx .cl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: color-mix(in srgb, var(--ink) 55%, transparent); }
-  /* the client column has nowhere to go on a phone, so it sits under the title */
-  @media (max-width: 560px) {
-    .idx a { grid-template-columns: 2.4em minmax(0, 1fr); row-gap: 3px; }
-    .idx .cl { grid-column: 2; }
-  }
-  .idx a:hover { color: var(--accent); }
-  .idx a:hover .cl { color: var(--accent); }
 
   .case .meta, .pop-meta { font-size: 13px; line-height: 2; color: var(--ink); font-style: italic; }
   .case .meta { grid-column: 1 / 2; }
@@ -476,8 +420,7 @@
     .name { left: calc(env(safe-area-inset-left) + (var(--bar) - var(--sigh)) / 2);
             top: env(safe-area-inset-top); }
     header { top: env(safe-area-inset-top); right: env(safe-area-inset-right); }
-    .menu-btn { font-size: 12px; padding: 0 16px; }
-    .idx-btn { right: env(safe-area-inset-right); bottom: env(safe-area-inset-bottom); }
+    .menu-btn { padding: 0 16px; }
     /* caption sits above the filter bar rather than beside it */
     .cloud-cap {
       left: calc(env(safe-area-inset-left) + 14px); right: calc(env(safe-area-inset-right) + 14px);
@@ -499,8 +442,9 @@
       bottom: calc(env(safe-area-inset-bottom) + 12px);
       padding: 0; gap: 0;
     }
-    .pill::before { width: 13px; }
-    .pill button { font-size: 11.5px; padding: 14px 10px; letter-spacing: 0.06em; min-height: 46px; }
+    /* the words stay at reading size; the thumb target grows around them */
+    .pill button { padding: 13px 0; min-height: 44px; }
+    .pill .sep { padding: 0 8px; }
   }
 
     .standalone { max-width: 900px; margin: 0 auto; padding: clamp(90px, 11vw, 130px) var(--pad, 20px) 40px; }
