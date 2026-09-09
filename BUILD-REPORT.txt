@@ -1,4 +1,4 @@
-Last rebuild: 2026-09-09T20:41:56.761Z
+Last rebuild: 2026-09-09T21:53:38.572Z
 
 Airtable records fetched : 33
 Projects built           : 32
@@ -6,6 +6,7 @@ Hero images              : 32
 Gallery images           : 73
 Failed downloads         : 0
 Sketchbook               : 8 records, 8 sketches, 0 newly downloaded
+Site logo                : updated from "busker.png" (1000x994)
 
 SKIPPED — these Airtable records are NOT on the site:
   "Event Guide" — missing hero attachment
