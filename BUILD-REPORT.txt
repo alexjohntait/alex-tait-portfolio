@@ -1,4 +1,4 @@
-Last rebuild: 2026-09-09T22:15:58.895Z
+Last rebuild: 2026-09-09T22:28:17.167Z
 
 Airtable records fetched : 33
 Projects built           : 32
@@ -6,7 +6,7 @@ Hero images              : 32
 Gallery images           : 73
 Failed downloads         : 0
 Sketchbook               : 8 records, 8 sketches, 0 newly downloaded
-Site logo                : updated from "F955B45F-FE4A-46CC-8841-44B70DF08147-(video-converter.png" (1042x708)
+Site logo                : "F955B45F-FE4A-46CC-8841-44B70DF08147-(video-converter.png" unchanged (still)
 
 SKIPPED — these Airtable records are NOT on the site:
   "Event Guide" — missing hero attachment
