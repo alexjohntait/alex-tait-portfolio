@@ -415,6 +415,15 @@
   /* ─── About: no vermillion in here, and no tonal split either — the
      headline is one flat ink line ─── */
   #aboutwrap h2 { color: var(--ink); }
+  /* the opening paragraph is the headline at half scale: same face, weight
+     and tracking, clamp halved throughout. Line-height opens from the
+     headline's 0.95 — at four lines rather than two, descenders met the
+     caps below them. */
+  #aboutwrap .pop-desc {
+    font-family: var(--sans); font-weight: 700;
+    font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -0.035em;
+    line-height: 1.05; color: var(--ink); max-width: 26ch;
+  }
   #aboutwrap .pop-x:hover { background: color-mix(in srgb, var(--ink) 62%, transparent); }
   #aboutwrap ::selection { background: var(--ink); color: var(--paper); }
   #aboutwrap :focus-visible { outline-color: var(--ink); }
@@ -805,9 +814,15 @@ function buildCloud() {
     [works[i], works[j]] = [works[j], works[i]];
   }
   const items = works.map(p => ({ kind: 'work', p }));
-  /* thread the sketchbook gifs through the flight as little asides */
+  /* thread the sketchbook gifs through the flight as little asides, spaced
+     evenly down the whole run. The fixed 6 + i * 6 stride outran the list:
+     with 30 pieces of work the seventh and eighth sketches both landed past
+     the end and got clamped onto it, so the last three arrived one after
+     another. Stepping by a fraction of the FINAL length — works plus
+     sketches — keeps the spacing even however many of either there are. */
+  const step = (works.length + SKETCHES.length) / (SKETCHES.length + 1);
   SKETCHES.forEach((s, i) => {
-    const at = Math.min(items.length, 6 + i * 6);
+    const at = Math.min(items.length, Math.round((i + 1) * step));
     items.splice(at, 0, { kind: 'sketch', s });
   });
 

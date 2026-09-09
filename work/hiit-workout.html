@@ -73,6 +73,10 @@
     .pop-x:hover { background: var(--accent); }
     /* About carries no vermillion, and the headline is one flat ink line */
     #aboutwrap h2 { color: var(--ink); }
+    /* the opening paragraph is that headline at half scale */
+    #aboutwrap .pop-desc { font-family: var(--sans); font-weight: 700;
+      font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -.035em;
+      line-height: 1.05; color: var(--ink); max-width: 26ch; }
     #aboutwrap .pop-x:hover { background: color-mix(in srgb, var(--ink) 62%, transparent); }
     #aboutwrap ::selection { background: var(--ink); color: var(--paper); }
     #aboutwrap :focus-visible { outline-color: var(--ink); }
