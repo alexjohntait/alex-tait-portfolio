@@ -9,7 +9,7 @@ on:
   push:
     branches: [main]
     # editing this file is a deliberate "run me now" — a no-UI manual trigger
-    # last kicked: 2026-09-10b, animated Site Logo support
+    # last kicked: 2026-09-10c, checking for the animated logo
     paths: [".github/workflows/rebuild.yml"]
 
 # one rebuild at a time. Two overlapping runs both commit media and the
