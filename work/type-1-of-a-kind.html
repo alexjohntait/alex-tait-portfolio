@@ -410,6 +410,12 @@
     transition: background 0.25s;
   }
   .pop-x:hover { background: var(--accent); }
+  /* ─── About: no vermillion in here ─── */
+  #aboutwrap h2 { color: color-mix(in srgb, var(--ink) 55%, transparent); }
+  #aboutwrap h2 em { color: var(--ink); }
+  #aboutwrap .pop-x:hover { background: color-mix(in srgb, var(--ink) 62%, transparent); }
+  #aboutwrap ::selection { background: var(--ink); color: var(--paper); }
+  #aboutwrap :focus-visible { outline-color: var(--ink); }
   .pop-media { background: var(--pb, #ddd); }
   .pop-media img, .pop-media video, .pop-gal img, .pop-gal video { width: 100%; height: auto; display: block; }
   .pop-body { padding: clamp(22px, 3.5vw, 44px); }
@@ -500,7 +506,7 @@
     <div class="pop" id="about-pop" style="width:min(720px, 94vw)">
       <button class="pop-x" id="about-x" aria-label="Close">✕</button>
       <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
-        <h2>I draw characters, and make them <em style="color:var(--ink);font-style:normal">move</em>.</h2>
+        <h2>I draw characters, and make them <em style="font-style:normal">move</em>.</h2>
         <p class="pop-desc" style="margin-bottom:26px">
           I'm an illustrator and motion designer based between Bath and London, making bold
           character work for brands alongside a personal series of dark, gradient creatures.
