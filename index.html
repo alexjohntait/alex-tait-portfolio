@@ -233,12 +233,6 @@
     border-radius: var(--r); background: var(--ink);
   }
 
-  /* how far through the work you have flown */
-  .cloud-prog {
-    position: fixed; top: 0; left: 0; z-index: 75;
-    height: 2px; width: 0; background: var(--accent);
-  }
-
   /* reduced motion: no flight, no depth — just the work in a plain grid */
   @media (prefers-reduced-motion: reduce) {
     .cloud-stage { position: static; height: auto; overflow: visible; padding: 96px var(--gx) 40px; }
@@ -250,7 +244,7 @@
       position: static; width: auto !important; opacity: 1 !important;
       transform: none !important; pointer-events: auto;
     }
-    .cloud-cap, .cloud-prog, .cloud-hint { display: none; }
+    .cloud-cap, .cloud-hint { display: none; }
   }
 
   #ink { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
@@ -293,25 +287,6 @@
   .pill .sep {
     color: color-mix(in srgb, var(--ink) 35%, transparent);
     font-size: 13px; padding: 0 9px;
-  }
-
-  /* who has already trusted him, on the page instead of two clicks inside
-     About, and read from the work itself so it cannot go stale */
-  .clients { padding: clamp(70px, 11vh, 130px) var(--gx) clamp(50px, 8vh, 90px); }
-  .clients-kicker {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-size: 13px; font-weight: 400; line-height: 1.8;
-    color: var(--ink);
-  }
-  .clients-kicker::before { content: ''; width: 9px; height: 9px; background: var(--accent); }
-  .clients-list {
-    list-style: none; margin-top: clamp(22px, 3vw, 34px);
-    display: flex; flex-wrap: wrap; gap: 10px clamp(20px, 2.6vw, 40px);
-  }
-  .clients-list li {
-    font-family: var(--sans); font-weight: 600;
-    font-size: clamp(24px, 3vw, 44px); letter-spacing: -0.03em;
-    color: var(--ink);
   }
 
   /* ─── project popup: the page IS the grid; projects open over it ─── */
@@ -447,12 +422,6 @@
     </div>
   </div>
   <div class="cloud-cap" id="cloud-cap" aria-live="polite"></div>
-  <div class="cloud-prog" id="cloud-prog" aria-hidden="true"></div>
-
-  <section class="clients" aria-label="Selected clients">
-    <span class="clients-kicker">Selected clients</span>
-    <ul class="clients-list" id="clients-list"></ul>
-  </section>
 
 </main>
 
@@ -630,20 +599,11 @@ const PROJECTS = [
 const ASSETS = {"app-store":{"file":"app-store.jpg","kind":"img"},"humantold-nyc":{"file":"humantold-nyc.mp4","kind":"video"},"pepper":{"file":"pepper.mp4","kind":"video"},"hiit-workout":{"file":"hiit-workout.jpg","kind":"img"},"tarot-cards":{"file":"tarot-cards.png","kind":"img"},"saying-goodbye-to-friends":{"file":"saying-goodbye-to-friends.mp4","kind":"video"},"yoga-x-oceans":{"file":"yoga-x-oceans.png","kind":"img"},"jellyfish":{"file":"jellyfish.mp4","kind":"video"},"fruit-snacks":{"file":"fruit-snacks.mp4","kind":"video"},"clear":{"file":"clear.mp4","kind":"video"},"alice-in-wonderland":{"file":"alice-in-wonderland.jpg","kind":"img"},"mantis":{"file":"mantis.mp4","kind":"video"},"kueski-pay":{"file":"kueski-pay.png","kind":"img"},"thinkartfully":{"file":"thinkartfully.mp4","kind":"video"},"tiger":{"file":"tiger.mp4","kind":"video"},"ao-driver-booklet":{"file":"ao-driver-booklet.png","kind":"img"},"type-1-of-a-kind":{"file":"type-1-of-a-kind.mp4","kind":"video"},"tap-on-tap-off":{"file":"tap-on-tap-off.png","kind":"img"},"cooking-for-cats":{"file":"cooking-for-cats.png","kind":"img"},"offline-dating":{"file":"offline-dating.png","kind":"img"},"urban-living":{"file":"urban-living.jpg","kind":"img"},"apo-discounter":{"file":"apo-discounter.mp4","kind":"video"},"give-it-time":{"file":"give-it-time.mp4","kind":"video"},"eco-living":{"file":"eco-living.jpg","kind":"img"},"paws-for-thought":{"file":"paws-for-thought.jpg","kind":"img"},"window-display":{"file":"window-display.png","kind":"img"},"wallpaper-pack":{"file":"wallpaper-pack.jpg","kind":"img"},"dreams":{"file":"dreams.mp4","kind":"video"},"special-edition-royal-wedding":{"file":"special-edition-royal-wedding.jpg","kind":"img"},"woodland":{"file":"woodland.png","kind":"img"},"cadooz":{"file":"cadooz.jpg","kind":"img"},"shapeshifters":{"file":"shapeshifters.mp4","kind":"video"}};
 const GALLERY = {"app-store":[{"file":"app-store-m1.png","kind":"img","w":1920,"h":1080},{"file":"app-store-m2.png","kind":"img","w":1920,"h":1080}],"humantold-nyc":[{"file":"humantold-nyc-m1.mp4","kind":"video","w":0,"h":0},{"file":"humantold-nyc-m2.mp4","kind":"video","w":0,"h":0},{"file":"humantold-nyc-m3.jpg","kind":"img","w":2700,"h":1519},{"file":"humantold-nyc-m4.jpg","kind":"img","w":2500,"h":1406},{"file":"humantold-nyc-m5.png","kind":"img","w":2148,"h":1269},{"file":"humantold-nyc-m6.png","kind":"img","w":2149,"h":1269}],"pepper":[{"file":"pepper-m1.mp4","kind":"video","w":0,"h":0}],"hiit-workout":[{"file":"hiit-workout-m1.mp4","kind":"video","w":0,"h":0},{"file":"hiit-workout-m2.jpg","kind":"img","w":2000,"h":1500},{"file":"hiit-workout-m3.jpg","kind":"img","w":2500,"h":1974},{"file":"hiit-workout-m4.jpg","kind":"img","w":3000,"h":2000},{"file":"hiit-workout-m5.webp","kind":"img","w":2560,"h":1909}],"tarot-cards":[{"file":"tarot-cards-m1.png","kind":"img","w":794,"h":1361},{"file":"tarot-cards-m2.png","kind":"img","w":794,"h":1361},{"file":"tarot-cards-m3.png","kind":"img","w":794,"h":1361},{"file":"tarot-cards-m4.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m5.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m6.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m7.png","kind":"img","w":795,"h":1361},{"file":"tarot-cards-m8.png","kind":"img","w":795,"h":1361}],"saying-goodbye-to-friends":[{"file":"saying-goodbye-to-friends-m1.mp4","kind":"video","w":1000,"h":1000},{"file":"saying-goodbye-to-friends-m2.mp4","kind":"video","w":1000,"h":1000},{"file":"saying-goodbye-to-friends-m3.mp4","kind":"video","w":1920,"h":1080}],"yoga-x-oceans":[{"file":"yoga-x-oceans-m1.jpg","kind":"img","w":2500,"h":1667},{"file":"yoga-x-oceans-m2.jpg","kind":"img","w":1440,"h":1440}],"fruit-snacks":[{"file":"fruit-snacks-m1.png","kind":"img","w":8193,"h":8124},{"file":"fruit-snacks-m2.jpg","kind":"img","w":2500,"h":1666},{"file":"fruit-snacks-m3.png","kind":"img","w":2500,"h":2100}],"clear":[{"file":"clear-m1.jpg","kind":"img","w":2880,"h":1800},{"file":"clear-m2.png","kind":"img","w":3902,"h":2000},{"file":"clear-m3.png","kind":"img","w":3902,"h":2000}],"alice-in-wonderland":[{"file":"alice-in-wonderland-m1.jpg","kind":"img","w":1000,"h":667},{"file":"alice-in-wonderland-m2.jpg","kind":"img","w":1000,"h":667}],"kueski-pay":[{"file":"kueski-pay-m1.jpg","kind":"img","w":4500,"h":3000},{"file":"kueski-pay-m2.mp4","kind":"video","w":0,"h":0},{"file":"kueski-pay-m3.png","kind":"img","w":4500,"h":3000}],"thinkartfully":[{"file":"thinkartfully-m1.mp4","kind":"video","w":1080,"h":1080},{"file":"thinkartfully-m2.mp4","kind":"video","w":1080,"h":1080},{"file":"thinkartfully-m3.mp4","kind":"video","w":1080,"h":1080},{"file":"thinkartfully-m4.mp4","kind":"video","w":1080,"h":1080}],"ao-driver-booklet":[{"file":"ao-driver-booklet-m1.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m2.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m3.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m4.png","kind":"img","w":2563,"h":2563},{"file":"ao-driver-booklet-m5.png","kind":"img","w":10251,"h":10251},{"file":"ao-driver-booklet-m6.png","kind":"img","w":10251,"h":10251}],"type-1-of-a-kind":[{"file":"type-1-of-a-kind-m1.mp4","kind":"video","w":0,"h":0}],"tap-on-tap-off":[{"file":"tap-on-tap-off-m1.png","kind":"img","w":2500,"h":1768},{"file":"tap-on-tap-off-m2.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m3.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m4.png","kind":"img","w":3509,"h":2481},{"file":"tap-on-tap-off-m5.png","kind":"img","w":3508,"h":2481},{"file":"tap-on-tap-off-m6.png","kind":"img","w":3509,"h":2481}],"offline-dating":[{"file":"offline-dating-m1.png","kind":"img","w":4501,"h":5625},{"file":"offline-dating-m2.png","kind":"img","w":4501,"h":5625}],"urban-living":[{"file":"urban-living-m1.jpg","kind":"img","w":2553,"h":3261},{"file":"urban-living-m2.png","kind":"img","w":2466,"h":2484},{"file":"urban-living-m3.jpg","kind":"img","w":3000,"h":2250}],"eco-living":[{"file":"eco-living-m1.jpg","kind":"img","w":900,"h":900}],"window-display":[{"file":"window-display-m1.jpg","kind":"img","w":2560,"h":1600}],"wallpaper-pack":[{"file":"wallpaper-pack-m1.jpg","kind":"img","w":4500,"h":3000},{"file":"wallpaper-pack-m2.png","kind":"img","w":5120,"h":2880},{"file":"wallpaper-pack-m3.jpg","kind":"img","w":4500,"h":3000},{"file":"wallpaper-pack-m4.png","kind":"img","w":2048,"h":2732},{"file":"wallpaper-pack-m5.png","kind":"img","w":5120,"h":2880}],"special-edition-royal-wedding":[{"file":"special-edition-royal-wedding-m1.jpg","kind":"img","w":2500,"h":2500},{"file":"special-edition-royal-wedding-m2.jpg","kind":"img","w":3000,"h":2000}],"cadooz":[{"file":"cadooz-m1.png","kind":"img","w":7681,"h":7680},{"file":"cadooz-m2.png","kind":"img","w":7680,"h":7681},{"file":"cadooz-m3.png","kind":"img","w":7681,"h":7681},{"file":"cadooz-m4.png","kind":"img","w":7680,"h":7680}]};
 
-/* the client list is read off the work, in the order Airtable holds it, so
-   adding a job adds the name and nothing here needs editing by hand */
-const CLIENTS = [...new Set(
-  PROJECTS.map(p => (p.client || '').trim()).filter(c => c && c !== 'Personal')
-)];
-document.getElementById('clients-list').innerHTML =
-  CLIENTS.map(c => `<li>${c}</li>`).join('');
-
 /* ─── the image cloud: build the cards, then fly the camera through ─── */
 const stage = document.getElementById('cloud-stage');
 const space = document.getElementById('cloud-space');
 const scroller = document.getElementById('cloud-scroll');
 const capEl = document.getElementById('cloud-cap');
-const progEl = document.getElementById('cloud-prog');
 const hintEl = document.getElementById('cloud-hint');
 const nameEl = document.getElementById('name');
 
@@ -940,7 +900,6 @@ function frame() {
   }
 
   /* the signature is a standing mark now — it stays put the whole way */
-  progEl.style.width = (prog * 100).toFixed(2) + '%';
 
   /* a phone plays whichever piece is crossing the middle, one at a time.
      The clips are small now, so the wait is short — it exists to stop the
