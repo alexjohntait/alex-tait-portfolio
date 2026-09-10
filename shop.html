@@ -52,7 +52,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -94,6 +94,11 @@
     .about-cols li { font-family: var(--sans); font-weight: 700;
       font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -.035em; line-height: 1.15; color: var(--ink); }
     @media (max-width: 560px) { .about-cols { grid-template-columns: 1fr; gap: 22px; } }
+    /* instagram, email and the rest in the same face and scale, set light */
+    #aboutwrap .pop-meta { font-family: var(--sans); font-weight: 300; font-style: normal;
+      font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -.035em; line-height: 1.25; color: var(--ink); }
+    #aboutwrap .pop-meta b { font-weight: 300; color: color-mix(in srgb, var(--ink) 42%, transparent); }
+    #aboutwrap .pop-meta a { text-underline-offset: 4px; }
     #aboutwrap .pop-x:hover { background: color-mix(in srgb, var(--ink) 62%, transparent); }
     #aboutwrap ::selection { background: var(--ink); color: var(--paper); }
     #aboutwrap :focus-visible { outline-color: var(--ink); }

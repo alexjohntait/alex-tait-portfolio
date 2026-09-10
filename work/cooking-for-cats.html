@@ -52,7 +52,7 @@
   <link rel="preconnect" href="https://api.fontshare.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -362,6 +362,20 @@
     font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -0.035em;
     line-height: 1.15; color: var(--ink);
   }
+  /* instagram, email, agent and the rest: the same face and scale as the
+     lists above, set light so the block reads as the quiet end of the page
+     rather than a third stack competing with them */
+  #aboutwrap .pop-meta {
+    font-family: var(--sans); font-weight: 300; font-style: normal;
+    font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -0.035em;
+    line-height: 1.25; color: var(--ink);
+  }
+  /* the field labels held back in tone, not in weight — a bolder label here
+     would put the emphasis on the word EMAIL rather than the address */
+  #aboutwrap .pop-meta b {
+    font-weight: 300; color: color-mix(in srgb, var(--ink) 42%, transparent);
+  }
+  #aboutwrap .pop-meta a { text-underline-offset: 4px; }
   /* a phone has no room for two columns of display type */
   @media (max-width: 560px) {
     .about-cols { grid-template-columns: 1fr; gap: 22px; }
