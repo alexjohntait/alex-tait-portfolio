@@ -68,7 +68,7 @@
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
     --sigh: clamp(24px, 3.15vw, 41px);   /* the mark's inset, still */
-    --sigsz: clamp(120px, 20vw, 300px);  /* the mark's longest side */
+    --sigsz: clamp(72px, 12vw, 180px);   /* the mark's longest side */
     --r: 25px;                            /* the corner on every piece of work */
     --bar: 58px;                          /* the header band it is centred in */
   }
@@ -175,6 +175,11 @@
     color: var(--accent); white-space: nowrap;
     pointer-events: none;
   }
+  .name a {
+    display: block; pointer-events: auto; cursor: pointer;
+    transition: opacity 0.2s var(--out);
+  }
+  .name a:hover { opacity: 0.7; }
   @media (min-width: 821px) {
     .name {
       left: calc((var(--gx) - var(--sigh)) / 2);

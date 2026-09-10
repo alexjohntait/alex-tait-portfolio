@@ -70,7 +70,7 @@
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
     --sigh: clamp(24px, 3.15vw, 41px);   /* the mark's inset, still */
-    --sigsz: clamp(120px, 20vw, 300px);  /* the mark's longest side */
+    --sigsz: clamp(72px, 12vw, 180px);   /* the mark's longest side */
     --r: 25px;                            /* the corner on every piece of work */
     --bar: 58px;                          /* the header band it is centred in */
   }
@@ -177,6 +177,11 @@
     color: var(--accent); white-space: nowrap;
     pointer-events: none;
   }
+  .name a {
+    display: block; pointer-events: auto; cursor: pointer;
+    transition: opacity 0.2s var(--out);
+  }
+  .name a:hover { opacity: 0.7; }
   @media (min-width: 821px) {
     .name {
       left: calc((var(--gx) - var(--sigh)) / 2);
@@ -416,8 +421,8 @@
   <div class="cloud-scroll" id="cloud-scroll">
     <div class="cloud-stage" id="cloud-stage" aria-label="Alex Tait — illustrator and motion designer">
       <div class="cloud-space" id="cloud-space"></div>
-      <h1 class="name" id="name"><img src="assets/signature.gif" alt="Alex Tait"
-        onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></h1>
+      <h1 class="name" id="name"><a href="index.html" id="name-link" aria-label="Alex Tait — back to the top"><img src="assets/signature.gif" alt="Alex Tait"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a></h1>
       <div class="cloud-hint" id="cloud-hint">scroll</div>
     </div>
   </div>
@@ -501,6 +506,19 @@ const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MOBILE = matchMedia('(max-width: 820px)');
 
 const COLS = 6;
+
+/* the mark goes back to the top of the run. The href stays a real link so
+   it still works without JS and reads as one to a screen reader; here it is
+   a scroll, so the shuffle you are looking at survives the trip. */
+(() => {
+  const link = document.getElementById('name-link');
+  if (!link) return;
+  link.addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' });
+  });
+})();
 
 /* ─── INFO ─── */
 (() => {
