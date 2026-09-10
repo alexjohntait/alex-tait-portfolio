@@ -18,6 +18,18 @@ const token = process.env.AIRTABLE_TOKEN;
 let sketchStatus = 'not run';
 let logoStatus = 'not run';
 
+/* Airtable is the source of truth for the logo — except right now.
+ *
+ * assets/signature.gif is the peace-sign loop, put there by hand. The Site
+ * Logo cell still holds an older still png, so every rebuild pulled that in
+ * and overwrote the loop: the 03:37 run did exactly that and the mark went
+ * back to the static head.
+ *
+ * Flip this to true once the loop is the attachment in Airtable, and the
+ * sync takes over again. Until then it leaves the file alone and says so in
+ * BUILD-REPORT.txt, rather than reverting the logo twice a day. */
+const LOGO_FROM_AIRTABLE = false;
+
 async function fetchRecords() {
   console.log('• Fetching records from Airtable…');
   const records = [];
@@ -150,6 +162,12 @@ async function refreshSketchbook() {
    Non-fatal: a missing column or a failed download leaves the previous
    signature in place rather than taking the site's masthead down. */
 async function refreshSiteLogo() {
+  if (!LOGO_FROM_AIRTABLE) {
+    const have = ['gif', 'webp', 'png'].map(e => `assets/signature.${e}`).find(p => fs.existsSync(p));
+    console.log(`• Site logo: pinned to the repo copy (${have || 'none'}) — LOGO_FROM_AIRTABLE is off`);
+    logoStatus = `pinned to ${have ? have.split('/').pop() : 'none'} in the repo (Airtable sync off)`;
+    return;
+  }
   if (!token) { console.log('• Site logo: skipped (no token / file mode)'); logoStatus = 'skipped (no token)'; return; }
   const DIR = 'assets', STEM = 'signature';
   try {
