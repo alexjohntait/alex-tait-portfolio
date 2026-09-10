@@ -59,6 +59,7 @@
   :root {
     color-scheme: light;
     --paper: #ffffff;
+    --accent-sm: #d13d18;   /* accent at reading size: 4.78:1 on paper */
     --ink: #16120f;
     --accent: #ff4a1d;
     --line: rgba(22, 18, 15, 0.28);
@@ -114,7 +115,7 @@
   @media (min-width: 821px) {
     .menu-btn { height: var(--gx); }
   }
-  .menu-btn:hover { color: var(--accent); }
+  .menu-btn:hover { color: var(--accent-sm); }
   /* ─── the image cloud: a linear flight through the work ───
      Every card sits at a fixed point in 3D space — scattered on a
      golden-angle spiral around one long Z axis, so nothing ever clumps.
@@ -285,8 +286,8 @@
     color: var(--ink); background: none; border: 0; cursor: pointer;
     padding: 6px 0; transition: color 0.2s;
   }
-  .pill button:hover { color: var(--accent); }
-  .pill button.active, .pill button.active:hover { color: var(--accent); }
+  .pill button:hover { color: var(--accent-sm); }
+  .pill button.active, .pill button.active:hover { color: var(--accent-sm); }
   .pill .sep {
     color: color-mix(in srgb, var(--ink) 35%, transparent);
     font-size: 13px; padding: 0 9px;

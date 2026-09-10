@@ -58,7 +58,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       color-scheme: light;
-      --paper: #ffffff; --ink: #16120f; --accent: #ff4a1d; --line: rgba(22,18,15,.28);
+      --paper: #ffffff; --ink: #16120f; --accent: #ff4a1d; --accent-sm: #d13d18; --line: rgba(22,18,15,.28);
       --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
       --mono: 'Roboto Mono', 'Courier New', monospace;
       --spring: cubic-bezier(.34,1.56,.64,1); --out: cubic-bezier(.19,1,.22,1);
@@ -75,7 +75,7 @@
     .menu-btn { height: 58px; border: 0; cursor: pointer; padding: 0 clamp(14px, 1.4vw, 26px); background: none; color: var(--ink); display: grid; place-items: center;
       font-family: var(--sans); font-weight: 700; font-size: clamp(26px, 3.2vw, 48px); letter-spacing: -.035em; line-height: .96; transition: color .25s; }
     @media (min-width: 821px) { .menu-btn { height: var(--gx); } }
-    .menu-btn:hover { color: var(--accent); }
+    .menu-btn:hover { color: var(--accent-sm); }
 
     .popwrap { position: fixed; inset: 0; z-index: 80; display: none; align-items: flex-start; justify-content: center; overflow-y: auto; overscroll-behavior: contain; background: color-mix(in srgb, var(--ink) 42%, transparent); padding: 6vh 16px 8vh; }
     .popwrap.open { display: flex; }
