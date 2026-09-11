@@ -294,14 +294,33 @@
   }
 
   /* ─── project popup: the page IS the grid; projects open over it ─── */
+  /* Overlays arrive and leave rather than switching on and off. .open puts
+     the wrap in the layout; .in, added a frame later, is what the backdrop
+     fades and the panel rises on. Closing drops .in, runs a shorter fade,
+     and only then drops .open — so what leaves is what you were looking
+     at, not an empty panel. The project popup keeps its own grow-from-tile
+     transform, so the rise here is scoped to About and the reel. */
   .popwrap {
     position: fixed; inset: 0; z-index: 80;
     display: none; align-items: flex-start; justify-content: center;
     overflow-y: auto; overscroll-behavior: contain;
     background: color-mix(in srgb, var(--ink) 42%, transparent);
     padding: 6vh 16px 8vh;
+    opacity: 0; transition: opacity 0.3s var(--out);
   }
   .popwrap.open { display: flex; }
+  .popwrap.in { opacity: 1; }
+  .popwrap.closing { transition-duration: 0.2s; }
+  #aboutwrap .pop, #reelwrap .reel {
+    transform: translateY(14px);
+    transition: transform 0.4s var(--out);
+  }
+  #aboutwrap.in .pop, #reelwrap.in .reel { transform: none; }
+  #aboutwrap.closing .pop, #reelwrap.closing .reel { transition-duration: 0.2s; }
+  @media (prefers-reduced-motion: reduce) {
+    .popwrap, #aboutwrap .pop, #reelwrap .reel, .pop.fly { transition: none; }
+    #aboutwrap .pop, #reelwrap .reel { transform: none; }
+  }
   .pop {
     background: var(--paper);
     width: min(860px, 94vw);

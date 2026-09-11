@@ -296,14 +296,33 @@
   }
 
   /* ─── project popup: the page IS the grid; projects open over it ─── */
+  /* Overlays arrive and leave rather than switching on and off. .open puts
+     the wrap in the layout; .in, added a frame later, is what the backdrop
+     fades and the panel rises on. Closing drops .in, runs a shorter fade,
+     and only then drops .open — so what leaves is what you were looking
+     at, not an empty panel. The project popup keeps its own grow-from-tile
+     transform, so the rise here is scoped to About and the reel. */
   .popwrap {
     position: fixed; inset: 0; z-index: 80;
     display: none; align-items: flex-start; justify-content: center;
     overflow-y: auto; overscroll-behavior: contain;
     background: color-mix(in srgb, var(--ink) 42%, transparent);
     padding: 6vh 16px 8vh;
+    opacity: 0; transition: opacity 0.3s var(--out);
   }
   .popwrap.open { display: flex; }
+  .popwrap.in { opacity: 1; }
+  .popwrap.closing { transition-duration: 0.2s; }
+  #aboutwrap .pop, #reelwrap .reel {
+    transform: translateY(14px);
+    transition: transform 0.4s var(--out);
+  }
+  #aboutwrap.in .pop, #reelwrap.in .reel { transform: none; }
+  #aboutwrap.closing .pop, #reelwrap.closing .reel { transition-duration: 0.2s; }
+  @media (prefers-reduced-motion: reduce) {
+    .popwrap, #aboutwrap .pop, #reelwrap .reel, .pop.fly { transition: none; }
+    #aboutwrap .pop, #reelwrap .reel { transform: none; }
+  }
   .pop {
     background: var(--paper);
     width: min(860px, 94vw);
@@ -504,6 +523,30 @@
 
 <script>
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* every overlay opens and closes through these two, so they share one
+   timing. showWrap puts the wrap in the layout, then adds .in a frame later
+   so the fade has something to transition from. hideWrap runs the shorter
+   exit and only takes the wrap out of the layout — and runs `after`, which
+   is where a caller empties its media — once that has finished. A timer
+   rather than transitionend: the event does not fire in a background tab,
+   and a wrap that never closes is worse than one that closes 20ms late. */
+const OUT_MS = 220;
+function showWrap(w) {
+  clearTimeout(w._hideT);
+  w.classList.remove('closing');
+  w.classList.add('open');
+  if (REDUCE) { w.classList.add('in'); return; }
+  requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('in')));
+}
+function hideWrap(w, after) {
+  clearTimeout(w._hideT);
+  w.classList.remove('in');
+  const done = () => { w.classList.remove('open', 'closing'); if (after) after(); };
+  if (REDUCE) return done();
+  w.classList.add('closing');
+  w._hideT = setTimeout(done, OUT_MS);
+}
 const MOBILE = matchMedia('(max-width: 820px)');
 
 const COLS = 6;
@@ -531,12 +574,12 @@ const COLS = 6;
   const awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
   btn.addEventListener('click', () => {
     btn.setAttribute('aria-expanded', 'true');
-    awrap.classList.add('open');
+    showWrap(awrap);
     document.body.style.overflow = 'hidden';
     ax.focus();
   });
   const closeAbout = () => {
-    awrap.classList.remove('open'); document.body.style.overflow = '';
+    hideWrap(awrap); document.body.style.overflow = '';
     btn.setAttribute('aria-expanded', 'false');
   };
   ax.addEventListener('click', closeAbout);
@@ -549,13 +592,13 @@ const COLS = 6;
   const reel = document.getElementById('reel-vid');
   const openReel = () => {
     if (!reel.src) reel.src = reel.dataset.src;
-    rwrap.classList.add('open');
+    showWrap(rwrap);
     document.body.style.overflow = 'hidden';
     reel.play().catch(() => {});
     rx.focus();
   };
   const closeReel = () => {
-    rwrap.classList.remove('open');
+    hideWrap(rwrap);
     document.body.style.overflow = '';
     reel.pause();
     if (location.hash === '#showreel') history.replaceState(null, '', location.pathname);
@@ -799,18 +842,27 @@ function place() {
   live.forEach((c, i) => {
     const ang = i * GOLD;
     const rad = MINR + rnd(i) * SPREAD;
-    c.ox = Math.cos(ang) * rad;
+    /* these are targets. A filter change gives every surviving card a new
+       station and a new scatter, and snapping to them read as the field
+       being re-rendered; frame() eases each card across instead, so the
+       change reads as the field reorganising. A card that was not on the
+       field a moment ago has nothing to ease from and takes its place
+       outright — otherwise it would fly in from wherever it last sat. */
+    const fresh = c.st === undefined || !c.wasLive;
+    c.tx = Math.cos(ang) * rad;
     /* a phone is tall: with the desktop ratio the whole field collapsed into
        one narrow band across the middle and left the screen empty top and
        bottom, so the vertical scatter is stretched to fit the portrait frame */
-    c.oy = Math.sin(ang) * rad * YMUL;
-    c.st = -i * SPACING;
-    c.dy = (rnd(i + 41) - 0.5) * 150;   /* a little vertical travel as it crosses */
+    c.ty = Math.sin(ang) * rad * YMUL;
+    c.tst = -i * SPACING;
+    c.tdy = (rnd(i + 41) - 0.5) * 150;  /* a little vertical travel as it crosses */
+    if (fresh) { c.ox = c.tx; c.oy = c.ty; c.st = c.tst; c.dy = c.tdy; }
     /* the sketches sit a quarter larger than they did: at 0.84 of the
        narrowest work they read as specks beside it rather than as asides */
     c.w = c.small ? MINW * 1.05 : MINW + rnd(i + 99) * (MAXW - MINW);
     c.el.style.setProperty('--w', Math.round(c.w) + 'px');
   });
+  cards.forEach(c => { c.wasLive = c.vis; });
   span = Math.max(0, (live.length - 1) * SPACING);
   scroller.style.height = (stage.offsetHeight + (live.length + 2) * PER) + 'px';
   /* measured once here rather than every frame, so the render loop never
@@ -865,6 +917,19 @@ function frame() {
   for (const c of cards) {
     const el = c.el;
     if (!c.vis) { hide(c); continue; }
+
+    /* ease onto the station place() gave it — same feel as the camera's
+       own glide, a touch slower so the field settles after the camera */
+    if (c.tst !== undefined) {
+      const dst = Math.abs(c.tst - c.st) + Math.abs(c.tx - c.ox) + Math.abs(c.ty - c.oy);
+      if (dst > 0.5) {
+        c.st += (c.tst - c.st) * 0.11;
+        c.ox += (c.tx - c.ox) * 0.11;
+        c.oy += (c.ty - c.oy) * 0.11;
+        c.dy += (c.tdy - c.dy) * 0.11;
+        busy = true;
+      } else if (dst) { c.st = c.tst; c.ox = c.tx; c.oy = c.ty; c.dy = c.tdy; }
+    }
 
     const bx = c.st + travel;               /* where its station has slid to */
     const t = bx / RANGE;                   /* -1 at one edge, +1 at the other */
@@ -1027,7 +1092,7 @@ function openPop(p, tile) {
     ? `<video src="images/${m.file}#t=0.1" muted loop ${REDUCE ? '' : 'autoplay '}playsinline preload="metadata"></video>`
     : `<img src="images/${m.file}" alt="" loading="lazy" />`).join('');
 
-  popwrap.classList.add('open');
+  showWrap(popwrap);
   document.body.style.overflow = 'hidden';
   popwrap.scrollTop = 0;
 
@@ -1048,10 +1113,11 @@ function openPop(p, tile) {
   document.getElementById('pop-x').focus();
 }
 function closePop() {
-  popwrap.classList.remove('open');
   document.body.style.overflow = '';
-  document.getElementById('pop-media').innerHTML = '';
-  document.getElementById('pop-gal').innerHTML = '';
+  hideWrap(popwrap, () => {
+    document.getElementById('pop-media').innerHTML = '';
+    document.getElementById('pop-gal').innerHTML = '';
+  });
   if (lastFocus && lastFocus.focus) lastFocus.focus();
 }
 document.getElementById('pop-x').addEventListener('click', closePop);
