@@ -5,3 +5,4 @@ _*.js
 .DS_Store
 node_modules/
 .logo-frames/
+_grid-preview.html
