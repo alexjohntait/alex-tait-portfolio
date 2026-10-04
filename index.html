@@ -93,7 +93,20 @@
   /* ─── menu: bare vermillion rules, top right ─── */
   /* the same margin the filter bar keeps on the left and the caption on the
      right, rather than an inset of its own */
+  /* Info stays in the corner, but over a scrolling grid it used to pass
+     across tiles with nothing behind it. It keeps the paper under itself
+     once the page has moved — a ground only where it is needed, rather than
+     a bar across the top that would push the work down. */
   header { position: fixed; top: 0; right: var(--gx); z-index: 70; }
+  .menu-btn {
+    border-radius: 999px;
+    transition: color .25s, background-color .25s var(--out);
+  }
+  body.scrolled .menu-btn {
+    background: var(--paper);
+    box-shadow: 0 0 0 10px var(--paper);
+  }
+  @media (prefers-reduced-motion: reduce) { .menu-btn { transition: none; } }
   /* the corner control is a word now, not three rules: the panel it opens
      carries the role, the location and the address, so "Info" says what is
      behind it where a hamburger only says "something". Blocked in vermillion
@@ -118,25 +131,49 @@
   }
   .menu-btn:hover { color: var(--accent-sm); }
   /* ─── the work, as a grid ───
-     Three across on a desktop, two on a tablet, one on a phone. The tiles
-     are a fixed ratio so the rows line up and the eye can run down a column;
-     each piece keeps its own background behind the crop, so a square drawing
-     on a coloured ground still reads as itself rather than as a letterboxed
-     photograph. */
+     Three across on a desktop, two on a tablet, one on a phone.
+
+     Every tile keeps its own proportions. A fixed 4:3 crop lined the rows up
+     beautifully and showed 42% of the jellyfish and 43% of the tarot cards;
+     on an illustrator's portfolio, tidy rows are not worth half a drawing.
+     So the columns are a masonry: each tile spans as many 8px rows as its
+     own height needs, measured once its image knows its shape. Columns stay
+     aligned, rows do not, and nothing is cropped.
+
+     A wide piece takes two columns. That is not decoration — it is the only
+     way a 16:9 frame reads at the same visual weight as a portrait beside
+     it, and it breaks the identical-tile rhythm that makes a grid of 32
+     look like a contact sheet. */
   .board { padding: clamp(18px, 2.4vw, 40px) var(--gx) clamp(70px, 10vh, 140px); }
   .grid {
+    --cols: 3;
+    --row: 8px;
+    --colgap: clamp(16px, 1.8vw, 32px);
+    --rowgap: clamp(26px, 3vw, 52px);
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(26px, 3vw, 52px) clamp(16px, 1.8vw, 32px);
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    column-gap: var(--colgap);
+    /* the row gap lives on the tile instead, so one span calculation covers
+       the tile and the space under it */
+    grid-auto-rows: var(--row);
+    align-items: start;
   }
-  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 620px)  { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 1000px) { .grid { --cols: 2; } }
+  @media (max-width: 620px)  { .grid { --cols: 1; } }
 
-  .card { display: block; text-decoration: none; color: var(--ink); }
+  .card {
+    display: block; text-decoration: none; color: var(--ink);
+    margin-bottom: var(--rowgap);
+    grid-row: span var(--span, 46);
+  }
+  /* a landscape piece earns the width; never on one column, where spanning
+     two would simply overflow */
+  @media (min-width: 621px) { .card.wide { grid-column: span 2; } }
+
   .card .shot {
     display: block; position: relative; overflow: hidden;
     border-radius: var(--r); background: var(--bg, var(--line));
-    aspect-ratio: 4 / 3;
+    aspect-ratio: var(--ar, 4 / 3);
   }
   .card .shot img, .card .vid {
     width: 100%; height: 100%; object-fit: cover; display: block;
@@ -144,7 +181,7 @@
   }
   .card .vid { position: absolute; inset: 0; }
   @media (hover: hover) {
-    .card:hover .shot img, .card:hover .vid { transform: scale(1.04); }
+    .card:hover .shot img, .card:hover .vid { transform: scale(1.03); }
   }
   .card .t {
     display: block; margin-top: 14px;
@@ -163,10 +200,25 @@
   .card.sketch { pointer-events: none; }
   .card.sketch .shot { background: none; border-radius: 0; }
   .card.sketch .shot img { mix-blend-mode: multiply; object-fit: contain; }
-  .card[hidden] { display: none; }
+
+  /* the arrival: the first screen's tiles come up as the page settles, in
+     the order they are read. Added by script, so with no JavaScript every
+     tile is simply there — the reveal enhances a visible default rather
+     than gating it. */
+  .grid.arrive .card.up {
+    animation: tileUp 0.55s var(--out) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+  @keyframes tileUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .card[hidden] { display: none; }  .card[hidden] { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
     .card .shot img, .card .vid, .card .t { transition: none; }
+    .grid.arrive .card.up { animation: none; }
   }
 
   /* the signature is a standing mark now: small, top left, always there —
@@ -344,12 +396,14 @@
 </head>
 <body>
 
-<header>
-  <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
-</header>
+
 
 <h1 class="name" id="name"><a href="index.html" id="name-link" aria-label="Alex Tait — back to the top"><img src="assets/signature.gif" alt="Alex Tait"
   onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a></h1>
+
+<header>
+  <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
+</header>
 
 <main class="board" aria-label="Alex Tait — illustrator and motion designer">
   <div class="grid" id="grid"></div>
@@ -652,6 +706,12 @@ function buildGrid() {
     frag.appendChild(el);
     const c = { el, p, clip, vid: null, vis: true };
     cards.push(c);
+    const img = el.querySelector('img');
+    if (img) {
+      if (img.complete) requestAnimationFrame(() => shapeFromImage(c, img));
+      else img.addEventListener('load', () => shapeFromImage(c, img), { once: true });
+      img.addEventListener('error', () => sizeTile(c), { once: true });
+    }
     if (clip) {
       el.addEventListener('pointerenter', () => wakeVideo(c));
       el.addEventListener('pointerleave', () => restVideo(c));
@@ -660,10 +720,60 @@ function buildGrid() {
     }
   });
   grid.appendChild(frag);
+  requestAnimationFrame(sizeAll);
+
+  /* the arrival: only what is on the first screen, in reading order. The
+     class is added here rather than sitting in the markup, so without
+     JavaScript every tile is simply visible. */
+  if (!REDUCE) {
+    const onFirstScreen = cards.filter(c => c.el.getBoundingClientRect().top < innerHeight);
+    onFirstScreen.slice(0, 12).forEach((c, i) => {
+      c.el.style.setProperty('--i', i);
+      c.el.classList.add('up');
+    });
+    grid.classList.add('arrive');
+  }
+
+  /* fonts land after first paint and change the title block's height */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizeAll);
+  let rt;
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(sizeAll, 150); });
 }
+
+/* Info needs the paper under it only once the work is passing behind it */
+addEventListener('scroll', () => {
+  document.body.classList.toggle('scrolled', scrollY > 24);
+}, { passive: true });
 
 function matches(c) {
   return currentF === 'all' || c.el.dataset.cats.includes(currentF);
+}
+
+/* ─── masonry ───
+   Each tile spans as many 8px rows as it actually needs. Measured from the
+   laid-out element rather than from the image alone, so the title and the
+   client line under it are counted too. */
+const ROW = 8;
+function sizeTile(c) {
+  const el = c.el;
+  if (el.hidden) return;
+  el.style.setProperty('--span', '1');          /* collapse, then measure */
+  const h = el.querySelector('.shot').getBoundingClientRect().height
+          + (el.querySelector('.t') ? el.getBoundingClientRect().height - el.querySelector('.shot').getBoundingClientRect().height : 0);
+  el.style.setProperty('--span', Math.max(1, Math.ceil(h / ROW)));
+}
+function sizeAll() { cards.forEach(sizeTile); }
+
+/* an image only knows its shape once it has loaded; until then the tile
+   holds the 4/3 default so the page does not jump around as they arrive */
+function shapeFromImage(c, img) {
+  if (!img.naturalWidth || !img.naturalHeight) return;
+  const ar = img.naturalWidth / img.naturalHeight;
+  c.el.querySelector('.shot').style.setProperty('--ar', img.naturalWidth + ' / ' + img.naturalHeight);
+  /* a frame half again as wide as it is tall reads thin in one column;
+     give it two, where it carries the same weight as a portrait beside it */
+  if (ar >= 1.6 && !c.el.classList.contains('sketch')) c.el.classList.add('wide');
+  sizeTile(c);
 }
 
 let currentF = 'all';
@@ -684,6 +794,7 @@ document.querySelectorAll('.pill button').forEach(b => {
       c.el.hidden = !c.vis;
       if (!c.vis) restVideo(c);
     });
+    requestAnimationFrame(sizeAll);
     const n = cards.filter(c => c.vis && c.p).length;
     announce(currentF === 'all' ? `everything · ${n}` : `${currentF} · ${n}`);
     scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' });
