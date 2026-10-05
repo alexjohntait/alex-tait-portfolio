@@ -48,18 +48,7 @@ swap(
   `<a class="menu-btn pagelink" id="page-link" href="index.html"><span>Work</span></a>`,
   'the corner link');
 
-/* every piece here is personal, so there is nothing to filter */
-const pillStart = html.indexOf('<div class="pill"');
-const pillEnd = html.indexOf('</div>', pillStart);
-if (pillStart < 0 || pillEnd < 0) throw new Error('make-sketchbook: the filter bar not found');
-html = html.slice(0, pillStart) + html.slice(pillEnd + '</div>'.length).replace(/^\r?\n/, '');
-
-/* and the script that drives it would throw on an empty selector list —
-   it does not, querySelectorAll returns nothing, but the announce line it
-   feeds is dead code either way. Left in place: it costs nothing and keeps
-   this generator to swaps rather than surgery. */
-
 fs.writeFileSync('sketchbook.html', html);
 
 const n = (html.match(/"category":"[^"]*personal/g) || []).length;
-console.log(`wrote sketchbook.html (PAGE=sketchbook, filter bar removed)`);
+console.log(`wrote sketchbook.html (PAGE=sketchbook)`);

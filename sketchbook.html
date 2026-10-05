@@ -277,19 +277,6 @@
      sideways */
   #ink { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
 
-  /* the filter's running count, spoken quietly under the grid */
-  .ghost {
-    position: fixed; left: 0; right: 0; bottom: 3.5vh; z-index: 3;
-    text-align: center; font-family: var(--mono);
-    font-weight: 400; font-size: 13px; line-height: 1.8;
-    color: color-mix(in srgb, var(--ink) 45%, transparent);
-    text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper), 0 0 22px var(--paper);
-    pointer-events: none; opacity: 0; transform: translateY(10px);
-    transition: opacity 0.3s var(--out), transform 0.4s var(--out);
-    white-space: nowrap;
-  }
-  .ghost.on { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .ghost { transition: none; } }
 
   /* ─── project popup: the page IS the grid; projects open over it ─── */
   /* Overlays arrive and leave rather than switching on and off. .open puts
@@ -405,16 +392,7 @@
     .name { padding: calc(env(safe-area-inset-top) + 16px) 16px 0; }
     header { top: env(safe-area-inset-top); right: calc(env(safe-area-inset-right) + 16px); }
     .menu-btn { padding: 0; }
-    .ghost, #ink { display: none; }
-    /* one line on a phone, but the buttons still clear 44px of thumb */
-    .pill {
-      left: calc(env(safe-area-inset-left) + 12px);
-      bottom: calc(env(safe-area-inset-bottom) + 12px);
-      padding: 0; gap: 0;
-    }
-    /* the words stay at reading size; the thumb target grows around them */
-    .pill button { padding: 13px 0; min-height: 44px; }
-    .pill .sep { padding: 0 8px; }
+    #ink { display: none; }
   }
 </style>
 </head>
@@ -433,7 +411,6 @@
 <main class="board" aria-label="Alex Tait — illustrator and motion designer">
   <div class="grid" id="grid"></div>
 </main>
-
 
 <!-- project popup -->
 <div class="popwrap" id="popwrap" role="dialog" aria-modal="true" aria-label="Project">
@@ -498,7 +475,6 @@
 </div>
 
 <canvas id="ink" aria-hidden="true"></canvas>
-<div class="ghost" id="ghost" aria-hidden="true"></div>
 
 <script>
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -605,16 +581,6 @@ const COLS = 6;
   addEventListener('keydown', e => { if (e.key === 'Escape' && rwrap.classList.contains('open')) closeReel(); });
   if (location.hash === '#showreel') openReel();
 })();
-
-/* ─── flood + ghost ─── */
-const ghost = document.getElementById('ghost');
-let ghostT;
-function announce(text) {
-  ghost.textContent = text;
-  ghost.classList.add('on');
-  clearTimeout(ghostT);
-  ghostT = setTimeout(() => ghost.classList.remove('on'), 1300);
-}
 
 /* ─── data: embedded directly (refresh.mjs injects fresh copies here) ─── */
 const SKETCHES = [{"f":"recB8sbUAxMMjp7NW-attBLupiCg3sS4l0x.png","k":"img"},{"f":"recEKiQP85awx61Hn-attgOLyTNec3zVqIx.gif","k":"img"},{"f":"recErJ50lW5o1SzVI-attC2CuQkQEHSQGNq.jpg","k":"img"},{"f":"recFmH4FgOOk4AWDn-atteThuoTTaMvnfIx.jpg","k":"img"},{"f":"recGu4kVuv4FwpwJl-att1jYIyJUO5dQBvE.jpg","k":"img"},{"f":"recSWO4ur1OZwMEtA-attFL0mn301bamTmh.jpg","k":"img"},{"f":"rechW6qSYi31erLM3-attiEGQ2hLGmXJIzD.jpg","k":"img"},{"f":"recqHnv6e7HwxVnZV-attNybQAm0TV5H0Yi.jpg","k":"img"}];
@@ -840,10 +806,6 @@ function buildGrid() {
 })();
 
 
-function matches(c) {
-  return currentF === 'all' || c.el.dataset.cats.includes(currentF);
-}
-
 /* ─── masonry ───
    Each tile spans as many 8px rows as it actually needs. Measured from the
    laid-out element rather than from the image alone, so the title and the
@@ -896,30 +858,6 @@ function shapeFromImage(c, img) {
   sizeTile(c);
 }
 
-let currentF = 'all';
-
-/* filters: click a category; click it again for everything. hidden rather
-   than display:none in CSS alone, so a filtered-out tile leaves the tab
-   order and the accessibility tree with it */
-document.querySelectorAll('.pill button').forEach(b => {
-  b.addEventListener('click', () => {
-    currentF = (currentF === b.dataset.f) ? 'all' : b.dataset.f;
-    document.querySelectorAll('.pill button').forEach(x => {
-      const on = x.dataset.f === currentF;
-      x.classList.toggle('active', on);
-      x.setAttribute('aria-pressed', on);
-    });
-    cards.forEach(c => {
-      c.vis = matches(c);
-      c.el.hidden = !c.vis;
-      if (!c.vis) restVideo(c);
-    });
-    requestAnimationFrame(sizeAll);
-    const n = cards.filter(c => c.vis && c.p).length;
-    announce(currentF === 'all' ? `everything · ${n}` : `${currentF} · ${n}`);
-    scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' });
-  });
-});
 
 /* ─── the popup: a project opens FROM its tile ─── */
 const popwrap = document.getElementById('popwrap');
