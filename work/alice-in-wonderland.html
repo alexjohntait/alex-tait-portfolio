@@ -113,14 +113,7 @@
     display: flex; align-items: center; gap: clamp(14px, 1.4vw, 26px);
   }
   .pagelink { text-decoration: none; }
-  .menu-btn {
-    border-radius: 999px;
-    transition: color .25s, background-color .25s var(--out);
-  }
-  body.scrolled .menu-btn {
-    background: var(--paper);
-    box-shadow: 0 0 0 10px var(--paper);
-  }
+  .menu-btn { transition: color .25s; }
   @media (prefers-reduced-motion: reduce) { .menu-btn { transition: none; } }
   /* the corner control is a word now, not three rules: the panel it opens
      carries the role, the location and the address, so "Info" says what is
