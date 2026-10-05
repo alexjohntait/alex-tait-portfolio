@@ -70,7 +70,8 @@
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
     --sigh: clamp(24px, 3.15vw, 41px);   /* the mark's inset, still */
     --sigsz: clamp(72px, 12vw, 180px);   /* the mark's longest side */
-    --info-fs: clamp(26px, 3.2vw, 48px); /* the corner words, and the tile titles */
+    --info-fs: clamp(13px, 1.6vw, 24px); /* the corner words */
+    --sig-ink: 0.088;                    /* transparent padding above the mark's ink */
     --r: 25px;                            /* the corner on every piece of work */
     --bar: 58px;                          /* the header band it is centred in */
   }
@@ -157,24 +158,31 @@
   .board { padding: clamp(18px, 2.4vw, 40px) var(--gx) clamp(70px, 10vh, 140px); }
   .grid {
     --cols: 3;
-    --row: 8px;
-    --colgap: clamp(16px, 1.8vw, 32px);
-    --rowgap: clamp(26px, 3vw, 52px);
+    --row: 4px;
+    --colgap: calc(clamp(16px, 1.8vw, 32px) + 20px);
+    --rowgap: calc(clamp(26px, 3vw, 52px) + 20px);
     display: grid;
     grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
     column-gap: var(--colgap);
-    /* the row gap lives on the tile instead, so one span calculation covers
-       the tile and the space under it */
     grid-auto-rows: var(--row);
+    /* a two-column piece otherwise waits for two free columns side by side
+       and leaves a hole the height of a tile behind it */
+    grid-auto-flow: row dense;
     align-items: start;
   }
+  /* the row gap is counted into each tile's span rather than set here:
+     grid-auto-rows makes every 4px slice a row, so a row-gap would open a
+     gap between all of them */
+  .grid { row-gap: 0; }
+  /* a probe the script can read the fluid row gap off, since calc() does
+     not resolve to a number in getComputedStyle */
+  .gap-probe { height: var(--rowgap); width: 0; visibility: hidden; grid-row: span 1; }
   @media (max-width: 1000px) { .grid { --cols: 2; } }
   @media (max-width: 620px)  { .grid { --cols: 1; } }
 
   .card {
     display: block; text-decoration: none; color: var(--ink);
-    margin-bottom: var(--rowgap);
-    grid-row: span var(--span, 46);
+    grid-row: span var(--span, 92);
   }
   /* a landscape piece earns the width; never on one column, where spanning
      two would simply overflow */
@@ -189,6 +197,15 @@
     width: 100%; height: 100%; object-fit: cover; display: block;
     transition: transform 0.6s var(--out);
   }
+  /* the develop: each tile's own ground is already on the page, and the
+     picture is wiped in over it from the top, like a print coming up in a
+     tray. Set by script once the image has decoded, so until then the tile
+     shows its colour alone rather than a broken frame. */
+  .card .shot img.develop {
+    clip-path: inset(0 0 100% 0);
+    transition: transform 0.6s var(--out), clip-path 1s var(--out);
+  }
+  .card .shot img.develop.in { clip-path: inset(0 0 0 0); }
   .card .vid { position: absolute; inset: 0; }
   @media (hover: hover) {
     .card:hover .shot img, .card:hover .vid { transform: scale(1.03); }
@@ -215,6 +232,8 @@
      the order they are read. Added by script, so with no JavaScript every
      tile is simply there — the reveal enhances a visible default rather
      than gating it. */
+  body.leaving .grid { opacity: 0; transform: translateY(-12px); transition: opacity 0.26s var(--out), transform 0.26s var(--out); }
+  body.leaving .name, body.leaving header { opacity: 0; transition: opacity 0.2s var(--out); }
   .grid.arrive .card.up {
     animation: tileUp 0.55s var(--out) both;
     animation-delay: calc(var(--i, 0) * 45ms);
@@ -229,6 +248,7 @@
   @media (prefers-reduced-motion: reduce) {
     .card .shot img, .card .vid, .card .t { transition: none; }
     .grid.arrive .card.up { animation: none; }
+    .card .shot img.develop { clip-path: none; transition: transform 0.6s var(--out); }
   }
 
   /* the signature is a standing mark now: small, top left, always there —

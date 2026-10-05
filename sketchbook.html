@@ -199,6 +199,15 @@
     width: 100%; height: 100%; object-fit: cover; display: block;
     transition: transform 0.6s var(--out);
   }
+  /* the develop: each tile's own ground is already on the page, and the
+     picture is wiped in over it from the top, like a print coming up in a
+     tray. Set by script once the image has decoded, so until then the tile
+     shows its colour alone rather than a broken frame. */
+  .card .shot img.develop {
+    clip-path: inset(0 0 100% 0);
+    transition: transform 0.6s var(--out), clip-path 1s var(--out);
+  }
+  .card .shot img.develop.in { clip-path: inset(0 0 0 0); }
   .card .vid { position: absolute; inset: 0; }
   @media (hover: hover) {
     .card:hover .shot img, .card:hover .vid { transform: scale(1.03); }
@@ -225,6 +234,8 @@
      the order they are read. Added by script, so with no JavaScript every
      tile is simply there — the reveal enhances a visible default rather
      than gating it. */
+  body.leaving .grid { opacity: 0; transform: translateY(-12px); transition: opacity 0.26s var(--out), transform 0.26s var(--out); }
+  body.leaving .name, body.leaving header { opacity: 0; transition: opacity 0.2s var(--out); }
   .grid.arrive .card.up {
     animation: tileUp 0.55s var(--out) both;
     animation-delay: calc(var(--i, 0) * 45ms);
@@ -239,6 +250,7 @@
   @media (prefers-reduced-motion: reduce) {
     .card .shot img, .card .vid, .card .t { transition: none; }
     .grid.arrive .card.up { animation: none; }
+    .card .shot img.develop { clip-path: none; transition: transform 0.6s var(--out); }
   }
 
   /* the signature is a standing mark now: small, top left, always there —
@@ -525,6 +537,21 @@ function hideWrap(w, after) {
 const MOBILE = matchMedia('(max-width: 820px)');
 
 const COLS = 6;
+
+/* moving between the two pages: the grid steps away, then the other one
+   arrives on its own first-screen stagger. Only the page change is handled
+   here; modified clicks and reduced motion take the plain link. */
+(() => {
+  const link = document.getElementById('page-link');
+  if (!link) return;
+  link.addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    if (REDUCE) return;
+    e.preventDefault();
+    document.body.classList.add('leaving');
+    setTimeout(() => { location.href = link.href; }, 260);
+  });
+})();
 
 /* the mark goes back to the top of the run. The href stays a real link so
    it still works without JS and reads as one to a screen reader; here it is
@@ -861,8 +888,18 @@ function sizeAll() { readGap(); cards.forEach(sizeTile); }
 
 /* an image only knows its shape once it has loaded; until then the tile
    holds the 4/3 default so the page does not jump around as they arrive */
+/* the develop: two frames before the class goes on, so the browser has
+   painted the wiped-out state and the transition has somewhere to start.
+   Reduced motion gets the picture with no wipe at all. */
+function revealImg(img) {
+  if (REDUCE || img.classList.contains('develop')) return;
+  img.classList.add('develop');
+  requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('in')));
+}
+
 function shapeFromImage(c, img) {
   if (!img.naturalWidth || !img.naturalHeight) return;
+  revealImg(img);
   const ar = img.naturalWidth / img.naturalHeight;
   c.el.querySelector('.shot').style.setProperty('--ar', img.naturalWidth + ' / ' + img.naturalHeight);
   /* a frame half again as wide as it is tall reads thin in one column;
