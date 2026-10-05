@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
 <!-- ── SEO ─────────────────────────────────────────────────── -->
-<title>Alex Tait — Illustrator &amp; Motion Designer, Bath &amp; London</title>
-<meta name="description" content="Alex Tait is an illustrator and motion designer based between Bath and London, represented by Jelly. Bold, character-driven commercial and editorial illustration and animation for brands and publications." />
+<title>Sketchbook — Alex Tait, Illustrator &amp; Motion Designer</title>
+<meta name="description" content="Personal work and sketchbook pages by Alex Tait, illustrator and motion designer between Bath and London: characters, loops and drawings made for their own sake." />
 <meta name="author" content="Alex Tait" />
 <meta name="keywords" content="Alex Tait, illustrator, motion designer, animation, editorial illustration, commercial illustration, character design, Bath, London, Jelly" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <meta name="theme-color" content="#ff4a1d" />
-<link rel="canonical" href="https://alexjohntait.com/" />
+<link rel="canonical" href="https://alexjohntait.com/sketchbook.html" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/favicon.svg" />
 <link rel="manifest" href="/site.webmanifest" />
@@ -19,7 +19,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Alex Tait" />
-<meta property="og:title" content="Alex Tait — Illustrator &amp; Motion Designer" />
+<meta property="og:title" content="Sketchbook — Alex Tait" />
 <meta property="og:description" content="Bold, character-driven illustration and motion design for brands and publications. Based between Bath &amp; London, represented by Jelly." />
 <meta property="og:url" content="https://alexjohntait.com/" />
 <meta property="og:image" content="https://alexjohntait.com/images/og-home.jpg" />
@@ -406,7 +406,7 @@
   onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a></h1>
 
 <header>
-  <a class="menu-btn pagelink" id="page-link" href="sketchbook.html">Sketchbook</a>
+  <a class="menu-btn pagelink" id="page-link" href="index.html">Work</a>
   <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
 </header>
 
@@ -414,10 +414,6 @@
   <div class="grid" id="grid"></div>
 </main>
 
-<div class="pill" role="toolbar" aria-label="Filter the work">
-  <button data-f="advertising" aria-pressed="false">Commercial</button><span class="sep">/</span>
-  <button data-f="editorial" aria-pressed="false">Editorial</button>
-</div>
 
 <!-- project popup -->
 <div class="popwrap" id="popwrap" role="dialog" aria-modal="true" aria-label="Project">
@@ -632,7 +628,7 @@ const GALLERY = {"app-store":[{"file":"app-store-m1.png","kind":"img","w":1920,"
    the sketchbook gifs on the other. make-sketchbook.mjs generates that page
    from this one and flips this constant, so there is one grid, one set of
    styles and one builder rather than two files drifting apart. */
-const PAGE = 'work';
+const PAGE = 'sketchbook';
 const isPersonal = p => String(p.category || '').includes('personal');
 
 const grid = document.getElementById('grid');

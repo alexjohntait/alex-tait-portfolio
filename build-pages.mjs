@@ -209,6 +209,7 @@ ${JSON.stringify(jsonld, null, 2)}
 // ── sitemap ────────────────────────────────────────────────────
 const urls = [
   { loc: SITE + '/', pri: '1.0', freq: 'monthly' },
+  { loc: SITE + '/sketchbook.html', pri: '0.9', freq: 'monthly' },
   { loc: SITE + '/shop.html', pri: '0.8', freq: 'weekly' },
   ...PROJECTS.map(p => ({ loc: `${SITE}/work/${p.id}.html`, pri: '0.7', freq: 'monthly' }))
 ];

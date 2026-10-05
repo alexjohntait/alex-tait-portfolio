@@ -362,6 +362,11 @@ function injectData() {
     console.log('• Rebuilding project pages + sitemap…');
     execFileSync('node', ['build-pages.mjs'], { stdio: 'inherit' });
 
+    /* sketchbook.html is derived from index.html, so it has to be rebuilt
+       after the data is injected or it keeps the previous run's work */
+    console.log('• Rebuilding the sketchbook page…');
+    execFileSync('node', ['make-sketchbook.mjs'], { stdio: 'inherit' });
+
     // tidy temp files
     for (const f of ['_data.json', '_records.json']) { try { fs.unlinkSync(f); } catch {} }
     console.log('✓ Refresh complete — index.html, /work/*.html, /images and sitemap.xml are up to date.');

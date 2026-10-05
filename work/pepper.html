@@ -95,7 +95,11 @@
      across tiles with nothing behind it. It keeps the paper under itself
      once the page has moved — a ground only where it is needed, rather than
      a bar across the top that would push the work down. */
-  header { position: fixed; top: 0; right: var(--gx); z-index: 70; }
+  header {
+    position: fixed; top: 0; right: var(--gx); z-index: 70;
+    display: flex; align-items: center; gap: clamp(14px, 1.4vw, 26px);
+  }
+  .pagelink { text-decoration: none; }
   .menu-btn {
     border-radius: 999px;
     transition: color .25s, background-color .25s var(--out);
