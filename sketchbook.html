@@ -72,6 +72,8 @@
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
     --sigh: clamp(24px, 3.15vw, 41px);   /* the mark's inset, still */
     --sigsz: clamp(72px, 12vw, 180px);   /* the mark's longest side */
+    --info-fs: clamp(26px, 3.2vw, 48px); /* the corner words, and the tile titles */
+    --sig-ink: 0.088;                    /* transparent padding above the mark's ink */
     --r: 25px;                            /* the corner on every piece of work */
     --bar: 58px;                          /* the header band it is centred in */
   }
@@ -97,8 +99,15 @@
      across tiles with nothing behind it. It keeps the paper under itself
      once the page has moved — a ground only where it is needed, rather than
      a bar across the top that would push the work down. */
+  /* The corner words line up with the mark opposite, cap-height to ink —
+     not box to box. The logo carries transparent padding of its own (8.8%
+     down the top of the current one), so matching the boxes would leave the
+     words sitting visibly high. --info-top is measured in the page and set
+     by script; the calc here is the no-JS fallback, right for a logo with
+     no padding at all. */
   header {
-    position: fixed; top: 0; right: var(--gx); z-index: 70;
+    position: fixed; right: var(--gx); z-index: 70;
+    top: var(--info-top, calc(var(--gx) / 2 + 0.365 * var(--info-fs)));
     display: flex; align-items: center; gap: clamp(14px, 1.4vw, 26px);
   }
   .pagelink { text-decoration: none; }
@@ -123,7 +132,7 @@
     display: grid; place-items: center;
     /* the tile-title scale, so the corner and the work are set alike */
     font-family: var(--sans); font-weight: 700;
-    font-size: clamp(26px, 3.2vw, 48px); letter-spacing: -0.035em; line-height: 0.96;
+    font-size: var(--info-fs); letter-spacing: -0.035em; line-height: 0.96;
     padding: 0;
     /* the same bar the signature stands in, so both corners share a line */
     height: var(--bar);
@@ -406,7 +415,7 @@
   onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a></h1>
 
 <header>
-  <a class="menu-btn pagelink" id="page-link" href="index.html">Work</a>
+  <a class="menu-btn pagelink" id="page-link" href="index.html"><span>Work</span></a>
   <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
 </header>
 
@@ -747,6 +756,62 @@ function buildGrid() {
   let rt;
   addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(sizeAll, 150); });
 }
+
+/* ─── the corner words, aligned to the mark ───
+   Cap-height to ink, not box to box. The mark's own file carries transparent
+   padding above the drawing, so lining the boxes up leaves the words high by
+   however much that padding is — 8.8% on the current logo, 15px on screen.
+   Both ends are measured rather than assumed: the ink by reading the image's
+   alpha, the cap by rendering the word to a canvas and finding its first
+   inked row. That way a new logo from Airtable, or a change of face, keeps
+   the alignment without anyone editing a number. */
+(() => {
+  const btn = document.getElementById('menu-btn');
+  const img = document.querySelector('.name img');
+  if (!btn || !img) return;
+  /* the mark animates, so its ink starts on a different row every frame.
+     --sig-ink is the union across all of them, measured on sync. */
+  const inkFrac = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--sig-ink')) || 0;
+
+  function capOffset() {
+    /* a zero-size inline box sits on the baseline, so its top is the baseline */
+    const span = btn.querySelector('span') || btn;
+    const mark = document.createElement('i');
+    mark.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+    span.appendChild(mark);
+    const baseline = mark.getBoundingClientRect().top;
+    mark.remove();
+    const st = getComputedStyle(btn);
+    const c = document.createElement('canvas');
+    c.width = 400; c.height = 240;
+    const x = c.getContext('2d', { willReadFrequently: true });
+    x.font = st.fontStyle + ' ' + st.fontWeight + ' ' + st.fontSize + ' ' + st.fontFamily;
+    x.textBaseline = 'alphabetic'; x.fillStyle = '#000';
+    x.fillText(btn.textContent.trim() || 'Info', 10, 190);
+    const d = x.getImageData(0, 0, 400, 240).data;
+    let row = 240;
+    for (let y = 0; y < 240 && row === 240; y++)
+      for (let xx = 0; xx < 400; xx++)
+        if (d[(y * 400 + xx) * 4 + 3] > 8) { row = y; break; }
+    const capHeight = 190 - row;
+    return (baseline - capHeight) - btn.getBoundingClientRect().top;
+  }
+
+  function align() {
+    const r = img.getBoundingClientRect();
+    if (!r.height) return;
+    /* the header is what moves, so measure its contribution out first */
+    const top = (r.top + scrollY) + inkFrac * r.height - capOffset();
+    document.documentElement.style.setProperty('--info-top', Math.round(top) + 'px');
+  }
+
+  const run = () => align();
+  if (img.complete && img.naturalWidth) run();
+  else img.addEventListener('load', run, { once: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(run);
+  let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(align, 150); });
+})();
 
 /* Info needs the paper under it only once the work is passing behind it */
 addEventListener('scroll', () => {

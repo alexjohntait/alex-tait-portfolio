@@ -44,8 +44,8 @@ swap(
 
 /* the corner points back to the commissions */
 swap(
-  `<a class="menu-btn pagelink" id="page-link" href="sketchbook.html">Sketchbook</a>`,
-  `<a class="menu-btn pagelink" id="page-link" href="index.html">Work</a>`,
+  `<a class="menu-btn pagelink" id="page-link" href="sketchbook.html"><span>Sketchbook</span></a>`,
+  `<a class="menu-btn pagelink" id="page-link" href="index.html"><span>Work</span></a>`,
   'the corner link');
 
 /* every piece here is personal, so there is nothing to filter */

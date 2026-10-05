@@ -74,6 +74,7 @@
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
     --sigh: clamp(24px, 3.15vw, 41px);   /* the mark's inset, still */
     --sigsz: clamp(72px, 12vw, 180px);   /* the mark's longest side */
+    --info-fs: clamp(26px, 3.2vw, 48px); /* the corner words, and the tile titles */
     --r: 25px;                            /* the corner on every piece of work */
     --bar: 58px;                          /* the header band it is centred in */
   }
@@ -99,8 +100,15 @@
      across tiles with nothing behind it. It keeps the paper under itself
      once the page has moved — a ground only where it is needed, rather than
      a bar across the top that would push the work down. */
+  /* The corner words line up with the mark opposite, cap-height to ink —
+     not box to box. The logo carries transparent padding of its own (8.8%
+     down the top of the current one), so matching the boxes would leave the
+     words sitting visibly high. --info-top is measured in the page and set
+     by script; the calc here is the no-JS fallback, right for a logo with
+     no padding at all. */
   header {
-    position: fixed; top: 0; right: var(--gx); z-index: 70;
+    position: fixed; right: var(--gx); z-index: 70;
+    top: var(--info-top, calc(var(--gx) / 2 + 0.365 * var(--info-fs)));
     display: flex; align-items: center; gap: clamp(14px, 1.4vw, 26px);
   }
   .pagelink { text-decoration: none; }
@@ -125,7 +133,7 @@
     display: grid; place-items: center;
     /* the tile-title scale, so the corner and the work are set alike */
     font-family: var(--sans); font-weight: 700;
-    font-size: clamp(26px, 3.2vw, 48px); letter-spacing: -0.035em; line-height: 0.96;
+    font-size: var(--info-fs); letter-spacing: -0.035em; line-height: 0.96;
     padding: 0;
     /* the same bar the signature stands in, so both corners share a line */
     height: var(--bar);
