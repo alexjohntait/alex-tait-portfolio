@@ -130,7 +130,6 @@
     /* the same bar the signature stands in, so both corners share a line */
     height: var(--bar);
     transition: color .25s;
-    text-shadow: 0 0 8px var(--paper), 0 0 20px var(--paper), 0 0 32px var(--paper);
   }
   @media (min-width: 821px) {
     .menu-btn { height: var(--gx); }
@@ -840,10 +839,6 @@ function buildGrid() {
   let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(align, 150); });
 })();
 
-/* Info needs the paper under it only once the work is passing behind it */
-addEventListener('scroll', () => {
-  document.body.classList.toggle('scrolled', scrollY > 24);
-}, { passive: true });
 
 function matches(c) {
   return currentF === 'all' || c.el.dataset.cats.includes(currentF);
