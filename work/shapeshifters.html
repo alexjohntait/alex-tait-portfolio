@@ -202,10 +202,16 @@
   @media (hover: hover) {
     .card:hover .shot img, .card:hover .vid { transform: scale(1.03); }
   }
+  /* set a weight down from the popup's hero title, and opened out rather
+     than tight: in a grid of twenty, a 700-weight, tightly tracked line
+     glued 14px under every piece read as a second headline competing with
+     the work rather than naming it. The gap above gives the art room to
+     finish before the caption starts; the weight and tracking are there to
+     still read as a title, not a label. */
   .card .t {
-    display: block; margin-top: 14px;
-    font-family: var(--sans); font-weight: 700;
-    font-size: clamp(19px, 1.6vw, 26px); letter-spacing: -0.035em; line-height: 1.1;
+    display: block; margin-top: 20px;
+    font-family: var(--sans); font-weight: 600;
+    font-size: clamp(18px, 1.45vw, 23px); letter-spacing: -0.02em; line-height: 1.2;
     transition: color 0.2s;
   }
   .card:hover .t { color: var(--accent-sm); }
