@@ -643,17 +643,20 @@ const cards = [];
 
 function mediaHTML(p) {
   const a = ASSETS[p.id] || {};
-  /* a video project shows its poster. The clip is only fetched when you
-     point at the tile — 32 autoplaying mp4s on first paint would be tens of
-     megabytes before anyone has chosen anything. */
+  /* a video project shows its poster until its tile is actually on screen —
+     32 autoplaying clips on first paint would be tens of megabytes before
+     anyone has scrolled at all. */
   const src = a.kind === 'video' ? `images/posters/${p.id}.jpg` : `images/${a.file}`;
   return `<img src="${src}" alt="${p.title}" draggable="false" loading="lazy" />`;
 }
 
-/* the clip is attached the first time you point at a tile, then paused
-   rather than destroyed, so a second look starts instantly */
+/* the clip is attached the first time its tile crosses into view, then
+   paused rather than destroyed when it leaves — so scrolling back up starts
+   it instantly rather than refetching. On a phone it is dropped outright
+   rather than just paused, so a long scroll does not leave a trail of
+   fetched video sitting off-screen. */
 function wakeVideo(c) {
-  if (!c.clip || REDUCE || MOBILE.matches) return;
+  if (!c.clip || REDUCE) return;
   if (!c.vid) {
     const v = document.createElement('video');
     v.className = 'vid';
@@ -671,15 +674,30 @@ function restVideo(c) {
   if (MOBILE.matches) { c.vid.removeAttribute('src'); c.vid.load(); c.vid.remove(); c.vid = null; }
 }
 
+/* one observer for every clip on the page: play what has scrolled into
+   view, pause what has scrolled out. rootMargin starts the fetch a little
+   before the tile arrives, so the clip has a frame ready rather than
+   starting on its poster. With no IntersectionObserver, or with reduced
+   motion, clips simply stay on their poster — wakeVideo is never called. */
+const videoCards = new Map();
+const videoIO = (!REDUCE && 'IntersectionObserver' in window)
+  ? new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        const c = videoCards.get(e.target);
+        if (!c) return;
+        if (e.isIntersecting) wakeVideo(c); else restVideo(c);
+      });
+    }, { rootMargin: '200px 0px', threshold: 0.1 })
+  : null;
+
 function buildGrid() {
-  /* a different piece leads every visit, so a second look at the site is not
-     a second look at the same five things. Shuffles a copy: PROJECTS keeps
-     its Airtable order for the index and for the prev/next on each page. */
+  /* most recent first. A copy, not PROJECTS itself — the index and the
+     prev/next on each work page still read PROJECTS in Airtable's own
+     order. Ties (same year, or no year on either) keep Airtable's order
+     between them: sort is stable, and the filter above already preserved
+     it. A project with no year sorts as 0 — to the back, not mid-list. */
   const works = PROJECTS.filter(p => PAGE === 'sketchbook' ? isPersonal(p) : !isPersonal(p));
-  for (let i = works.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [works[i], works[j]] = [works[j], works[i]];
-  }
+  works.sort((a, b) => (parseInt(b.year, 10) || 0) - (parseInt(a.year, 10) || 0));
   const items = works.map(p => ({ kind: 'work', p }));
   if (PAGE === 'sketchbook') {
     /* threaded evenly down the whole run rather than piling at the end */
@@ -727,11 +745,9 @@ function buildGrid() {
       else img.addEventListener('load', () => shapeFromImage(c, img), { once: true });
       img.addEventListener('error', () => sizeTile(c), { once: true });
     }
-    if (clip) {
-      el.addEventListener('pointerenter', () => wakeVideo(c));
-      el.addEventListener('pointerleave', () => restVideo(c));
-      el.addEventListener('focus', () => wakeVideo(c));
-      el.addEventListener('blur', () => restVideo(c));
+    if (clip && videoIO) {
+      videoCards.set(el, c);
+      videoIO.observe(el);
     }
   });
   grid.appendChild(frag);
