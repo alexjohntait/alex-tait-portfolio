@@ -227,7 +227,12 @@
   /* a sketchbook gif is an aside, not a commission: it takes a cell but
      carries no title, and its whites knock out against the page */
   .card.sketch { pointer-events: none; }
-  .card.sketch .shot { background: none; border-radius: 0; }
+  /* a sketch used to be marginalia dotted around the old cloud, small
+     enough that a square corner never showed. It is a full grid tile now —
+     same rounding as every other one. A transparent PNG or GIF has no
+     visible edge either way; a flat JPG upload does, and that is the corner
+     this was actually zeroing. */
+  .card.sketch .shot { background: none; }
   .card.sketch .shot img, .card.sketch .shot video { mix-blend-mode: multiply; object-fit: contain; }
 
   /* the arrival: the first screen's tiles come up as the page settles, in
