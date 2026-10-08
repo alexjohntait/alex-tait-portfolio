@@ -171,6 +171,11 @@
   /* a probe the script can read the fluid row gap off, since calc() does
      not resolve to a number in getComputedStyle */
   .gap-probe { height: var(--rowgap); width: 0; visibility: hidden; grid-row: span 1; }
+  /* a fourth column once there is genuinely room for it — a maximised
+     widescreen monitor, not just a big laptop. Below this three stays wide
+     enough to carry the work; above it, four keeps tiles from stretching
+     into a width no illustration was drawn for. */
+  @media (min-width: 1700px) { .grid { --cols: 4; } }
   @media (max-width: 1000px) { .grid { --cols: 2; } }
   @media (max-width: 620px)  { .grid { --cols: 1; } }
 
