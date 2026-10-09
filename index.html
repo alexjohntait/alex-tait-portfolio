@@ -55,7 +55,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -66,7 +65,7 @@
     --accent: #ff4a1d;
     --line: rgba(22, 18, 15, 0.28);
     --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
-    --mono: 'Roboto Mono', 'Courier New', monospace;
+    --mono: var(--sans);   /* one family throughout: the mono was the only voice that wasn't the site's */
     --spring: cubic-bezier(0.22, 1, 0.36, 1);   /* ease-out-quint, no overshoot */
     --out: cubic-bezier(0.19, 1, 0.22, 1);
     --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
@@ -74,7 +73,7 @@
     --sigsz: clamp(72px, 12vw, 180px);   /* the mark's longest side */
     --info-fs: clamp(13px, 1.6vw, 24px); /* the corner words */
     --sig-ink: 0.088;                    /* transparent padding above the mark's ink */
-    --r: 25px;                            /* the corner on every piece of work */
+    --r: 6px;                             /* the corner on every piece of work: a frame, not a button */
     --bar: 58px;                          /* the header band it is centred in */
   }
   @property --tx { syntax: '<length>'; inherits: false; initial-value: 0px; }
@@ -225,10 +224,12 @@
     transition: color 0.2s;
   }
   .card:hover .t { color: var(--accent-sm); }
+  /* the same face as the title, a size and a tone down: one voice, two
+     volumes, rather than a typewriter line under every piece */
   .card .m {
-    display: block; margin-top: 3px;
-    font-size: 13px; font-weight: 400; line-height: 1.8;
-    color: color-mix(in srgb, var(--ink) 55%, transparent);
+    display: block; margin-top: 4px;
+    font-size: 14px; font-weight: 400; line-height: 1.5; letter-spacing: -0.005em;
+    color: color-mix(in srgb, var(--ink) 52%, transparent);
   }
   /* a sketchbook gif is an aside, not a commission: it takes a cell but
      carries no title, and its whites knock out against the page */
@@ -323,7 +324,7 @@
   #aboutwrap.in .pop, #reelwrap.in .reel { transform: none; }
   #aboutwrap.closing .pop, #reelwrap.closing .reel { transition-duration: 0.2s; }
   @media (prefers-reduced-motion: reduce) {
-    .popwrap, #aboutwrap .pop, #reelwrap .reel, .pop.fly { transition: none; }
+    .popwrap, #aboutwrap .pop, #reelwrap .reel { transition: none; }
     #aboutwrap .pop, #reelwrap .reel { transform: none; }
   }
   .pop {
@@ -333,7 +334,6 @@
     transform-origin: top left;
     position: relative;
   }
-  .pop.fly { transition: transform 0.55s var(--out), opacity 0.55s var(--out); }
   .pop-x {
     position: absolute; top: 0; right: 0; z-index: 2;
     width: 52px; height: 52px; border: 0; cursor: pointer;
@@ -388,8 +388,6 @@
   #aboutwrap .pop-x:hover { background: color-mix(in srgb, var(--ink) 62%, transparent); }
   #aboutwrap ::selection { background: var(--ink); color: var(--paper); }
   #aboutwrap :focus-visible { outline-color: var(--ink); }
-  .pop-media { background: var(--pb, #ddd); }
-  .pop-media img, .pop-media video, .pop-gal img, .pop-gal video { width: 100%; height: auto; display: block; }
   .pop-body { padding: clamp(22px, 3.5vw, 44px); }
   .pop-body h2 {
     font-family: var(--sans); font-weight: 700;
@@ -397,12 +395,11 @@
     color: var(--accent); text-wrap: balance; margin-bottom: 20px;
   }
   .pop-meta {
-    font-size: 13px; line-height: 2; color: var(--ink); font-style: italic;
+    font-size: 14px; line-height: 1.8; color: var(--ink);
     margin-bottom: 20px;
   }
   .pop-meta b { font-weight: 500; }
   .pop-desc { font-size: 13px; line-height: 1.8; color: var(--ink); max-width: 62ch; }
-  .pop-gal { display: grid; gap: 2px; margin-top: 2px; }
 
   /* ─── mobile ─── */
   @media (max-width: 820px) {
@@ -431,20 +428,6 @@
 <main class="board" aria-label="Alex Tait — illustrator and motion designer">
   <div class="grid" id="grid"></div>
 </main>
-
-<!-- project popup -->
-<div class="popwrap" id="popwrap" role="dialog" aria-modal="true" aria-label="Project">
-  <div class="pop" id="pop">
-    <button class="pop-x" id="pop-x" aria-label="Close">✕</button>
-    <div class="pop-media" id="pop-media"></div>
-    <div class="pop-body">
-      <h2 id="pop-title"></h2>
-      <div class="pop-meta" id="pop-meta"></div>
-      <p class="pop-desc" id="pop-desc"></p>
-    </div>
-    <div class="pop-gal" id="pop-gal"></div>
-  </div>
-</div>
 
 <!-- about overlay: same paper / vermillion / mono language as the rest of the site -->
 <div class="popwrap reelwrap" id="reelwrap" role="dialog" aria-modal="true" aria-label="Showreel">
@@ -540,6 +523,10 @@ const COLS = 6;
     setTimeout(() => { location.href = link.href; }, 260);
   });
 })();
+
+/* back from a project, the browser restores this page as it was left —
+   mid-exit, grid faded out. Put it back. */
+addEventListener('pageshow', e => { if (e.persisted) document.body.classList.remove('leaving'); });
 
 /* the mark goes back to the top of the run. The href stays a real link so
    it still works without JS and reads as one to a screen reader; here it is
@@ -753,10 +740,13 @@ function buildGrid() {
       el.innerHTML = `<span class="shot">${mediaHTML(p)}</span>` +
         `<span class="t">${p.title}</span><span class="m">${meta}</span>`;
       cats = String(p.category || '');
+      /* a project is a page of its own now, not a popup over this one: the
+         grid steps away exactly as it does between Work and Sketchbook */
       el.addEventListener('click', e => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || REDUCE) return;
         e.preventDefault();
-        openPop(p, el);
+        document.body.classList.add('leaving');
+        setTimeout(() => { location.href = el.href; }, 260);
       });
     }
     el.dataset.cats = cats;
@@ -917,60 +907,6 @@ function shapeFromImage(c, img) {
 }
 
 
-/* ─── the popup: a project opens FROM its tile ─── */
-const popwrap = document.getElementById('popwrap');
-const pop = document.getElementById('pop');
-let lastFocus = null;
-function openPop(p, tile) {
-  lastFocus = document.activeElement;
-  const a = ASSETS[p.id] || {};
-  document.getElementById('pop-media').innerHTML = a.kind === 'video'
-    ? `<video src="images/${a.file}#t=0.1" ${REDUCE ? '' : 'autoplay '}loop muted playsinline preload="auto"></video>`
-    : `<img src="images/${a.file}" alt="${p.title}" />`;
-  document.getElementById('pop-media').style.setProperty('--pb', p.bg);
-  document.getElementById('pop-title').textContent = p.title;
-  const cats = String(p.category || '').split(',').map(s => s.trim()).filter(Boolean).join(' · ');
-  document.getElementById('pop-meta').innerHTML =
-    (p.client && p.client !== 'Personal' ? `<b>CLIENT</b> ${p.client}<br />` : '') +
-    (p.year ? `<b>DATE</b> ${p.year}<br />` : '') +
-    `<b>FIELD</b> ${cats}`;
-  document.getElementById('pop-desc').textContent = (p.desc || p.caption || '').trim();
-  const gal = (GALLERY[p.id] || []).slice(0, 6);
-  document.getElementById('pop-gal').innerHTML = gal.map(m => m.kind === 'video'
-    ? `<video src="images/${m.file}#t=0.1" muted loop ${REDUCE ? '' : 'autoplay '}playsinline preload="metadata"></video>`
-    : `<img src="images/${m.file}" alt="" loading="lazy" />`).join('');
-
-  showWrap(popwrap);
-  document.body.style.overflow = 'hidden';
-  popwrap.scrollTop = 0;
-
-  /* it grows out of the tile it came from */
-  if (!REDUCE && tile) {
-    const from = tile.getBoundingClientRect();
-    const to = pop.getBoundingClientRect();
-    const sx = from.width / to.width, sy = from.height / to.height;
-    pop.classList.remove('fly');
-    pop.style.transform = `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${sx}, ${sy})`;
-    pop.style.opacity = '0.4';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      pop.classList.add('fly');
-      pop.style.transform = 'none';
-      pop.style.opacity = '1';
-    }));
-  }
-  document.getElementById('pop-x').focus();
-}
-function closePop() {
-  document.body.style.overflow = '';
-  hideWrap(popwrap, () => {
-    document.getElementById('pop-media').innerHTML = '';
-    document.getElementById('pop-gal').innerHTML = '';
-  });
-  if (lastFocus && lastFocus.focus) lastFocus.focus();
-}
-document.getElementById('pop-x').addEventListener('click', closePop);
-popwrap.addEventListener('click', e => { if (e.target === popwrap) closePop(); });
-addEventListener('keydown', e => { if (e.key === 'Escape' && popwrap.classList.contains('open')) closePop(); });
 
 /* ─── INK TRAIL ─── */
 (() => {
@@ -987,7 +923,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && popwrap.classList.c
   size(); addEventListener('resize', size);
   let pts = [], running = false;
   addEventListener('pointermove', e => {
-    if (MOBILE.matches || popwrap.classList.contains('open')) return;
+    if (MOBILE.matches || document.querySelector('.popwrap.open')) return;
     const last = pts[pts.length - 1];
     if (last && !last.up && Math.hypot(e.clientX - last.x, e.clientY - last.y) > 90) pts.push({ up: 1 });
     pts.push({ x: e.clientX, y: e.clientY, t: performance.now() });

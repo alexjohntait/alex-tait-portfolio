@@ -43,14 +43,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       color-scheme: light;
       --paper: #ffffff; --ink: #16120f; --accent: #ff4a1d; --accent-sm: #d13d18; --line: rgba(22,18,15,.28);
       --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
-      --mono: 'Roboto Mono', 'Courier New', monospace;
+      --mono: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
       --spring: cubic-bezier(.34,1.56,.64,1); --out: cubic-bezier(.19,1,.22,1);
       --pad: clamp(20px, 5vw, 60px);
     }
@@ -93,7 +92,7 @@
     #aboutwrap :focus-visible { outline-color: var(--ink); }
     .pop-body { padding: clamp(22px, 3.5vw, 44px); }
     .pop-body h2 { font-family: var(--sans); font-weight: 400; font-size: clamp(32px, 3.6vw, 54px); letter-spacing: -.01em; line-height: 1.05; color: var(--accent); margin-bottom: 20px; text-wrap: balance; }
-    .pop-meta { font-size: 13px; font-style: italic; color: var(--ink); line-height: 2; margin-bottom: 20px; }
+    .pop-meta { font-size: 13px; color: var(--ink); line-height: 2; margin-bottom: 20px; }
     .pop-meta b { font-weight: 500; }
     .pop-desc { font-size: 13px; line-height: 1.8; color: var(--ink); max-width: 62ch; }
 
@@ -103,7 +102,7 @@
     .back-link:hover { color: var(--accent); }
     .cs-label { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
     .cs-title { font-family: var(--sans); font-weight: 400; font-size: clamp(38px, 6vw, 76px); letter-spacing: -.015em; line-height: .98; color: var(--accent); margin: 14px 0 24px; text-wrap: balance; }
-    .cs-meta { display: flex; flex-wrap: wrap; gap: 22px 34px; font-size: 12.5px; font-style: italic; color: color-mix(in srgb, var(--ink) 60%, transparent); margin-bottom: clamp(36px, 6vw, 64px); }
+    .cs-meta { display: flex; flex-wrap: wrap; gap: 22px 34px; font-size: 12.5px; color: color-mix(in srgb, var(--ink) 60%, transparent); margin-bottom: clamp(36px, 6vw, 64px); }
     .cs-meta b { display: block; font-style: normal; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 10.5px; color: var(--accent); margin-bottom: 3px; }
     .cs-hero-media { width: 100%; background: #000; margin-bottom: clamp(50px, 9vw, 90px); }
     .cs-hero-media video, .cs-hero-media img { width: 100%; height: auto; display: block; }

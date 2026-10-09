@@ -1,7 +1,13 @@
-// Generates a standalone, crawlable, SEO-rich HTML page per project into /work/.
+// Generates a standalone, crawlable case-study page per project into /work/.
 // Reads data + CSS straight from index.html so pages stay identical and in sync.
+//
+// The grid opens these directly now (the popup is gone), so this page is
+// where a project is actually seen: title and facts, the hero at full width,
+// the rest of the work laid out in rows by its own proportions, and the next
+// project waiting at the bottom.
 import fs from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 
 const SITE = 'https://alexjohntait.com';
 const html = fs.readFileSync('index.html', 'utf8');
@@ -17,55 +23,212 @@ const PROJECTS = JSON.parse(grab(/const PROJECTS = (\[[\s\S]*?\n\]);/, 'PROJECTS
 const ASSETS   = JSON.parse(grab(/const ASSETS = (\{[\s\S]*?\});/, 'ASSETS'));
 const GALLERY  = JSON.parse(grab(/const GALLERY = (\{[\s\S]*?\});/, 'GALLERY'));
 const CSS      = grab(/<style>([\s\S]*?)<\/style>/, 'CSS');
+const FONTS    = [...html.matchAll(/<link href="https:\/\/api\.fontshare\.com[^>]*>/g)].map(m => m[0]).join('\n  ');
+/* the corner-word alignment and the About panel, lifted from the home page
+   so a project page's corners and Info match it exactly */
+const ALIGN    = grab(/(\/\* ─── the corner words, aligned to the mark ───[\s\S]*?\n\}\)\(\);)/, 'corner alignment');
+const ABOUT    = grab(/(<div class="popwrap" id="aboutwrap"[\s\S]*?)\s*<canvas id="ink"/, 'About panel')
+  .replace(/href="#showreel"/, 'href="../index.html#showreel"')
+  .replace(/href="shop\.html"/, 'href="../shop.html"');
 
 const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const colourfulness = hex => { hex = hex.replace('#',''); const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16); return Math.max(r,g,b)-Math.min(r,g,b); };
-const pickVivid = (bg, fg) => (colourfulness(fg) > colourfulness(bg) ? fg : bg);
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const isPersonal = p => String(p.category || '').includes('personal');
 
-function media(m, alt) {
-  const src = `../images/${m.file}`;
-  const ar = (m.w && m.h) ? ` style="aspect-ratio:${m.w} / ${m.h}"` : '';
-  if (m.kind === 'video')
-    return `<video src="${src}#t=0.1" autoplay loop muted playsinline preload="metadata" aria-label="${esc(alt)}"${ar}></video>`;
-  return `<img src="${src}" alt="${esc(alt)}" loading="lazy"${m.w && m.h ? ` width="${m.w}" height="${m.h}"` : ''}${ar} />`;
+/* the order the grid shows them in — newest first, commissions and personal
+   work kept apart — so Next on a page is the tile beside it on the grid */
+const byYear = list => list.slice().sort((a, b) => (parseInt(b.year, 10) || 0) - (parseInt(a.year, 10) || 0));
+const RUNS = { work: byYear(PROJECTS.filter(p => !isPersonal(p))), sketchbook: byYear(PROJECTS.filter(isPersonal)) };
+
+/* the hero's real proportions, so a portrait piece is not blown up to the
+   full width of the page and its box is reserved before it loads */
+async function dims(file) {
+  try { const m = await sharp(file).metadata(); return m.width && m.height ? { w: m.width, h: m.height } : {}; }
+  catch { return {}; }
 }
 
-// extra rules for the standalone page (the modal .pop-* classes don't need
-// these — a page has a back-link, a reading column and prev/next nav)
+function media(m, alt, { hero = false } = {}) {
+  const src = `../images/${m.file}`;
+  const size = m.w && m.h ? ` width="${m.w}" height="${m.h}"` : '';
+  if (m.kind === 'video')
+    return `<video src="${src}#t=0.1" muted loop playsinline preload="metadata" data-auto aria-label="${esc(alt)}"${size}></video>`;
+  return `<img src="${src}" alt="${esc(alt)}"${size}${hero ? ' fetchpriority="high"' : ' loading="lazy" decoding="async"'} />`;
+}
+
+/* the rest of the work, in rows. A landscape frame takes the full measure on
+   its own; portraits and squares that come together share a row, sized by
+   their own ratios so they stand the same height with nothing cropped —
+   three to a row when they are tall, two when they are square. */
+function rows(items) {
+  const out = [];
+  let run = [];
+  const flush = () => {
+    if (!run.length) return;
+    const per = run.every(m => m.w / m.h < 0.85) ? 3 : 2;
+    const n = Math.ceil(run.length / per);
+    let i = 0;
+    for (let r = 0; r < n; r++) {
+      const take = Math.ceil((run.length - i) / (n - r));
+      out.push(run.slice(i, i + take)); i += take;
+    }
+    run = [];
+  };
+  for (const m of items) {
+    if (m.w && m.h && m.w / m.h < 1.2) run.push(m);
+    else { flush(); out.push([m]); }
+  }
+  flush();
+  return out;
+}
+
+function rowHTML(row, title, start) {
+  const one = row.length === 1;
+  return `<div class="cs-row${one ? ' solo' : ''}">` + row.map((m, k) => {
+    const ar = m.w && m.h ? m.w / m.h : null;
+    const style = ar ? ` style="--ar:${m.w} / ${m.h}; --f:${ar.toFixed(4)}"` : '';
+    return `<figure class="cs-fig${ar ? '' : ' free'}${ar && ar < 1.2 ? ' tall' : ''}"${style}>${media(m, `${title}, image ${start + k}`)}</figure>`;
+  }).join('') + `</div>`;
+}
+
+// extra rules for the case study, on top of the home page's own
 const EXTRA_CSS = `
-    .standalone { max-width: 900px; margin: 0 auto; padding: clamp(90px, 11vw, 130px) var(--pad, 20px) 40px; }
-    .standalone .back-link {
-      display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500;
-      color: var(--muted); text-decoration: none; margin-bottom: clamp(22px, 4vw, 40px);
-    }
-    .standalone .back-link:hover { color: var(--accent); }
-    .standalone .pop-media { border-radius: 0; }
-    .standalone .pv-nav {
-      display: flex; justify-content: space-between; gap: 20px; margin-top: clamp(50px, 8vw, 90px);
-      padding-top: 22px; border-top: 1px solid var(--line);
-    }
-    .standalone .pv-nav a { text-decoration: none; color: var(--ink); max-width: 46%; }
-    .standalone .pv-nav a:hover { color: var(--accent); }
-    .standalone .pv-nav .dir { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-    .standalone .pv-nav .ti { font-family: var(--sans); font-weight: 600; font-size: clamp(18px, 2.1vw, 24px); letter-spacing: -0.03em; }
-    .standalone .pv-nav .next { text-align: right; margin-left: auto; }
+  .cs { padding: clamp(36px, 5vw, 80px) var(--gx) 0; }
+
+  /* the title at display size, then the work, then what it was: the facts
+     and the words on a two-part measure under the hero, so the piece is the
+     first thing seen and the page still has a left edge to read down */
+  .cs-title {
+    font-family: var(--sans); font-weight: 600;
+    font-size: clamp(44px, 7.2vw, 128px); letter-spacing: -0.045em; line-height: 0.92;
+    text-wrap: balance; max-width: 16ch;
+    margin-bottom: clamp(28px, 3.6vw, 60px);
+  }
+  .cs-intro {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 24px clamp(24px, 4vw, 72px);
+    margin: clamp(40px, 6vw, 100px) 0 clamp(48px, 7vw, 120px);
+  }
+  .cs-facts { display: grid; gap: 14px; align-content: start; }
+  .cs-facts dt {
+    font-size: 13px; line-height: 1.4;
+    color: color-mix(in srgb, var(--ink) 50%, transparent);
+  }
+  .cs-facts dd { font-size: 16px; line-height: 1.4; font-weight: 500; }
+  .cs-desc {
+    font-size: clamp(19px, 1.7vw, 26px); font-weight: 400;
+    letter-spacing: -0.015em; line-height: 1.4; max-width: 36ch;
+  }
+
+  /* the work: full measure, its own colour behind it while it loads */
+  .cs-hero, .cs-fig { border-radius: var(--r); overflow: hidden; background: var(--pb); }
+  .cs-hero { aspect-ratio: var(--ar, auto); }
+  /* a portrait or square hero is shown whole, not stretched to the width of
+     the sheet: its height caps at the window and the width follows, and the
+     facts and words take the room beside it rather than leaving it empty */
+  .cs-lead.tall {
+    display: grid; grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(28px, 5vw, 96px); align-items: end;
+    margin-bottom: clamp(48px, 7vw, 120px);
+  }
+  .cs-lead.tall .cs-hero { width: min(58vw, calc(86svh * var(--f))); }
+  .cs-lead.tall .cs-intro { grid-template-columns: 1fr; margin: 0; }
+  .cs-row.solo .cs-fig.tall { width: min(100%, calc(86svh * var(--f))); margin: 0 auto; }
+  /* below a laptop there is no width to share: the hero takes the measure
+     and the words go under it, as they do for a landscape one */
+  @media (max-width: 1000px) {
+    .cs-lead.tall { display: block; margin-bottom: 0; }
+    .cs-lead.tall .cs-hero { width: min(100%, calc(86svh * var(--f))); }
+    .cs-lead.tall .cs-intro { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); margin: clamp(40px, 6vw, 100px) 0 clamp(48px, 7vw, 120px); }
+  }
+  .cs-hero img, .cs-hero video, .cs-fig img, .cs-fig video {
+    display: block; width: 100%; height: 100%; object-fit: cover;
+  }
+  .cs-fig.free img, .cs-fig.free video { height: auto; }
+  .cs-gal { display: grid; gap: clamp(12px, 1.6vw, 28px); }
+  .cs-row { display: flex; gap: clamp(12px, 1.6vw, 28px); align-items: flex-start; }
+  .cs-row .cs-fig { flex: var(--f, 1) 1 0; min-width: 0; aspect-ratio: var(--ar, auto); }
+  .cs-row.solo .cs-fig { flex: none; width: 100%; }
+
+  /* the way on: the next piece in the grid's own order, big enough to be
+     the obvious thing to do once the page runs out */
+  .cs-next {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(20px, 4vw, 72px); align-items: end;
+    margin-top: clamp(80px, 12vw, 200px); padding: clamp(28px, 3vw, 44px) 0 0;
+    border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+    text-decoration: none; color: var(--ink);
+  }
+  .cs-next-k { display: block; font-size: 13px; margin-bottom: 14px;
+    color: color-mix(in srgb, var(--ink) 50%, transparent); }
+  .cs-next-t {
+    display: block; font-weight: 600;
+    font-size: clamp(32px, 4.6vw, 80px); letter-spacing: -0.04em; line-height: 0.95;
+    text-wrap: balance; transition: color 0.2s ease;
+  }
+  .cs-next-img { display: block; border-radius: var(--r); overflow: hidden; aspect-ratio: 4 / 3; background: var(--pb); }
+  .cs-next-img img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 200ms ease; }
+  @media (hover: hover) {
+    .cs-next:hover .cs-next-t { color: var(--accent-sm); }
+    .cs-next:hover .cs-next-img img { transform: scale(1.03); }
+  }
+  .cs-foot {
+    display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    padding: clamp(48px, 7vw, 110px) 0 clamp(28px, 4vw, 56px);
+    font-size: 14px; color: color-mix(in srgb, var(--ink) 50%, transparent);
+  }
+  .cs-foot a { color: inherit; text-decoration: none; transition: color 0.2s ease; }
+  .cs-foot a:hover { color: var(--accent-sm); }
+
+  @media (max-width: 760px) {
+    .cs-intro, .cs-lead.tall .cs-intro { grid-template-columns: 1fr; }
+    .cs-facts { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
+    .cs-next { grid-template-columns: 1fr; }
+    .cs-next-img { order: -1; }
+  }
+  @media (max-width: 560px) {
+    /* a phone has no width to share: everything stacks, whole */
+    .cs-row { flex-direction: column; }
+    .cs-row .cs-fig, .cs-row.solo .cs-fig.tall { width: 100%; flex: none; }
+  }
+
+  /* arriving: the heading settles, then the work comes up under it */
+  .cs-title, .cs-intro, .cs-hero { animation: tileUp 0.6s var(--out) both; }
+  .cs-hero { animation-delay: 70ms; }
+  .cs-intro { animation-delay: 140ms; }
+  body.leaving .cs { opacity: 0; transform: translateY(-12px); transition: opacity 0.26s var(--out), transform 0.26s var(--out); }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-title, .cs-intro, .cs-hero { animation: none; }
+    .cs-next-t, .cs-next-img img, .cs-foot a { transition: none; }
+  }
 `;
 
 fs.mkdirSync('work', { recursive: true });
 
-PROJECTS.forEach((p, idx) => {
-  if (BESPOKE.has(p.id)) { console.log(`↩ skipping bespoke case study: work/${p.id}.html`); return; }
-  const hero = ASSETS[p.id] || {};
-  const list = [{ file: hero.file, kind: hero.kind, w: hero.w, h: hero.h }, ...(GALLERY[p.id] || [])].filter(m => m.file);
-  const rest = list.slice(1);
-  const prev = PROJECTS[idx - 1], next = PROJECTS[idx + 1];
-  const catList = String(p.category || '').split(',').map(s => s.trim()).filter(Boolean)
-    .map(s => s.charAt(0).toUpperCase() + s.slice(1));
-  const cat = catList.join(' · ') || 'Illustration';
-  const heroImg = `${SITE}/images/${hero.file}`;
-  const desc = (p.desc || p.caption || `${p.title}: ${cat.toLowerCase()} illustration and motion work by Alex Tait.`).replace(/\s+/g, ' ').trim();
-  const metaDesc = desc.length > 300 ? desc.slice(0, 297).trim() + '…' : desc;
-  const vivid = pickVivid(p.bg, p.fg);
+for (const p of PROJECTS) {
+  if (BESPOKE.has(p.id)) { console.log(`↩ skipping bespoke case study: work/${p.id}.html`); continue; }
+  const group = isPersonal(p) ? 'sketchbook' : 'work';
+  const run = RUNS[group];
+  const at = run.indexOf(p);
+  const next = run[(at + 1) % run.length], prev = run[(at - 1 + run.length) % run.length];
+  const home = group === 'work' ? '../index.html' : '../sketchbook.html';
+  const groupName = group === 'work' ? 'Work' : 'Sketchbook';
+
+  const hero = { ...(ASSETS[p.id] || {}) };
+  if (!hero.w) Object.assign(hero, await dims(hero.kind === 'video' ? `images/posters/${p.id}.jpg` : `images/${hero.file}`));
+  const heroAr = hero.w && hero.h ? hero.w / hero.h : null;
+  const heroStill = hero.kind === 'video' ? `posters/${p.id}.jpg` : hero.file;
+  const rest = (GALLERY[p.id] || []).filter(m => m.file);
+
+  const nextA = ASSETS[next.id] || {};
+  const nextThumb = `../images/${nextA.kind === 'video' ? `posters/${next.id}.jpg` : nextA.file}`;
+
+  const catList = String(p.category || '').split(',').map(s => s.trim()).filter(Boolean).map(cap);
+  const cat = catList.join(', ') || 'Illustration';
+  const heroImg = `${SITE}/images/${heroStill}`;
+  const desc = (p.desc || p.caption || '').replace(/\s+/g, ' ').trim();
+  const about = desc || `${p.title}: ${cat.toLowerCase()} illustration and motion work by Alex Tait.`;
+  const metaDesc = about.length > 300 ? about.slice(0, 297).trim() + '…' : about;
+  const client = p.client && p.client !== 'Personal' ? p.client : null;
 
   const jsonld = {
     "@context": "https://schema.org", "@type": "VisualArtwork",
@@ -75,17 +238,25 @@ PROJECTS.forEach((p, idx) => {
     "genre": cat,
     "dateCreated": String(p.year || ''),
     "image": heroImg,
-    "description": desc,
+    "description": about,
     "url": `${SITE}/work/${p.id}.html`,
     "copyrightHolder": { "@type": "Person", "name": "Alex Tait" },
     "isPartOf": { "@type": "WebSite", "name": "Alex Tait", "url": SITE + "/" }
   };
-  if (p.client && p.client !== 'Personal') jsonld.commissioner = { "@type": "Organization", "name": p.client };
+  if (client) jsonld.commissioner = { "@type": "Organization", "name": client };
 
-  const metaBlock =
-    (p.client && p.client !== 'Personal' ? `<b>CLIENT</b> ${esc(p.client)}<br />` : '') +
-    (p.year ? `<b>DATE</b> ${esc(p.year)}<br />` : '') +
-    `<b>FIELD</b> ${esc(cat)}`;
+  const facts = [
+    client ? ['Client', client] : ['Project', 'Personal'],
+    p.year ? ['Year', p.year] : null,
+    ['Discipline', catList.filter(c => c !== 'Personal').join(', ') || 'Illustration'],
+  ].filter(Boolean).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
+
+  let n = 2;
+  const gallery = rows(rest).map(r => { const h = rowHTML(r, p.title, n); n += r.length; return h; }).join('\n    ');
+
+  const heroMedia = hero.kind === 'video'
+    ? `<video src="../images/${hero.file}#t=0.1" poster="../images/${heroStill}" muted loop playsinline preload="auto" data-auto aria-label="${esc(p.title)}"></video>`
+    : media(hero, client ? `${p.title} for ${client}` : p.title, { hero: true });
 
   const page = `<!DOCTYPE html>
 <html lang="en">
@@ -115,96 +286,113 @@ PROJECTS.forEach((p, idx) => {
 ${JSON.stringify(jsonld, null, 2)}
   </script>
   <link rel="preconnect" href="https://api.fontshare.com" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+  ${FONTS}
+  <link rel="preload" as="image" href="../images/${heroStill}" />
   <style>${CSS}${EXTRA_CSS}</style>
 </head>
-<body>
+<body style="--pb:${esc(p.bg || '#eee')}">
 
-  <header>
-    <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
-  </header>
+<div class="name"><a href="${home}" id="name-link" aria-label="Alex Tait — back to ${groupName}"><img src="../assets/signature.gif" alt="Alex Tait" /></a></div>
 
-  <main class="standalone">
-    <a class="back-link" href="../index.html"><span aria-hidden="true">←</span> All work</a>
-    <div class="pop-media" style="--pb:${p.bg}">${media(list[0] || {}, p.title)}</div>
-    <div class="pop-body">
-      <h2>${esc(p.title)}</h2>
-      <div class="pop-meta">${metaBlock}</div>
-      <p class="pop-desc">${esc(desc)}</p>
-    </div>
-    ${rest.length ? `<div class="pop-gal">${rest.map((m, n) => media(m, `${p.title} ${n + 2}`)).join('')}</div>` : ''}
-    <nav class="pv-nav" aria-label="More projects">
-      ${prev ? `<a href="${prev.id}.html"><span class="dir">← Previous</span><span class="ti">${esc(prev.title)}</span></a>` : '<span></span>'}
-      ${next ? `<a class="next" href="${next.id}.html"><span class="dir">Next →</span><span class="ti">${esc(next.title)}</span></a>` : ''}
-    </nav>
-  </main>
+<header>
+  <a class="menu-btn pagelink" id="page-link" href="${home}"><span>${groupName}</span></a>
+  <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
+</header>
 
-  <!-- about overlay: identical to the home page, so the nav feels the same everywhere -->
-  <div class="popwrap" id="aboutwrap" role="dialog" aria-modal="true" aria-label="About Alex Tait">
-    <div class="pop" id="about-pop" style="width:min(720px, 94vw)">
-      <button class="pop-x" id="about-x" aria-label="Close">✕</button>
-      <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
-        <h2>Wide awake</h2>
-        <p class="pop-desc" style="margin-bottom:26px">
-          I'm an illustrator and motion designer based between Bath and London, making bold
-          character work for brands alongside a personal series of dark, gradient creatures.
-          My work has been commissioned by Apple, Google, Spotify and Adidas, spanning
-          broadcast, social, packaging and print.
-        </p>
-        <div class="about-cols"><ul><li>Illustration</li><li>Motion Design</li><li>Art Direction</li><li>Editorial</li></ul><ul><li>Spotify</li><li>Apple</li><li>Google</li><li>Adidas</li><li>Levi's</li></ul></div>
-        <div class="pop-meta">
-          <b>Instagram</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
-          <b>Email</b> <a href="mailto:alexjohntait@gmail.com" style="color:inherit">alexjohntait@gmail.com</a><br />
-          <b>Agent</b> <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener" style="color:inherit">Jelly ↗</a><br />
-          <b>Location</b> Bath / London
-        </div>
-      </div>
+<main class="cs">
+  <h1 class="cs-title">${esc(p.title)}</h1>
+  <div class="cs-lead${heroAr && heroAr < 1.2 ? ' tall' : ''}">
+    <figure class="cs-hero"${heroAr ? ` style="--ar:${hero.w} / ${hero.h}; --f:${heroAr.toFixed(4)}"` : ''}>${heroMedia}</figure>
+    <div class="cs-intro">
+      <dl class="cs-facts">${facts}</dl>
+      ${desc ? `<p class="cs-desc">${esc(desc)}</p>` : ''}
     </div>
   </div>
+  ${gallery ? `<div class="cs-gal">
+    ${gallery}
+  </div>` : ''}
 
-  <script>
-    // info
-    (function () {
-      var btn = document.getElementById('menu-btn');
-      var awrap = document.getElementById('aboutwrap'), ax = document.getElementById('about-x');
-      btn.addEventListener('click', function () {
-        btn.setAttribute('aria-expanded', 'true');
-        awrap.classList.add('open'); document.body.style.overflow = 'hidden'; ax.focus();
-      });
-      var closeAbout = function () {
-        awrap.classList.remove('open'); document.body.style.overflow = '';
-        btn.setAttribute('aria-expanded', 'false');
-      };
-      ax.addEventListener('click', closeAbout);
-      awrap.addEventListener('click', function (e) { if (e.target === awrap) closeAbout(); });
-      addEventListener('keydown', function (e) { if (e.key === 'Escape' && awrap.classList.contains('open')) closeAbout(); });
-    })();
-    // reduced motion: pause autoplay, show first frame
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches)
-      document.querySelectorAll('video').forEach(function (v) { v.removeAttribute('autoplay'); v.pause(); });
-    // correct video boxes to true ratio
-    document.querySelectorAll('video').forEach(function (v) {
-      var set = function () { if (v.videoWidth && v.videoHeight) v.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
-      v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
-    });
-    // keyboard: ← / → between projects, Esc back to the grid
-    var _prev = ${prev ? `'${prev.id}.html'` : 'null'}, _next = ${next ? `'${next.id}.html'` : 'null'};
-    addEventListener('keydown', function (e) {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (document.getElementById('aboutwrap').classList.contains('open')) return;
-      if (e.key === 'ArrowRight' && _next) location.href = _next;
-      else if (e.key === 'ArrowLeft' && _prev) location.href = _prev;
-      else if (e.key === 'Escape') location.href = '../index.html';
-    });
-  </script>
+  <a class="cs-next" href="${next.id}.html" style="--pb:${esc(next.bg || '#eee')}">
+    <span><span class="cs-next-k">Next project</span><span class="cs-next-t">${esc(next.title)}</span></span>
+    <span class="cs-next-img"><img src="${nextThumb}" alt="" loading="lazy" decoding="async" /></span>
+  </a>
+  <footer class="cs-foot">
+    <a href="${prev.id}.html">← ${esc(prev.title)}</a>
+    <a href="${home}">All ${groupName.toLowerCase()}</a>
+  </footer>
+</main>
+
+${ABOUT}
+
+<script>
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Info: the same panel as the home page, with the same open and close */
+(() => {
+  const btn = document.getElementById('menu-btn');
+  const w = document.getElementById('aboutwrap'), x = document.getElementById('about-x');
+  let t;
+  const open = () => {
+    clearTimeout(t); w.classList.remove('closing'); w.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden';
+    if (REDUCE) w.classList.add('in'); else requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('in')));
+    x.focus();
+  };
+  const close = () => {
+    w.classList.remove('in'); btn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = '';
+    if (REDUCE) return w.classList.remove('open');
+    w.classList.add('closing'); t = setTimeout(() => w.classList.remove('open', 'closing'), 220);
+  };
+  btn.addEventListener('click', open);
+  x.addEventListener('click', close);
+  w.addEventListener('click', e => { if (e.target === w) close(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && w.classList.contains('open')) close(); });
+})();
+
+/* video plays while it is on screen and rests when it is not; a box with
+   no ratio of its own takes the video's once it knows it */
+(() => {
+  const vids = document.querySelectorAll('video[data-auto]');
+  vids.forEach(v => {
+    const box = v.parentElement;
+    const set = () => { if (v.videoWidth && !box.style.getPropertyValue('--ar')) box.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
+    v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
+  });
+  if (REDUCE) { vids.forEach(v => v.setAttribute('controls', '')); return; }
+  if (!('IntersectionObserver' in window)) { vids.forEach(v => v.play().catch(() => {})); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) e.target.play().catch(() => {}); else e.target.pause();
+  }), { rootMargin: '200px 0px', threshold: 0.1 });
+  vids.forEach(v => io.observe(v));
+})();
+
+/* leaving: the page steps away the way the grid does, and comes back
+   whole if the browser restores it from history */
+document.querySelectorAll('a.cs-next, .cs-foot a, #page-link, #name-link').forEach(a =>
+  a.addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || REDUCE) return;
+    e.preventDefault();
+    document.body.classList.add('leaving');
+    setTimeout(() => { location.href = a.href; }, 260);
+  }));
+addEventListener('pageshow', e => { if (e.persisted) document.body.classList.remove('leaving'); });
+
+/* keyboard: ← / → through the run, Esc back to it */
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (document.getElementById('aboutwrap').classList.contains('open')) return;
+  if (e.key === 'ArrowRight') location.href = '${next.id}.html';
+  else if (e.key === 'ArrowLeft') location.href = '${prev.id}.html';
+  else if (e.key === 'Escape') location.href = '${home}';
+});
+
+${ALIGN}
+</script>
 </body>
 </html>`;
 
   fs.writeFileSync(path.join('work', `${p.id}.html`), page);
-});
+}
 
 // ── sitemap ────────────────────────────────────────────────────
 const urls = [

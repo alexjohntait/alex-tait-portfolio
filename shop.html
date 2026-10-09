@@ -53,14 +53,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       color-scheme: light;
       --paper: #ffffff; --ink: #16120f; --accent: #ff4a1d; --accent-sm: #d13d18; --line: rgba(22,18,15,.28);
       --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
-      --mono: 'Roboto Mono', 'Courier New', monospace;
+      --mono: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
       --spring: cubic-bezier(.34,1.56,.64,1); --out: cubic-bezier(.19,1,.22,1);
       --pad: clamp(20px, 5vw, 60px);
       --gx: clamp(28px, 5vw, 96px);
@@ -104,7 +103,7 @@
     #aboutwrap :focus-visible { outline-color: var(--ink); }
     .pop-body { padding: clamp(22px, 3.5vw, 44px); }
     .pop-body h2 { font-family: var(--sans); font-weight: 700; font-size: clamp(38px, 4.4vw, 66px); letter-spacing: -.035em; line-height: .95; color: var(--accent); margin-bottom: 20px; text-wrap: balance; }
-    .pop-meta { font-size: 13px; font-style: italic; color: var(--ink); line-height: 2; margin-bottom: 20px; }
+    .pop-meta { font-size: 13px; color: var(--ink); line-height: 2; margin-bottom: 20px; }
     .pop-meta b { font-weight: 500; }
     .pop-desc { font-size: 13px; line-height: 1.8; color: var(--ink); max-width: 62ch; }
 
