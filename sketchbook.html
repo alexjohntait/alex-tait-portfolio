@@ -194,7 +194,10 @@
   }
   .card .shot img, .card .vid, .card.sketch .shot video {
     width: 100%; height: 100%; object-fit: cover; display: block;
-    transition: transform 0.6s var(--out);
+    /* a hover, not an entrance — plain ease, not the ease-out curve the
+       develop wipe uses, and fast: this fires every time the pointer
+       crosses a tile, not once like the wipe does */
+    transition: transform 200ms ease;
   }
   /* the develop: each tile's own ground is already on the page, and the
      picture is wiped in over it from the top, like a print coming up in a
@@ -202,7 +205,7 @@
      shows its colour alone rather than a broken frame. */
   .card .shot img.develop {
     clip-path: inset(0 0 100% 0);
-    transition: transform 0.6s var(--out), clip-path 1s var(--out);
+    transition: transform 200ms ease, clip-path 1s var(--out);
   }
   .card .shot img.develop.in { clip-path: inset(0 0 0 0); }
   .card .vid { position: absolute; inset: 0; }
@@ -253,12 +256,12 @@
     to   { opacity: 1; transform: none; }
   }
 
-  .card[hidden] { display: none; }  .card[hidden] { display: none; }
+  .card[hidden] { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
     .card .shot img, .card .vid, .card .t { transition: none; }
     .grid.arrive .card.up { animation: none; }
-    .card .shot img.develop { clip-path: none; transition: transform 0.6s var(--out); }
+    .card .shot img.develop { clip-path: none; transition: none; }
   }
 
   /* the signature is a standing mark now: small, top left, always there —
@@ -314,7 +317,8 @@
   .popwrap.closing { transition-duration: 0.2s; }
   #aboutwrap .pop, #reelwrap .reel {
     transform: translateY(14px);
-    transition: transform 0.4s var(--out);
+    /* matches .popwrap's own 0.3s exactly — they're one entrance, not two */
+    transition: transform 0.3s var(--out);
   }
   #aboutwrap.in .pop, #reelwrap.in .reel { transform: none; }
   #aboutwrap.closing .pop, #reelwrap.closing .reel { transition-duration: 0.2s; }
@@ -329,7 +333,7 @@
     transform-origin: top left;
     position: relative;
   }
-  .pop.fly { transition: transform 0.55s var(--out), opacity 0.3s; }
+  .pop.fly { transition: transform 0.55s var(--out), opacity 0.55s var(--out); }
   .pop-x {
     position: absolute; top: 0; right: 0; z-index: 2;
     width: 52px; height: 52px; border: 0; cursor: pointer;
