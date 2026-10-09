@@ -414,10 +414,12 @@
   /* the title at display size, then the work, then what it was: the facts
      and the words on a two-part measure under the hero, so the piece is the
      first thing seen and the page still has a left edge to read down */
+  /* set as the Humantold case study sets its title: regular weight, open
+     tracking, in the accent — it names the piece rather than shouting over it */
   .cs-title {
-    font-family: var(--sans); font-weight: 600;
-    font-size: clamp(44px, 7.2vw, 128px); letter-spacing: -0.045em; line-height: 0.92;
-    text-wrap: balance; max-width: 16ch;
+    font-family: var(--sans); font-weight: 400;
+    font-size: clamp(38px, 6vw, 76px); letter-spacing: -0.015em; line-height: 0.98;
+    color: var(--accent); text-wrap: balance; max-width: 18ch;
     margin-bottom: clamp(28px, 3.6vw, 60px);
   }
   .cs-intro {
@@ -478,8 +480,8 @@
   .cs-next-k { display: block; font-size: 13px; margin-bottom: 14px;
     color: color-mix(in srgb, var(--ink) 50%, transparent); }
   .cs-next-t {
-    display: block; font-weight: 600;
-    font-size: clamp(32px, 4.6vw, 80px); letter-spacing: -0.04em; line-height: 0.95;
+    display: block; font-weight: 400;
+    font-size: clamp(32px, 4.6vw, 64px); letter-spacing: -0.015em; line-height: 0.98;
     text-wrap: balance; transition: color 0.2s ease;
   }
   .cs-next-img { display: block; border-radius: var(--r); overflow: hidden; aspect-ratio: 4 / 3; background: var(--pb); }
