@@ -1,11 +1,11 @@
-Last rebuild: 2026-10-21T16:50:28.857Z
+Last rebuild: 2026-10-22T10:33:52.076Z
 
 Airtable records fetched : 33
 Projects built           : 32
 Hero images              : 32
 Gallery images           : 73
 Failed downloads         : 0
-Sketchbook               : 11 records, 11 sketches, 0 newly downloaded
+Sketchbook               : 12 records, 12 sketches, 1 newly downloaded
 Site logo                : pinned to signature.gif in the repo (Airtable sync off)
 
 SKIPPED — these Airtable records are NOT on the site:
