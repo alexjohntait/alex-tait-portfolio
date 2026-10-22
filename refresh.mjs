@@ -99,7 +99,9 @@ async function refreshSketchbook() {
       for (const a of v) {
         if (!a || typeof a !== 'object' || !a.url || !a.type) continue;
         if (!/^(image|video)\//.test(a.type)) continue;
-        const ext = extFor(a);
+        /* every video is re-encoded to mp4 below, whatever was uploaded — a
+           .mov arrives as video/quicktime, which used to fall through to .jpg */
+        const ext = a.type.startsWith('video') ? 'mp4' : extFor(a);
         /* name the file after the ATTACHMENT, not the record's position.
            Keying on position meant swapping an image on an existing record
            produced the same filename, so the skip below treated it as
@@ -119,6 +121,12 @@ async function refreshSketchbook() {
     }
   }
 
+  /* GitHub refuses any file over 100MB, and one refused file fails the whole
+     rebuild push — so nothing from Airtable reaches the site until it is
+     removed. Videos are compressed the way project clips are; anything still
+     over the line is left out and named in the report instead. */
+  const MAX_BYTES = 90 * 1024 * 1024;
+  const tooBig = [];
   let fresh = 0;
   for (const s of sketches) {
     const dest = `${DIR}/${s.f}`;
@@ -128,10 +136,36 @@ async function refreshSketchbook() {
     try {
       const res = await fetch(s.src);
       if (!res.ok) throw new Error(res.status);
-      fs.writeFileSync(dest, Buffer.from(await res.arrayBuffer()));
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (s.k === 'video') {
+        const raw = `${dest}.src`;
+        fs.writeFileSync(raw, buf);
+        try {
+          execFileSync('ffmpeg', [
+            '-hide_banner', '-loglevel', 'error', '-i', raw,
+            '-vf', "scale='min(1280,iw)':-2",
+            '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26',
+            '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', '-threads', '1',
+            '-map_metadata', '-1', '-fflags', '+bitexact', '-flags:v', '+bitexact',
+            '-y', dest
+          ], { stdio: 'inherit' });
+        } catch (e) {
+          console.warn(`  could not compress ${s.f}: ${e.message.split('\n')[0]}`);
+          try { fs.unlinkSync(dest); } catch {}
+        } finally { fs.unlinkSync(raw); }
+        if (!fs.existsSync(dest)) continue;
+      } else {
+        fs.writeFileSync(dest, buf);
+      }
+      if (fs.statSync(dest).size > MAX_BYTES) {
+        tooBig.push(`${s.f} (${(fs.statSync(dest).size / 1048576).toFixed(0)}MB)`);
+        fs.unlinkSync(dest);
+        continue;
+      }
       fresh++;
     } catch (e) { console.warn(`  sketch ${s.f} failed: ${e.message}`); }
   }
+  if (tooBig.length) console.warn(`  left out, too large for GitHub even compressed: ${tooBig.join(', ')}`);
   // prune files whose records were deleted in Airtable
   const keep = new Set(sketches.map(s => s.f));
   for (const f of fs.readdirSync(DIR)) if (!keep.has(f)) fs.unlinkSync(`${DIR}/${f}`);
@@ -144,7 +178,8 @@ async function refreshSketchbook() {
     fs.writeFileSync(page, html.replace(/const SKETCHES = \[[\s\S]*?\];/, decl));
   }
   console.log(`• Sketchbook: ${list.length} sketches (${fresh} newly downloaded)`);
-  sketchStatus = `${records.length} records, ${list.length} sketches, ${fresh} newly downloaded`;
+  sketchStatus = `${records.length} records, ${list.length} sketches, ${fresh} newly downloaded`
+    + (tooBig.length ? ` — LEFT OUT, over GitHub's file limit: ${tooBig.join(', ')}` : '');
 }
 
 /* ── site logo ──
