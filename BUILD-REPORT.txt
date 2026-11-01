@@ -1,4 +1,4 @@
-Last rebuild: 2026-11-01T04:55:29.239Z
+Last rebuild: 2026-11-01T12:52:18.656Z
 
 Airtable records fetched : 33
 Projects built           : 32
