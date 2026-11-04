@@ -143,7 +143,7 @@ async function refreshSketchbook() {
         try {
           execFileSync('ffmpeg', [
             '-hide_banner', '-loglevel', 'error', '-i', raw,
-            '-vf', "scale='min(1280,iw)':-2",
+            '-vf', "scale='if(gt(iw,ih),min(1280,iw),min(720,iw))':-2",
             '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26',
             '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', '-threads', '1',
             '-map_metadata', '-1', '-fflags', '+bitexact', '-flags:v', '+bitexact',

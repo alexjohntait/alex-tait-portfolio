@@ -111,7 +111,8 @@ if (converted.size) {
 /* ── video ────────────────────────────────────────────────────────────────
    Airtable holds masters at 10-20MB each. The cloud autoplays the clips of
    whatever is on screen, so they have to be web weight or a single scroll
-   pulls a hundred megabytes. Re-encoded at 1280px / CRF 26 they land around
+   pulls a hundred megabytes. Re-encoded at 1280px wide (720px wide for portrait clips, so a tall
+   phone-shaped master is not 1280 x 2276) / CRF 26 they land around
    0.7MB with no visible loss at card size. Audio is dropped: every clip on
    the site is muted.
 
@@ -131,7 +132,7 @@ for (const f of vids) {
   try {
     execFileSync('ffmpeg', [
       '-hide_banner', '-loglevel', 'error', '-i', p,
-      '-vf', "scale='min(1280,iw)':-2",
+      '-vf', "scale='if(gt(iw,ih),min(1280,iw),min(720,iw))':-2",
       '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26',
       '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an',
       /* single-threaded so the same master always encodes to the same bytes:

@@ -228,7 +228,10 @@ for (const p of PROJECTS) {
   const cat = catList.join(', ') || 'Illustration';
   const heroImg = `${SITE}/images/${heroStill}`;
   const desc = (p.desc || p.caption || '').replace(/\s+/g, ' ').trim();
-  const about = desc || `${p.title}: ${cat.toLowerCase()} illustration and motion work by Alex Tait.`;
+  const _client = p.client && p.client !== 'Personal' ? p.client : null;
+  const about = desc || (_client
+    ? `${p.title}: ${cat.toLowerCase()} by Alex Tait for ${_client}${p.year ? ', ' + p.year : ''}. Illustration and motion design by a Bath and London based illustrator.`
+    : `${p.title}: a personal ${cat.toLowerCase()} project${p.year ? ' from ' + p.year : ''} by Alex Tait, an illustrator and motion designer based in Bath and London.`);
   const metaDesc = about.length > 300 ? about.slice(0, 297).trim() + '…' : about;
   const client = p.client && p.client !== 'Personal' ? p.client : null;
 
