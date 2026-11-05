@@ -154,7 +154,7 @@ const EXTRA_CSS = `
   /* the way on: the next piece in the grid's own order, big enough to be
      the obvious thing to do once the page runs out */
   .cs-next {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    display: grid; grid-template-columns: minmax(0, 1fr);
     gap: clamp(20px, 4vw, 72px); align-items: end;
     margin-top: clamp(80px, 12vw, 200px); padding: clamp(28px, 3vw, 44px) 0 0;
     border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
@@ -167,11 +167,8 @@ const EXTRA_CSS = `
     font-size: clamp(32px, 4.6vw, 64px); letter-spacing: -0.015em; line-height: 0.98;
     text-wrap: balance; transition: color 0.2s ease;
   }
-  .cs-next-img { display: block; border-radius: var(--r); overflow: hidden; aspect-ratio: 4 / 3; background: var(--pb); }
-  .cs-next-img img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 200ms ease; }
   @media (hover: hover) {
     .cs-next:hover .cs-next-t { color: var(--accent-sm); }
-    .cs-next:hover .cs-next-img img { transform: scale(1.03); }
   }
   .cs-foot {
     display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
@@ -185,7 +182,6 @@ const EXTRA_CSS = `
     .cs-intro, .cs-lead.tall .cs-intro { grid-template-columns: 1fr; }
     .cs-facts { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
     .cs-next { grid-template-columns: 1fr; }
-    .cs-next-img { order: -1; }
   }
   @media (max-width: 560px) {
     /* a phone has no width to share: everything stacks, whole */
@@ -200,7 +196,7 @@ const EXTRA_CSS = `
   body.leaving .cs { opacity: 0; transform: translateY(-12px); transition: opacity 0.26s var(--out), transform 0.26s var(--out); }
   @media (prefers-reduced-motion: reduce) {
     .cs-title, .cs-intro, .cs-hero { animation: none; }
-    .cs-next-t, .cs-next-img img, .cs-foot a { transition: none; }
+    .cs-next-t, .cs-foot a { transition: none; }
   }
 `;
 
@@ -221,8 +217,6 @@ for (const p of PROJECTS) {
   const heroStill = hero.kind === 'video' ? `posters/${p.id}.jpg` : hero.file;
   const rest = (GALLERY[p.id] || []).filter(m => m.file);
 
-  const nextA = ASSETS[next.id] || {};
-  const nextThumb = `../images/${nextA.kind === 'video' ? `posters/${next.id}.jpg` : nextA.file}`;
 
   const catList = String(p.category || '').split(',').map(s => s.trim()).filter(Boolean).map(cap);
   const cat = catList.join(', ') || 'Illustration';
@@ -319,7 +313,6 @@ ${JSON.stringify(jsonld, null, 2)}
 
   <a class="cs-next" href="${next.id}.html" style="--pb:${esc(next.bg || '#eee')}">
     <span><span class="cs-next-k">Next project</span><span class="cs-next-t">${esc(next.title)}</span></span>
-    <span class="cs-next-img"><img src="${nextThumb}" alt="" loading="lazy" decoding="async" /></span>
   </a>
   <footer class="cs-foot">
     <a href="${prev.id}.html">← ${esc(prev.title)}</a>
