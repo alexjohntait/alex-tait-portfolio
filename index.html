@@ -219,8 +219,8 @@
      still read as a title, not a label. */
   .card .t {
     display: block; margin-top: 20px;
-    font-family: var(--sans); font-weight: 600;
-    font-size: clamp(18px, 1.45vw, 23px); letter-spacing: -0.02em; line-height: 1.2;
+    font-family: var(--sans); font-weight: 700;
+    font-size: clamp(20px, 1.7vw, 27px); letter-spacing: -0.03em; line-height: 1.15;
     transition: color 0.2s;
   }
   .card:hover .t { color: var(--accent-sm); }
@@ -256,6 +256,37 @@
     from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: none; }
   }
+
+  /* a colour tab under each tile, pulled from the artwork itself by script
+     (--tab). It lengthens on hover and the tile picks up a soft glow of the
+     same colour, so every piece answers the pointer in its own colour. */
+  .card:not(.sketch) .t::before {
+    content: ""; display: block; width: 26px; height: 5px; border-radius: 3px;
+    background: var(--tab, var(--accent)); margin-bottom: 12px;
+    transition: width .3s var(--out);
+  }
+  .card:not(.sketch) .t { margin-top: 18px; }
+  @media (hover: hover) {
+    .card:hover .t::before { width: 56px; }
+    .card:not(.sketch) .shot { transition: box-shadow .3s ease; }
+    .card:not(.sketch):hover .shot {
+      box-shadow: 0 18px 44px -16px color-mix(in srgb, var(--tab, var(--accent)) 70%, transparent);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card:not(.sketch) .t::before, .card:not(.sketch) .shot { transition: none; }
+  }
+  /* one line of voice beside the mark, in the title face */
+  .intro {
+    position: absolute; z-index: 1;
+    left: calc(var(--gx) + var(--sigsz) + clamp(22px, 3.4vw, 56px));
+    top: calc(var(--gx) + var(--sigsz) * 0.30);
+    max-width: min(30ch, 38vw);
+    font-family: var(--sans); font-weight: 600; letter-spacing: -0.025em; line-height: 1.18;
+    font-size: clamp(17px, 1.9vw, 30px); color: var(--ink);
+  }
+  .intro em { font-style: normal; color: var(--accent-sm); }
+  @media (max-width: 820px) { .intro { display: none; } }
 
   .card[hidden] { display: none; }
 
@@ -419,6 +450,8 @@
 
 <h1 class="name" id="name"><a href="index.html" id="name-link" aria-label="Alex Tait — back to the top"><img src="assets/signature.gif" alt="Alex Tait"
   onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'Alex Tait'}))" /></a></h1>
+
+<p class="intro">Illustration and motion with characters, colour and a sense of <em>play</em>.</p>
 
 <header>
   <a class="menu-btn pagelink" id="page-link" href="sketchbook.html"><span>Sketchbook</span></a>
@@ -710,6 +743,31 @@ function buildGrid() {
     });
   }
 
+    /* the colour tab: the liveliest colour in the artwork, found by sampling it
+     small. Whites, blacks and greys are skipped; a piece with no colour keeps
+     the accent. Quietly does nothing if the image can't be read. */
+  function tabColour(c, img) {
+    try {
+      const n = 28, cv = document.createElement('canvas');
+      cv.width = cv.height = n;
+      const x = cv.getContext('2d', { willReadFrequently: true });
+      x.drawImage(img, 0, 0, n, n);
+      const d = x.getImageData(0, 0, n, n).data, bins = {};
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i+1], b = d[i+2], mx = Math.max(r,g,b), mn = Math.min(r,g,b);
+        const sat = mx ? (mx - mn) / mx : 0;
+        if (mx < 70 || sat < 0.35 || mn > 225) continue;
+        const k = (r>>5) + ',' + (g>>5) + ',' + (b>>5);
+        const o = bins[k] || (bins[k] = { w: 0, r: 0, g: 0, b: 0 });
+        const w = sat * (0.4 + mx / 255);
+        o.w += w; o.r += r*w; o.g += g*w; o.b += b*w;
+      }
+      let best = null;
+      for (const k in bins) if (!best || bins[k].w > best.w) best = bins[k];
+      if (best && best.w > 2) c.el.style.setProperty('--tab',
+        'rgb(' + Math.round(best.r/best.w) + ',' + Math.round(best.g/best.w) + ',' + Math.round(best.b/best.w) + ')');
+    } catch (e) {}
+  }
   const frag = document.createDocumentFragment();
   items.forEach(item => {
     let el, cats = 'advertising editorial personal', p = null, clip = null;
@@ -768,6 +826,10 @@ function buildGrid() {
       else c.vid.addEventListener('loadedmetadata', onMeta, { once: true });
     }
     const img = el.querySelector('img');
+    if (img && item.kind !== 'sketch') {
+      const go = () => tabColour(c, img);
+      if (img.complete) go(); else img.addEventListener('load', go, { once: true });
+    }
     if (img) {
       if (img.complete) requestAnimationFrame(() => shapeFromImage(c, img));
       else img.addEventListener('load', () => shapeFromImage(c, img), { once: true });
