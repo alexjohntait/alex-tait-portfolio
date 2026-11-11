@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="day">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -7,7 +7,7 @@
   <meta name="description" content="A vinyl window installation for Art of Ping Pong, a creative event space and hospitality venue. The illustration wrapped the street-facing windows: large-format character work designed to signal the playfulness of what was happening inside and draw people in off the street. Bold line work and a f…" />
   <meta name="author" content="Alex Tait" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
-  <meta name="theme-color" content="#ff4a1d" />
+  <meta name="theme-color" content="#ebe8e1" />
   <link rel="canonical" href="https://alexjohntait.com/work/window-display.html" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -53,691 +53,185 @@
   }
 }
   </script>
+  <script>/* paint the right theme before anything shows */
+(function(){var t;try{t=localStorage.getItem('noa-theme')}catch(e){}if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'day';document.documentElement.dataset.theme=t})();</script>
   <link rel="preconnect" href="https://api.fontshare.com" />
-  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/noa.css" />
   <link rel="preload" as="image" href="../images/window-display.png" />
   <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    color-scheme: light;
-    --paper: #ffffff;
-    --accent-sm: #d13d18;   /* accent at reading size: 4.78:1 on paper */
-    --ink: #16120f;
-    --accent: #ff4a1d;
-    --line: rgba(22, 18, 15, 0.28);
-    --sans: 'General Sans', 'Helvetica Neue', Arial, sans-serif;
-    --mono: var(--sans);   /* one family throughout: the mono was the only voice that wasn't the site's */
-    --spring: cubic-bezier(0.22, 1, 0.36, 1);   /* ease-out-quint, no overshoot */
-    --out: cubic-bezier(0.19, 1, 0.22, 1);
-    --gx: clamp(28px, 5vw, 96px);   /* quiet margins either side — nothing sits here */
-    --sigh: clamp(24px, 3.15vw, 41px);   /* the mark's inset, still */
-    --sigsz: clamp(72px, 12vw, 180px);   /* the mark's longest side */
-    --info-fs: clamp(13px, 1.6vw, 24px); /* the corner words */
-    --sig-ink: 0.088;                    /* transparent padding above the mark's ink */
-    --r: 6px;                             /* the corner on every piece of work: a frame, not a button */
-    --bar: 58px;                          /* the header band it is centred in */
-  }
-  @property --tx { syntax: '<length>'; inherits: false; initial-value: 0px; }
-  @property --ty { syntax: '<length>'; inherits: false; initial-value: 0px; }
-  @property --s  { syntax: '<number>'; inherits: false; initial-value: 1; }
-  @property --hs { syntax: '<number>'; inherits: false; initial-value: 1; }
-
-  body {
-    font-family: var(--mono); color: var(--ink);
-    background: var(--paper);
-    -webkit-font-smoothing: antialiased;
-    overflow-x: clip;
-  }
-  ::selection { background: var(--accent); color: #fff; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-
-
-  /* ─── menu: bare vermillion rules, top right ─── */
-  /* the same margin the filter bar keeps on the left and the caption on the
-     right, rather than an inset of its own */
-  /* Info stays in the corner, but over a scrolling grid it used to pass
-     across tiles with nothing behind it. It keeps the paper under itself
-     once the page has moved — a ground only where it is needed, rather than
-     a bar across the top that would push the work down. */
-  /* The corner words line up with the mark opposite, cap-height to ink —
-     not box to box. The logo carries transparent padding of its own (8.8%
-     down the top of the current one), so matching the boxes would leave the
-     words sitting visibly high. --info-top is measured in the page and set
-     by script; the calc here is the no-JS fallback, right for a logo with
-     no padding at all. */
-  header {
-    position: fixed; right: var(--gx); z-index: 70;
-    top: var(--info-top, calc(var(--gx) / 2 + 0.365 * var(--info-fs)));
-    display: flex; align-items: center; gap: clamp(14px, 1.4vw, 26px);
-  }
-  .pagelink { text-decoration: none; }
-  .menu-btn { transition: color .25s; }
-  @media (prefers-reduced-motion: reduce) { .menu-btn { transition: none; } }
-  /* the corner control is a word now, not three rules: the panel it opens
-     carries the role, the location and the address, so "Info" says what is
-     behind it where a hamburger only says "something". Blocked in vermillion
-     to match the filter bar at the other end of the sheet. */
-  /* set exactly as the project descriptions are — 13px mono, ink, no case
-     or tracking of its own. The halo is the signature's, so the word stays
-     readable when a card passes under it. */
-  .menu-btn {
-    border: 0; cursor: pointer; background: none; color: var(--ink);
-    display: grid; place-items: center;
-    /* the tile-title scale, so the corner and the work are set alike */
-    font-family: var(--sans); font-weight: 700;
-    font-size: var(--info-fs); letter-spacing: -0.035em; line-height: 0.96;
-    padding: 0;
-    /* the same bar the signature stands in, so both corners share a line */
-    height: var(--bar);
-    transition: color .25s;
-  }
-  @media (min-width: 821px) {
-    .menu-btn { height: var(--gx); }
-  }
-  .menu-btn:hover { color: var(--accent-sm); }
-  /* ─── the work, as a grid ───
-     Three across on a desktop, two on a tablet, one on a phone.
-
-     Every tile keeps its own proportions. A fixed 4:3 crop lined the rows up
-     beautifully and showed 42% of the jellyfish and 43% of the tarot cards;
-     on an illustrator's portfolio, tidy rows are not worth half a drawing.
-     So the columns are a masonry: each tile spans as many 8px rows as its
-     own height needs, measured once its image knows its shape. Columns stay
-     aligned, rows do not, and nothing is cropped.
-
-     A wide piece takes two columns. That is not decoration — it is the only
-     way a 16:9 frame reads at the same visual weight as a portrait beside
-     it, and it breaks the identical-tile rhythm that makes a grid of 32
-     look like a contact sheet. */
-  .board { padding: clamp(18px, 2.4vw, 40px) var(--gx) clamp(70px, 10vh, 140px); }
-  .grid {
-    --cols: 3;
-    --row: 4px;
-    --colgap: calc(clamp(16px, 1.8vw, 32px) + 20px);
-    --rowgap: calc(clamp(26px, 3vw, 52px) + 20px);
-    display: grid;
-    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-    column-gap: var(--colgap);
-    grid-auto-rows: var(--row);
-    /* a two-column piece otherwise waits for two free columns side by side
-       and leaves a hole the height of a tile behind it */
-    grid-auto-flow: row dense;
-    align-items: start;
-  }
-  /* the row gap is counted into each tile's span rather than set here:
-     grid-auto-rows makes every 4px slice a row, so a row-gap would open a
-     gap between all of them */
-  .grid { row-gap: 0; }
-  /* a probe the script can read the fluid row gap off, since calc() does
-     not resolve to a number in getComputedStyle */
-  .gap-probe { height: var(--rowgap); width: 0; visibility: hidden; grid-row: span 1; }
-  /* a fourth column once there is genuinely room for it — a maximised
-     widescreen monitor, not just a big laptop. Below this three stays wide
-     enough to carry the work; above it, four keeps tiles from stretching
-     into a width no illustration was drawn for. */
-  @media (min-width: 1700px) { .grid { --cols: 4; } }
-  @media (max-width: 1000px) { .grid { --cols: 2; } }
-  @media (max-width: 620px)  { .grid { --cols: 1; } }
-
-  .card {
-    display: block; text-decoration: none; color: var(--ink);
-    grid-row: span var(--span, 92);
-  }
-  /* a landscape piece earns the width; never on one column, where spanning
-     two would simply overflow */
-  @media (min-width: 621px) { .card.wide { grid-column: span 2; } }
-
-  .card .shot {
-    display: block; position: relative; overflow: hidden;
-    border-radius: var(--r); background: var(--bg, var(--line));
-    aspect-ratio: var(--ar, 4 / 3);
-  }
-  .card .shot img, .card .vid, .card.sketch .shot video {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-    /* a hover, not an entrance — plain ease, not the ease-out curve the
-       develop wipe uses, and fast: this fires every time the pointer
-       crosses a tile, not once like the wipe does */
-    transition: transform 200ms ease;
-  }
-  /* the develop: each tile's own ground is already on the page, and the
-     picture is wiped in over it from the top, like a print coming up in a
-     tray. Set by script once the image has decoded, so until then the tile
-     shows its colour alone rather than a broken frame. */
-  .card .shot img.develop {
-    clip-path: inset(0 0 100% 0);
-    transition: transform 200ms ease, clip-path 1s var(--out);
-  }
-  .card .shot img.develop.in { clip-path: inset(0 0 0 0); }
-  .card .vid { position: absolute; inset: 0; }
-  @media (hover: hover) {
-    .card:hover .shot img, .card:hover .vid { transform: scale(1.03); }
-  }
-  /* set a weight down from the popup's hero title, and opened out rather
-     than tight: in a grid of twenty, a 700-weight, tightly tracked line
-     glued 14px under every piece read as a second headline competing with
-     the work rather than naming it. The gap above gives the art room to
-     finish before the caption starts; the weight and tracking are there to
-     still read as a title, not a label. */
-  .card .t {
-    display: block; margin-top: 20px;
-    font-family: var(--sans); font-weight: 700;
-    font-size: clamp(20px, 1.7vw, 27px); letter-spacing: -0.03em; line-height: 1.15;
-    transition: color 0.2s;
-  }
-  .card:hover .t { color: var(--accent-sm); }
-  /* the same face as the title, a size and a tone down: one voice, two
-     volumes, rather than a typewriter line under every piece */
-  .card .m {
-    display: block; margin-top: 4px;
-    font-size: 14px; font-weight: 400; line-height: 1.5; letter-spacing: -0.005em;
-    color: color-mix(in srgb, var(--ink) 52%, transparent);
-  }
-  /* a sketchbook gif is an aside, not a commission: it takes a cell but
-     carries no title, and its whites knock out against the page */
-  .card.sketch { pointer-events: none; }
-  /* a sketch used to be marginalia dotted around the old cloud, small
-     enough that a square corner never showed. It is a full grid tile now —
-     same rounding as every other one. A transparent PNG or GIF has no
-     visible edge either way; a flat JPG upload does, and that is the corner
-     this was actually zeroing. */
-  .card.sketch .shot { background: none; }
-  .card.sketch .shot img, .card.sketch .shot video { mix-blend-mode: multiply; object-fit: contain; }
-
-  /* the arrival: the first screen's tiles come up as the page settles, in
-     the order they are read. Added by script, so with no JavaScript every
-     tile is simply there — the reveal enhances a visible default rather
-     than gating it. */
-  body.leaving .grid { opacity: 0; transform: translateY(-12px); transition: opacity 0.26s var(--out), transform 0.26s var(--out); }
-  body.leaving .name, body.leaving header { opacity: 0; transition: opacity 0.2s var(--out); }
-  .grid.arrive .card.up {
-    animation: tileUp 0.55s var(--out) both;
-    animation-delay: calc(var(--i, 0) * 45ms);
-  }
-  @keyframes tileUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: none; }
-  }
-
-  /* a colour tab under each tile, pulled from the artwork itself by script
-     (--tab). It lengthens on hover and the tile picks up a soft glow of the
-     same colour, so every piece answers the pointer in its own colour. */
-  .card:not(.sketch) .t::before {
-    content: ""; display: block; width: 26px; height: 5px; border-radius: 3px;
-    background: var(--tab, var(--accent)); margin-bottom: 12px;
-    transition: width .3s var(--out);
-  }
-  .card:not(.sketch) .t { margin-top: 18px; }
-  @media (hover: hover) {
-    .card:hover .t::before { width: 56px; }
-    .card:not(.sketch) .shot { transition: box-shadow .3s ease; }
-    .card:not(.sketch):hover .shot {
-      box-shadow: 0 18px 44px -16px color-mix(in srgb, var(--tab, var(--accent)) 70%, transparent);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .card:not(.sketch) .t::before, .card:not(.sketch) .shot { transition: none; }
-  }
-  /* one line of voice beside the mark, in the title face */
-  .intro {
-    position: absolute; z-index: 1;
-    left: calc(var(--gx) + var(--sigsz) + clamp(22px, 3.4vw, 56px));
-    top: calc(var(--gx) + var(--sigsz) * 0.30);
-    max-width: min(30ch, 38vw);
-    font-family: var(--sans); font-weight: 600; letter-spacing: -0.025em; line-height: 1.18;
-    font-size: clamp(17px, 1.9vw, 30px); color: var(--ink);
-  }
-  .intro em { font-style: normal; color: var(--accent-sm); }
-  @media (max-width: 820px) { .intro { display: none; } }
-
-  .card[hidden] { display: none; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .card .shot img, .card .vid, .card .t { transition: none; }
-    .grid.arrive .card.up { animation: none; }
-    .card .shot img.develop { clip-path: none; transition: none; }
-  }
-
-  /* the signature is a standing mark now: small, top left, always there —
-     it sits opposite the menu rules and holds the corner */
-  .name {
-    /* in the page rather than over it: a grid has no empty corner to stand
-       in, and a fixed mark simply covered the first tile */
-    display: block; padding: var(--gx) var(--gx) 0;
-    font-family: var(--sans); font-weight: 400;
-    font-size: clamp(15px, 1.6vw, 24px); letter-spacing: -0.01em;
-    color: var(--accent); white-space: nowrap;
-    pointer-events: none;
-  }
-  .name a {
-    display: block; pointer-events: auto; cursor: pointer;
-    transition: opacity 0.2s var(--out);
-  }
-  .name a:hover { opacity: 0.7; }
-  .name img {
-    max-width: var(--sigsz); max-height: var(--sigsz);
-    width: auto; height: auto; display: block;
-    /* a soft paper halo keeps the handwriting legible over the work */
-    filter: drop-shadow(0 0 8px var(--paper)) drop-shadow(0 0 20px var(--paper));
-  }
-
-  /* the role, the address and the reel used to sit under the signature as a
-     masthead. They live in the Info panel now, so the top left is the mark
-     alone and the work has the whole sheet. */
-
-  /* the ink trail rides over everything and takes no space: without this
-     the canvas lays out at its backing-store width and the page scrolls
-     sideways */
-  #ink { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
-
-
-  /* ─── project popup: the page IS the grid; projects open over it ─── */
-  /* Overlays arrive and leave rather than switching on and off. .open puts
-     the wrap in the layout; .in, added a frame later, is what the backdrop
-     fades and the panel rises on. Closing drops .in, runs a shorter fade,
-     and only then drops .open — so what leaves is what you were looking
-     at, not an empty panel. The project popup keeps its own grow-from-tile
-     transform, so the rise here is scoped to About and the reel. */
-  .popwrap {
-    position: fixed; inset: 0; z-index: 80;
-    display: none; align-items: flex-start; justify-content: center;
-    overflow-y: auto; overscroll-behavior: contain;
-    background: color-mix(in srgb, var(--ink) 42%, transparent);
-    padding: 6vh 16px 8vh;
-    opacity: 0; transition: opacity 0.3s var(--out);
-  }
-  .popwrap.open { display: flex; }
-  .popwrap.in { opacity: 1; }
-  .popwrap.closing { transition-duration: 0.2s; }
-  #aboutwrap .pop, #reelwrap .reel {
-    transform: translateY(14px);
-    /* matches .popwrap's own 0.3s exactly — they're one entrance, not two */
-    transition: transform 0.3s var(--out);
-  }
-  #aboutwrap.in .pop, #reelwrap.in .reel { transform: none; }
-  #aboutwrap.closing .pop, #reelwrap.closing .reel { transition-duration: 0.2s; }
-  @media (prefers-reduced-motion: reduce) {
-    .popwrap, #aboutwrap .pop, #reelwrap .reel { transition: none; }
-    #aboutwrap .pop, #reelwrap .reel { transform: none; }
-  }
-  .pop {
-    background: var(--paper);
-    width: min(860px, 94vw);
-    border: 1px solid var(--line);
-    transform-origin: top left;
-    position: relative;
-  }
-  .pop-x {
-    position: absolute; top: 0; right: 0; z-index: 2;
-    width: 52px; height: 52px; border: 0; cursor: pointer;
-    background: var(--ink); color: #fff; font-size: 20px; line-height: 1;
-    transition: background 0.25s;
-  }
-  .pop-x:hover { background: var(--accent); }
-  /* ─── About: no vermillion in here, and no tonal split either — the
-     headline is one flat ink line ─── */
-  #aboutwrap h2 { color: var(--ink); }
-  /* the opening paragraph is the headline at half scale: same face, weight
-     and tracking, clamp halved throughout. Line-height opens from the
-     headline's 0.95 — at four lines rather than two, descenders met the
-     caps below them. */
-  #aboutwrap .pop-desc {
-    font-family: var(--sans); font-weight: 400;
-    font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -0.035em;
-    line-height: 1.15; color: var(--ink); max-width: 26ch;
-  }
-  /* disciplines and clients, side by side and set in the same type as the
-     opener. The field labels are gone: two short stacks of proper nouns
-     announce what they are without being told. */
-  .about-cols {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px clamp(20px, 4vw, 56px);
-    margin: 30px 0 26px;
-  }
-  .about-cols ul { list-style: none; }
-  .about-cols li {
-    font-family: var(--sans); font-weight: 700;
-    font-size: clamp(19px, 2.2vw, 33px); letter-spacing: -0.035em;
-    line-height: 1.25; color: var(--ink);
-  }
-  /* instagram, email, agent and the rest: the same face as the lists above
-     at two thirds of their scale, set light so the block reads as the quiet end of the page
-     rather than a third stack competing with them */
-  #aboutwrap .pop-meta {
-    font-family: var(--sans); font-weight: 300; font-style: normal;
-    font-size: clamp(12.7px, 1.47vw, 22px); letter-spacing: -0.035em;
-    line-height: 1.35; color: var(--ink);
-  }
-  /* the field labels held back in tone, not in weight — a bolder label here
-     would put the emphasis on the word EMAIL rather than the address */
-  #aboutwrap .pop-meta b {
-    font-weight: 300; color: color-mix(in srgb, var(--ink) 42%, transparent);
-  }
-  #aboutwrap .pop-meta a { text-underline-offset: 4px; }
-  /* a phone has no room for two columns of display type */
-  @media (max-width: 560px) {
-    .about-cols { grid-template-columns: 1fr; gap: 22px; }
-  }
-  #aboutwrap .pop-x:hover { background: color-mix(in srgb, var(--ink) 62%, transparent); }
-  #aboutwrap ::selection { background: var(--ink); color: var(--paper); }
-  #aboutwrap :focus-visible { outline-color: var(--ink); }
-  .pop-body { padding: clamp(22px, 3.5vw, 44px); }
-  .pop-body h2 {
-    font-family: var(--sans); font-weight: 700;
-    font-size: clamp(38px, 4.4vw, 66px); letter-spacing: -0.035em; line-height: 0.95;
-    color: var(--accent); text-wrap: balance; margin-bottom: 20px;
-  }
-  .pop-meta {
-    font-size: 14px; line-height: 1.8; color: var(--ink);
-    margin-bottom: 20px;
-  }
-  .pop-meta b { font-weight: 500; }
-  .pop-desc { font-size: 13px; line-height: 1.8; color: var(--ink); max-width: 62ch; }
-
-  /* ─── mobile ─── */
-  @media (max-width: 820px) {
-    /* every fixed control clears the notch and the home indicator */
-    /* no ink offset here: that term aligns text TO the mark, and applying it
-       to the mark itself pushed the signature 6px right of its own margin */
-    .name { padding: calc(env(safe-area-inset-top) + 16px) 16px 0; }
-    header { top: env(safe-area-inset-top); right: calc(env(safe-area-inset-right) + 16px); }
-    .menu-btn { padding: 0; }
-    #ink { display: none; }
-  }
-
-  .cs { padding: clamp(36px, 5vw, 80px) var(--gx) 0; }
-
-  /* the title at display size, then the work, then what it was: the facts
-     and the words on a two-part measure under the hero, so the piece is the
-     first thing seen and the page still has a left edge to read down */
-  /* set as the Humantold case study sets its title: regular weight, open
-     tracking, in the accent — it names the piece rather than shouting over it */
+  .cs { padding: 64px var(--gx) 0; }
+  .cs-eye { margin-bottom: 10px; }
   .cs-title {
-    font-family: var(--sans); font-weight: 400;
-    font-size: clamp(38px, 6vw, 76px); letter-spacing: -0.015em; line-height: 0.98;
-    color: var(--accent); text-wrap: balance; max-width: 18ch;
-    margin-bottom: clamp(28px, 3.6vw, 60px);
+    font-weight: 400; text-transform: lowercase;
+    font-size: clamp(64px, 15.5vw, 260px); letter-spacing: -.065em; line-height: .86;
+    margin-left: -.05em; overflow-wrap: anywhere; text-wrap: balance;
+    animation: up .9s var(--out) both;
   }
-  .cs-intro {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: 24px clamp(24px, 4vw, 72px);
-    margin: clamp(40px, 6vw, 100px) 0 clamp(48px, 7vw, 120px);
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
+  .cs-facts { margin-top: clamp(28px, 4vw, 56px); border-bottom: 1px solid var(--line); animation: up .9s .08s var(--out) both; }
+  .cs-facts > div {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gx);
+    padding: 9px 0 8px; border-top: 1px solid var(--line);
   }
-  .cs-facts { display: grid; gap: 14px; align-content: start; }
-  .cs-facts dt {
-    font-size: 13px; line-height: 1.4;
-    color: color-mix(in srgb, var(--ink) 50%, transparent);
+  .cs-facts dt { color: var(--mute); }
+  .cs-facts dd { grid-column: 2 / 4; }
+  .cs-sum, .cs-desc {
+    font-size: clamp(20px, 1.9vw, 30px); letter-spacing: -.025em; line-height: 1.22;
+    max-width: 46ch; text-wrap: pretty;
   }
-  .cs-facts dd { font-size: 16px; line-height: 1.4; font-weight: 500; }
-  .cs-desc {
-    font-size: clamp(19px, 1.7vw, 26px); font-weight: 400;
-    letter-spacing: -0.015em; line-height: 1.4; max-width: 36ch;
-  }
+  .cs-sum { margin: clamp(20px, 2.4vw, 36px) 0 clamp(40px, 6vw, 90px); animation: up .9s .14s var(--out) both; }
 
-  /* the work: full measure, its own colour behind it while it loads */
-  .cs-hero, .cs-fig { border-radius: var(--r); overflow: hidden; background: var(--pb); }
-  .cs-hero { aspect-ratio: var(--ar, auto); }
-  /* a portrait or square hero is shown whole, not stretched to the width of
-     the sheet: its height caps at the window and the width follows, and the
-     facts and words take the room beside it rather than leaving it empty */
-  .cs-lead.tall {
-    display: grid; grid-template-columns: auto minmax(0, 1fr);
-    gap: clamp(28px, 5vw, 96px); align-items: end;
-    margin-bottom: clamp(48px, 7vw, 120px);
+  /* media arrives bent and straightens as it climbs (assets/noa.js) */
+  .warp {
+    position: relative; overflow: hidden; background: var(--pb, var(--card));
+    border-radius: var(--bend, 0%) var(--bend, 0%) 0 0 / calc(var(--bend, 0%) * .55) calc(var(--bend, 0%) * .55) 0 0;
+    transform: translate3d(0, var(--lift, 0), 0);
   }
-  .cs-lead.tall .cs-hero { width: min(58vw, calc(86svh * var(--f))); }
-  .cs-lead.tall .cs-intro { grid-template-columns: 1fr; margin: 0; }
-  .cs-row.solo .cs-fig.tall { width: min(100%, calc(86svh * var(--f))); margin: 0 auto; }
-  /* below a laptop there is no width to share: the hero takes the measure
-     and the words go under it, as they do for a landscape one */
-  @media (max-width: 1000px) {
-    .cs-lead.tall { display: block; margin-bottom: 0; }
-    .cs-lead.tall .cs-hero { width: min(100%, calc(86svh * var(--f))); }
-    .cs-lead.tall .cs-intro { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); margin: clamp(40px, 6vw, 100px) 0 clamp(48px, 7vw, 120px); }
-  }
-  .cs-hero img, .cs-hero video, .cs-fig img, .cs-fig video {
-    display: block; width: 100%; height: 100%; object-fit: cover;
-  }
-  .cs-fig.free img, .cs-fig.free video { height: auto; }
-  .cs-gal { display: grid; gap: clamp(12px, 1.6vw, 28px); }
-  .cs-row { display: flex; gap: clamp(12px, 1.6vw, 28px); align-items: flex-start; }
-  .cs-row .cs-fig { flex: var(--f, 1) 1 0; min-width: 0; aspect-ratio: var(--ar, auto); }
-  .cs-row.solo .cs-fig { flex: none; width: 100%; }
+  .warp img, .warp video { width: 100%; height: 100%; object-fit: cover; }
+  .cs-hero { aspect-ratio: var(--ar, 16 / 9); }
+  .cs-hero.tall { width: min(100%, calc(88svh * var(--f))); margin: 0 auto; }
 
-  /* the way on: the next piece in the grid's own order, big enough to be
-     the obvious thing to do once the page runs out */
+  .cs-app { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gx); margin: clamp(48px, 7vw, 110px) 0; }
+  .cs-app .cap { padding-top: .55em; }
+  .cs-app .cs-desc { grid-column: 2 / 4; }
+
+  .cs-gal { display: grid; gap: var(--gx); margin-top: var(--gx); }
+  .cs-row { display: flex; gap: var(--gx); align-items: flex-start; }
+  .cs-fig { flex: var(--f, 1) 1 0; aspect-ratio: var(--ar, auto); min-width: 0; }
+  .cs-fig.free { aspect-ratio: auto; }
+  .cs-fig.free video, .cs-fig.free img { height: auto; }
+  .cs-row.solo .cs-fig.tall { flex: none; width: min(100%, calc(88svh * var(--f))); margin: 0 auto; }
+
   .cs-next {
-    display: grid; grid-template-columns: minmax(0, 1fr);
-    gap: clamp(20px, 4vw, 72px); align-items: end;
-    margin-top: clamp(80px, 12vw, 200px); padding: clamp(28px, 3vw, 44px) 0 0;
-    border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
-    text-decoration: none; color: var(--ink);
+    display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--gx); align-items: end;
+    margin-top: clamp(80px, 12vw, 180px); padding-top: 12px; border-top: 1px solid var(--line);
   }
-  .cs-next-k { display: block; font-size: 13px; margin-bottom: 14px;
-    color: color-mix(in srgb, var(--ink) 50%, transparent); }
   .cs-next-t {
-    display: block; font-weight: 400;
-    font-size: clamp(32px, 4.6vw, 64px); letter-spacing: -0.015em; line-height: 0.98;
-    text-wrap: balance; transition: color 0.2s ease;
+    display: block; font-size: clamp(48px, 9vw, 150px); letter-spacing: -.065em; line-height: .88;
+    text-transform: lowercase; margin: 14px 0 0 -.05em; transition: color .3s;
   }
+  .cs-next-img { aspect-ratio: 4 / 5; overflow: hidden; background: var(--pb); }
+  .cs-next-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--out); }
   @media (hover: hover) {
-    .cs-next:hover .cs-next-t { color: var(--accent-sm); }
+    .cs-next:hover .cs-next-t { color: var(--mute); }
+    .cs-next:hover .cs-next-img img { transform: scale(1.05); }
   }
   .cs-foot {
-    display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
-    padding: clamp(48px, 7vw, 110px) 0 clamp(28px, 4vw, 56px);
-    font-size: 14px; color: color-mix(in srgb, var(--ink) 50%, transparent);
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gx);
+    padding: clamp(60px, 9vw, 140px) 0 15px;
   }
-  .cs-foot a { color: inherit; text-decoration: none; transition: color 0.2s ease; }
-  .cs-foot a:hover { color: var(--accent-sm); }
+  .cs-foot > :last-child { text-align: right; }
+  body.leaving .cs { opacity: 0; transform: translateY(-14px); transition: opacity .28s var(--out), transform .28s var(--out); }
 
   @media (max-width: 760px) {
-    .cs-intro, .cs-lead.tall .cs-intro { grid-template-columns: 1fr; }
-    .cs-facts { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
-    .cs-next { grid-template-columns: 1fr; }
+    .cs-facts > div, .cs-app { grid-template-columns: 1fr 2fr; }
+    .cs-facts dd, .cs-app .cs-desc { grid-column: 2; }
+    .cs-next { grid-template-columns: 1fr 1fr; }
+    .cs-foot { grid-template-columns: 1fr 1fr; row-gap: 10px; }
+    .cs-foot > :last-child { text-align: left; }
   }
   @media (max-width: 560px) {
-    /* a phone has no width to share: everything stacks, whole */
     .cs-row { flex-direction: column; }
     .cs-row .cs-fig, .cs-row.solo .cs-fig.tall { width: 100%; flex: none; }
-  }
-
-  /* arriving: the heading settles, then the work comes up under it */
-  .cs-title, .cs-intro, .cs-hero { animation: tileUp 0.6s var(--out) both; }
-  .cs-hero { animation-delay: 70ms; }
-  .cs-intro { animation-delay: 140ms; }
-  body.leaving .cs { opacity: 0; transform: translateY(-12px); transition: opacity 0.26s var(--out), transform 0.26s var(--out); }
-  @media (prefers-reduced-motion: reduce) {
-    .cs-title, .cs-intro, .cs-hero { animation: none; }
-    .cs-next-t, .cs-foot a { transition: none; }
+    .cs-app { grid-template-columns: 1fr; }
+    .cs-app .cs-desc { grid-column: 1; }
   }
 </style>
 </head>
 <body style="--pb:#ffffff">
 
-<div class="name"><a href="../index.html" id="name-link" aria-label="Alex Tait — back to Work"><img src="../assets/signature.gif" alt="Alex Tait" /></a></div>
-
-<header>
-  <a class="menu-btn pagelink" id="page-link" href="../index.html"><span>Work</span></a>
-  <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
+<header class="hd cap">
+  <div class="hd-col">
+    <a href="../index.html" id="name-link" aria-label="Alex Tait, home">
+      <span class="roll"><span data-t="Alex">Alex</span></span><br />
+      <span class="roll"><span data-t="Tait">Tait</span></span>
+    </a>
+  </div>
+  <div class="hd-col">
+    <a href="../index.html" class="back"><span class="roll"><span data-t="All work">All work</span></span></a>
+    <button type="button" data-open="talk" aria-controls="talk" aria-expanded="false"><span class="roll"><span data-t="Get in touch">Get in touch</span></span></button>
+  </div>
+  <div class="hd-end">
+    <div class="hd-col hd-clock mute"><span>Local time</span><span class="clock-t">--:--</span></div>
+    <div class="theme" role="group" aria-label="Colour scheme">
+      <button type="button" data-theme-set="day" aria-pressed="true">Day</button>
+      <button type="button" data-theme-set="night" aria-pressed="false">Night</button>
+    </div>
+  </div>
 </header>
 
 <main class="cs">
+  <p class="cs-eye cap mute">20 — Advertising</p>
   <h1 class="cs-title">Window Display</h1>
-  <div class="cs-lead tall">
-    <figure class="cs-hero" style="--ar:1198 / 1122; --f:1.0677"><img src="../images/window-display.png" alt="Window Display for Art of Ping Pong" width="1198" height="1122" fetchpriority="high" /></figure>
-    <div class="cs-intro">
-      <dl class="cs-facts"><div><dt>Client</dt><dd>Art of Ping Pong</dd></div><div><dt>Year</dt><dd>2019</dd></div><div><dt>Discipline</dt><dd>Advertising</dd></div></dl>
-      <p class="cs-desc">A vinyl window installation for Art of Ping Pong, a creative event space and hospitality venue. The illustration wrapped the street-facing windows: large-format character work designed to signal the playfulness of what was happening inside and draw people in off the street. Bold line work and a flat colour palette that read clearly at scale and held up under the variable light conditions of a busy London exterior.</p>
-    </div>
-  </div>
+  <dl class="cs-facts cap">
+    <div><dt>Client</dt><dd>Art of Ping Pong</dd></div>
+    <div><dt>Year</dt><dd>2019</dd></div>
+    <div><dt>Discipline</dt><dd>Advertising</dd></div>
+  </dl>
+  <p class="cs-sum">Vinyl window installation for the Art of Ping Pong event.</p>
+
+  <figure class="cs-hero warp tall" data-warp style="--ar:1198 / 1122; --f:1.0677"><img src="../images/window-display.png" alt="Window Display for Art of Ping Pong" width="1198" height="1122" fetchpriority="high" /></figure>
+
+  <div class="cs-app"><p class="cap mute">About the project</p><p class="cs-desc">A vinyl window installation for Art of Ping Pong, a creative event space and hospitality venue. The illustration wrapped the street-facing windows: large-format character work designed to signal the playfulness of what was happening inside and draw people in off the street. Bold line work and a flat colour palette that read clearly at scale and held up under the variable light conditions of a busy London exterior.</p></div>
+
   <div class="cs-gal">
-    <div class="cs-row solo"><figure class="cs-fig" style="--ar:2560 / 1600; --f:1.6000"><img src="../images/window-display-m1.jpg" alt="Window Display, image 2" width="2560" height="1600" loading="lazy" decoding="async" /></figure></div>
+    <div class="cs-row solo"><figure class="cs-fig warp" data-warp style="--ar:2560 / 1600; --f:1.6000"><img src="../images/window-display-m1.jpg" alt="Window Display, image 2" width="2560" height="1600" loading="lazy" decoding="async" /></figure></div>
   </div>
 
   <a class="cs-next" href="alice-in-wonderland.html" style="--pb:#f6d8d4">
-    <span><span class="cs-next-k">Next project</span><span class="cs-next-t">Alice in Wonderland</span></span>
+    <span><span class="cap mute">Next project</span><span class="cs-next-t">Alice in Wonderland</span></span>
+    <span class="cs-next-img"><img src="../images/alice-in-wonderland.jpg" alt="" loading="lazy" /></span>
   </a>
-  <footer class="cs-foot">
+  <footer class="cs-foot cap">
+    <span class="mute">© 2026 Alex Tait</span>
     <a href="eco-living.html">← Eco Living</a>
-    <a href="../index.html">All work</a>
+    <button type="button" data-open="talk" aria-controls="talk" aria-expanded="false" style="text-align:left">Get in touch</button>
+    <a href="#top" onclick="scrollTo({top:0,behavior:'smooth'});return false">Back to top ↑</a>
   </footer>
 </main>
 
-<div class="popwrap" id="aboutwrap" role="dialog" aria-modal="true" aria-label="About Alex Tait">
-  <div class="pop" id="about-pop" style="width:min(720px, 94vw)">
-    <button class="pop-x" id="about-x" aria-label="Close">✕</button>
-    <div class="pop-body" style="padding-top:clamp(50px, 7vw, 76px)">
-      <p class="pop-desc" style="margin-bottom:26px">
-        Illustration and motion designer based between Bath and London. Bringing playful simplicity to briefs, using characters, colour, and exciting compositions &mdash; I've worked with the likes of Netflix, Apple, Google and Adidas to bring campaigns a human touch.
-      </p>
-      <p class="pop-desc" style="margin-bottom:26px">
-        If you would like to work together please reach out via <a href="mailto:alexjohntait@gmail.com" style="color:inherit">email</a> or contact my agency <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener" style="color:inherit">Jelly</a> to start something fun!
-      </p>
-      <div class="about-cols">
-        <ul>
-          <li>Illustration</li>
-          <li>Motion Design</li>
-          <li>Art Direction</li>
-          <li>Editorial</li>
-        </ul>
-        <ul>
-          <li>Spotify</li>
-          <li>Apple</li>
-          <li>Google</li>
-          <li>Adidas</li>
-          <li>Levi's</li>
-        </ul>
-      </div>
-      <div class="pop-meta">
-        <b>Instagram</b> <a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener" style="color:inherit">@alextaitillustration</a><br />
-        <b>Email</b> <a href="mailto:alexjohntait@gmail.com" style="color:inherit">alexjohntait@gmail.com</a><br />
-        <b>Agent</b> <a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener" style="color:inherit">Jelly ↗</a><br />
-        <b>Showreel</b> <a href="../index.html#showreel" id="reel-link" style="color:inherit">Watch the reel &rarr;</a><br />
-        <b>Press</b> <a href="https://www.itsnicethat.com/articles/alex-tait" target="_blank" rel="noopener" style="color:inherit">It&rsquo;s Nice That</a>, <a href="https://lbbonline.com/news/style-guide-alex-tait" target="_blank" rel="noopener" style="color:inherit">LBB</a>, <a href="https://www.outofcommission.news/alex-tait-for-feldwick-co-ooc55/" target="_blank" rel="noopener" style="color:inherit">Out of Commission</a><br />
-        <b>Shop</b> <a href="../shop.html" style="color:inherit">Digital downloads &rarr;</a><br />
-        <b>Location</b> Bath / London
-      </div>
+<div class="ov" id="menu" aria-hidden="true" role="dialog" aria-label="Menu">
+  <button type="button" class="ov-x cap" data-close><span class="roll"><span data-t="Close">Close</span></span></button>
+  <nav class="tiles" aria-label="Pages">
+    <a class="tile" href="../index.html" data-tile="work"><span class="tile-t">work</span><span class="tile-n cap mute">01</span><span class="tile-img"><img src="../images/app-store.jpg" alt="" loading="lazy" /></span></a>
+    <a class="tile" href="../index.html#index" data-tile="index"><span class="tile-t">index</span><span class="tile-n cap mute">02</span><span class="tile-img"><img src="../images/kueski-pay.jpg" alt="" loading="lazy" /></span></a>
+    <a class="tile" href="../sketchbook.html" data-tile="sketchbook"><span class="tile-t">sketchbook</span><span class="tile-n cap mute">03</span><span class="tile-img"><img src="../images/posters/jellyfish.jpg" alt="" loading="lazy" /></span></a>
+    <a class="tile" href="../index.html#profile" data-tile="profile"><span class="tile-t">profile</span><span class="tile-n cap mute">04</span><span class="tile-img"><img src="../images/tap-on-tap-off.jpg" alt="" loading="lazy" /></span></a>
+  </nav>
+</div>
+
+<div class="ov" id="talk" aria-hidden="true" role="dialog" aria-label="Get in touch">
+  <button type="button" class="ov-x cap" data-close><span class="roll"><span data-t="Close">Close</span></span></button>
+  <div class="talk">
+    <p class="talk-big">let’s talk</p>
+    <div class="talk-rows">
+      <div><span class="cap mute">Email</span><button type="button" data-copy="alexjohntait@gmail.com">alexjohntait@gmail.com</button><span class="cap mute copied" aria-live="polite">Copied</span></div>
+      <div><span class="cap mute">Agent</span><a href="https://www.thisisjelly.com/uk/talent/alex-tait?splash=true" target="_blank" rel="noopener">Jelly ↗</a></div>
+      <div><span class="cap mute">Instagram</span><a href="https://instagram.com/alextaitillustration" target="_blank" rel="noopener">@alextaitillustration ↗</a></div>
+      <div><span class="cap mute">Based</span><span style="font-size:clamp(16px,1.5vw,22px);letter-spacing:-.02em">Bath / London</span></div>
     </div>
   </div>
 </div>
 
+
+<div class="grain" aria-hidden="true"></div>
+<script src="../assets/noa.js"></script>
 <script>
-const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* Info: the same panel as the home page, with the same open and close */
-(() => {
-  const btn = document.getElementById('menu-btn');
-  const w = document.getElementById('aboutwrap'), x = document.getElementById('about-x');
-  let t;
-  const open = () => {
-    clearTimeout(t); w.classList.remove('closing'); w.classList.add('open');
-    btn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden';
-    if (REDUCE) w.classList.add('in'); else requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('in')));
-    x.focus();
-  };
-  const close = () => {
-    w.classList.remove('in'); btn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = '';
-    if (REDUCE) return w.classList.remove('open');
-    w.classList.add('closing'); t = setTimeout(() => w.classList.remove('open', 'closing'), 220);
-  };
-  btn.addEventListener('click', open);
-  x.addEventListener('click', close);
-  w.addEventListener('click', e => { if (e.target === w) close(); });
-  addEventListener('keydown', e => { if (e.key === 'Escape' && w.classList.contains('open')) close(); });
-})();
-
-/* video plays while it is on screen and rests when it is not; a box with
-   no ratio of its own takes the video's once it knows it */
-(() => {
-  const vids = document.querySelectorAll('video[data-auto]');
-  vids.forEach(v => {
-    const box = v.parentElement;
-    const set = () => { if (v.videoWidth && !box.style.getPropertyValue('--ar')) box.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
-    v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
-  });
-  if (REDUCE) { vids.forEach(v => v.setAttribute('controls', '')); return; }
-  if (!('IntersectionObserver' in window)) { vids.forEach(v => v.play().catch(() => {})); return; }
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting) e.target.play().catch(() => {}); else e.target.pause();
-  }), { rootMargin: '200px 0px', threshold: 0.1 });
-  vids.forEach(v => io.observe(v));
-})();
-
-/* leaving: the page steps away the way the grid does, and comes back
-   whole if the browser restores it from history */
-document.querySelectorAll('a.cs-next, .cs-foot a, #page-link, #name-link').forEach(a =>
+/* leaving fades the page; ← / → step through the run, Esc goes back */
+document.querySelectorAll('a.cs-next, a.back, #name-link, .cs-foot a[href$=".html"]').forEach(a =>
   a.addEventListener('click', e => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || REDUCE) return;
-    e.preventDefault();
-    document.body.classList.add('leaving');
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || window.NOA_REDUCE) return;
+    e.preventDefault(); document.body.classList.add('leaving');
     setTimeout(() => { location.href = a.href; }, 260);
   }));
 addEventListener('pageshow', e => { if (e.persisted) document.body.classList.remove('leaving'); });
-
-/* keyboard: ← / → through the run, Esc back to it */
 addEventListener('keydown', e => {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-  if (document.getElementById('aboutwrap').classList.contains('open')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey || document.querySelector('.ov.open')) return;
   if (e.key === 'ArrowRight') location.href = 'alice-in-wonderland.html';
   else if (e.key === 'ArrowLeft') location.href = 'eco-living.html';
   else if (e.key === 'Escape') location.href = '../index.html';
 });
-
-/* ─── the corner words, aligned to the mark ───
-   Cap-height to ink, not box to box. The mark's own file carries transparent
-   padding above the drawing, so lining the boxes up leaves the words high by
-   however much that padding is — 8.8% on the current logo, 15px on screen.
-   Both ends are measured rather than assumed: the ink by reading the image's
-   alpha, the cap by rendering the word to a canvas and finding its first
-   inked row. That way a new logo from Airtable, or a change of face, keeps
-   the alignment without anyone editing a number. */
-(() => {
-  const btn = document.getElementById('menu-btn');
-  const img = document.querySelector('.name img');
-  if (!btn || !img) return;
-  /* the mark animates, so its ink starts on a different row every frame.
-     --sig-ink is the union across all of them, measured on sync. */
-  const inkFrac = parseFloat(
-    getComputedStyle(document.documentElement).getPropertyValue('--sig-ink')) || 0;
-
-  function capOffset() {
-    /* a zero-size inline box sits on the baseline, so its top is the baseline */
-    const span = btn.querySelector('span') || btn;
-    const mark = document.createElement('i');
-    mark.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
-    span.appendChild(mark);
-    const baseline = mark.getBoundingClientRect().top;
-    mark.remove();
-    const st = getComputedStyle(btn);
-    const c = document.createElement('canvas');
-    c.width = 400; c.height = 240;
-    const x = c.getContext('2d', { willReadFrequently: true });
-    x.font = st.fontStyle + ' ' + st.fontWeight + ' ' + st.fontSize + ' ' + st.fontFamily;
-    x.textBaseline = 'alphabetic'; x.fillStyle = '#000';
-    x.fillText(btn.textContent.trim() || 'Info', 10, 190);
-    const d = x.getImageData(0, 0, 400, 240).data;
-    let row = 240;
-    for (let y = 0; y < 240 && row === 240; y++)
-      for (let xx = 0; xx < 400; xx++)
-        if (d[(y * 400 + xx) * 4 + 3] > 8) { row = y; break; }
-    const capHeight = 190 - row;
-    return (baseline - capHeight) - btn.getBoundingClientRect().top;
-  }
-
-  function align() {
-    const r = img.getBoundingClientRect();
-    if (!r.height) return;
-    /* the header is what moves, so measure its contribution out first */
-    const top = (r.top + scrollY) + inkFrac * r.height - capOffset();
-    document.documentElement.style.setProperty('--info-top', Math.round(top) + 'px');
-  }
-
-  const run = () => align();
-  if (img.complete && img.naturalWidth) run();
-  else img.addEventListener('load', run, { once: true });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(run);
-  let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(align, 150); });
-})();
 </script>
 </body>
 </html>

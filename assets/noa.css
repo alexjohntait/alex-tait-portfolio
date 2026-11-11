@@ -1,0 +1,172 @@
+/* ─────────────────────────────────────────────────────────────
+   Shared styles for every page: warm paper, one ink colour, Switzer.
+   Index, sketchbook and the /work/ case pages all link this file, so a
+   change here reaches the whole site at once.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --paper: #ebe8e1;
+  --ink: #1d1c19;
+  --mute: #8b867c;
+  --line: rgba(29, 28, 25, .14);
+  --card: #d9d5cb;
+  --gx: 16px;                       /* the page margin */
+  --sans: 'Switzer', 'Helvetica Neue', Arial, sans-serif;
+  --out: cubic-bezier(.22, 1, .36, 1);
+  color-scheme: light;
+}
+:root[data-theme="night"] {
+  --paper: #1f1e1b;
+  --ink: #e6e1d6;
+  --mute: #8b867c;
+  --line: rgba(230, 225, 214, .14);
+  --card: #2b2a26;
+  color-scheme: dark;
+}
+@media (min-width: 1400px) { :root { --gx: 20px; } }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-weight: 400;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  transition: background-color .45s var(--out), color .45s var(--out);
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-transform: inherit; letter-spacing: inherit; }
+img, video { display: block; max-width: 100%; }
+:focus-visible { outline: 1.5px solid currentColor; outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── the small caps: every label on the site ───────────────── */
+.cap {
+  font-size: 12px; line-height: 1.15; letter-spacing: 0;
+  text-transform: uppercase; font-weight: 400;
+}
+.mute { color: var(--mute); }
+
+/* a word that rolls up to a copy of itself on hover */
+.roll { display: inline-block; position: relative; overflow: hidden; vertical-align: top; }
+.roll > span { display: block; transition: transform .45s var(--out); }
+.roll > span::after {
+  content: attr(data-t); position: absolute; left: 0; top: 100%;
+}
+@media (hover: hover) {
+  a:hover > .roll > span, button:hover > .roll > span, .roll:hover > span { transform: translateY(-100%); }
+}
+
+/* ── header ─────────────────────────────────────────────────── */
+.hd {
+  position: fixed; inset: 0 0 auto 0; z-index: 40;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gx); padding: 15px var(--gx) 0;
+  pointer-events: none;
+}
+.hd > * { pointer-events: auto; }
+.hd::before {
+  content: ''; position: absolute; inset: 0 0 -26px 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(var(--paper) 62%, color-mix(in srgb, var(--paper) 0%, transparent));
+  opacity: 0; transition: opacity .35s var(--out);
+}
+.hd.solid::before { opacity: 1; }
+.hd-col { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.hd-col a, .hd-col button { text-align: left; }
+.hd-end { display: flex; justify-content: space-between; align-items: flex-start; }
+.theme { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.theme button { display: flex; align-items: center; gap: 6px; color: var(--mute); transition: color .3s; }
+.theme button::before {
+  content: ''; width: 4px; height: 4px; border-radius: 50%; background: currentColor;
+  opacity: 0; transform: scale(0); transition: opacity .3s, transform .3s var(--out);
+}
+.theme button[aria-pressed="true"] { color: var(--ink); }
+.theme button[aria-pressed="true"]::before { opacity: 1; transform: none; }
+.theme { margin-left: auto; }
+.theme button { margin-left: -10px; }           /* dot hangs in the margin */
+.clock-t { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 640px) {
+  .hd { grid-template-columns: 1fr 1fr auto; }
+  .hd-clock { display: none; }
+  .theme button { margin-left: 0; }
+}
+
+/* ── film grain, over everything, never in the way ─────────── */
+.grain {
+  position: fixed; inset: -50%; z-index: 90; pointer-events: none; opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1.2s steps(6) infinite;
+}
+:root[data-theme="night"] .grain { opacity: .09; mix-blend-mode: screen; }
+@keyframes grain {
+  0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -3%); } 60% { transform: translate(-2%, -1%); }
+  80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); }
+}
+
+/* ── the page title: one lowercase word ─────────────────────── */
+.ptitle {
+  font-size: clamp(44px, 4.8vw, 76px); font-weight: 400; line-height: 1;
+  letter-spacing: -.055em; text-transform: lowercase;
+  padding: 0 var(--gx); margin-left: -.04em;
+}
+
+/* ── overlays: the menu and get-in-touch ────────────────────── */
+.ov {
+  position: fixed; inset: 0; z-index: 60; background: var(--paper);
+  visibility: hidden; opacity: 0;
+  transition: opacity .45s var(--out), visibility 0s linear .45s, background-color .45s var(--out);
+}
+.ov.open { visibility: visible; opacity: 1; transition: opacity .45s var(--out), visibility 0s, background-color .45s var(--out); }
+.ov-x { position: absolute; top: 15px; right: var(--gx); z-index: 2; }
+
+/* the menu: every page as a tile */
+.tiles {
+  position: absolute; inset: 64px var(--gx) var(--gx);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gx);
+}
+.tile {
+  position: relative; display: flex; flex-direction: column; justify-content: space-between;
+  border: 1px solid var(--line); background: var(--paper); overflow: hidden;
+  padding: 12px; min-height: 0;
+  transform: translateY(24px) scale(.97); opacity: 0;
+  transition: transform .7s var(--out), opacity .7s var(--out), border-color .3s;
+}
+.ov.open .tile { transform: none; opacity: 1; }
+.ov.open .tile:nth-child(2) { transition-delay: .05s; }
+.ov.open .tile:nth-child(3) { transition-delay: .1s; }
+.ov.open .tile:nth-child(4) { transition-delay: .15s; }
+.tile-t { font-size: clamp(30px, 3vw, 48px); letter-spacing: -.05em; line-height: 1; }
+.tile-n { position: absolute; top: 12px; right: 12px; }
+.tile-img { position: relative; flex: 0 1 62%; min-height: 80px; margin-top: 12px; overflow: hidden; background: var(--card); }
+.tile-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .9s var(--out); }
+.tile[aria-current="page"] { border-color: var(--ink); }
+@media (hover: hover) {
+  .tile:hover { border-color: var(--ink); }
+  .tile:hover .tile-img img { transform: scale(1.05); }
+}
+@media (max-width: 760px) {
+  .tiles { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+}
+
+/* get in touch */
+.talk {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 var(--gx) var(--gx);
+}
+.talk-big {
+  font-size: clamp(56px, 13vw, 220px); letter-spacing: -.065em; line-height: .86;
+  margin-left: -.05em; margin-bottom: clamp(24px, 4vw, 56px);
+  transform: translateY(30px); opacity: 0; transition: transform .8s var(--out), opacity .8s var(--out);
+}
+.ov.open .talk-big { transform: none; opacity: 1; }
+.talk-rows { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gx); border-top: 1px solid var(--line); padding-top: 12px; }
+.talk-rows > div { display: flex; flex-direction: column; gap: 6px; }
+.talk-rows a, .talk-rows button { font-size: clamp(16px, 1.5vw, 22px); letter-spacing: -.02em; text-align: left; }
+.copied { opacity: 0; transition: opacity .3s; }
+.copied.on { opacity: 1; }
+@media (max-width: 760px) { .talk-rows { grid-template-columns: 1fr 1fr; row-gap: 18px; } }
+
+/* ── reduced motion: nothing moves that does not have to ────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; }
+}

@@ -1,5 +1,5 @@
 // Generates a standalone, crawlable case-study page per project into /work/.
-// Reads data + CSS straight from index.html so pages stay identical and in sync.
+// Reads the data, header and overlays straight from index.html so pages stay in sync with it.
 //
 // The grid opens these directly now (the popup is gone), so this page is
 // where a project is actually seen: title and facts, the hero at full width,
@@ -22,14 +22,11 @@ const grab = (re, label) => { const m = html.match(re); if (!m) throw new Error(
 const PROJECTS = JSON.parse(grab(/const PROJECTS = (\[[\s\S]*?\n\]);/, 'PROJECTS'));
 const ASSETS   = JSON.parse(grab(/const ASSETS = (\{[\s\S]*?\});/, 'ASSETS'));
 const GALLERY  = JSON.parse(grab(/const GALLERY = (\{[\s\S]*?\});/, 'GALLERY'));
-const CSS      = grab(/<style>([\s\S]*?)<\/style>/, 'CSS');
-const FONTS    = [...html.matchAll(/<link href="https:\/\/api\.fontshare\.com[^>]*>/g)].map(m => m[0]).join('\n  ');
-/* the corner-word alignment and the About panel, lifted from the home page
-   so a project page's corners and Info match it exactly */
-const ALIGN    = grab(/(\/\* ─── the corner words, aligned to the mark ───[\s\S]*?\n\}\)\(\);)/, 'corner alignment');
-const ABOUT    = grab(/(<div class="popwrap" id="aboutwrap"[\s\S]*?)\s*<canvas id="ink"/, 'About panel')
-  .replace(/href="#showreel"/, 'href="../index.html#showreel"')
-  .replace(/href="shop\.html"/, 'href="../shop.html"');
+/* the header, the menu and get-in-touch are lifted from the home page so a
+   project page matches it exactly; only the paths step up a folder */
+const up = s => s.replace(/(href|src)="(?!https?:|mailto:|#|\/)/g, '$1="../');
+const HEADER = up(grab(/(<header class="hd cap">[\s\S]*?<\/header>)/, 'header'));
+const OVERLAYS = up(grab(/(<div class="ov" id="menu"[\s\S]*?)\n<div class="grain"/, 'overlays'));
 
 const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -81,131 +78,108 @@ function rows(items) {
   return out;
 }
 
+
+// the case page's own rules, on top of assets/noa.css
+const CSS = `
+  .cs { padding: 64px var(--gx) 0; }
+  .cs-eye { margin-bottom: 10px; }
+  .cs-title {
+    font-weight: 400; text-transform: lowercase;
+    font-size: clamp(64px, 15.5vw, 260px); letter-spacing: -.065em; line-height: .86;
+    margin-left: -.05em; overflow-wrap: anywhere; text-wrap: balance;
+    animation: up .9s var(--out) both;
+  }
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
+  .cs-facts { margin-top: clamp(28px, 4vw, 56px); border-bottom: 1px solid var(--line); animation: up .9s .08s var(--out) both; }
+  .cs-facts > div {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gx);
+    padding: 9px 0 8px; border-top: 1px solid var(--line);
+  }
+  .cs-facts dt { color: var(--mute); }
+  .cs-facts dd { grid-column: 2 / 4; }
+  .cs-sum, .cs-desc {
+    font-size: clamp(20px, 1.9vw, 30px); letter-spacing: -.025em; line-height: 1.22;
+    max-width: 46ch; text-wrap: pretty;
+  }
+  .cs-sum { margin: clamp(20px, 2.4vw, 36px) 0 clamp(40px, 6vw, 90px); animation: up .9s .14s var(--out) both; }
+
+  /* media arrives bent and straightens as it climbs (assets/noa.js) */
+  .warp {
+    position: relative; overflow: hidden; background: var(--pb, var(--card));
+    border-radius: var(--bend, 0%) var(--bend, 0%) 0 0 / calc(var(--bend, 0%) * .55) calc(var(--bend, 0%) * .55) 0 0;
+    transform: translate3d(0, var(--lift, 0), 0);
+  }
+  .warp img, .warp video { width: 100%; height: 100%; object-fit: cover; }
+  .cs-hero { aspect-ratio: var(--ar, 16 / 9); }
+  .cs-hero.tall { width: min(100%, calc(88svh * var(--f))); margin: 0 auto; }
+
+  .cs-app { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gx); margin: clamp(48px, 7vw, 110px) 0; }
+  .cs-app .cap { padding-top: .55em; }
+  .cs-app .cs-desc { grid-column: 2 / 4; }
+
+  .cs-gal { display: grid; gap: var(--gx); margin-top: var(--gx); }
+  .cs-row { display: flex; gap: var(--gx); align-items: flex-start; }
+  .cs-fig { flex: var(--f, 1) 1 0; aspect-ratio: var(--ar, auto); min-width: 0; }
+  .cs-fig.free { aspect-ratio: auto; }
+  .cs-fig.free video, .cs-fig.free img { height: auto; }
+  .cs-row.solo .cs-fig.tall { flex: none; width: min(100%, calc(88svh * var(--f))); margin: 0 auto; }
+
+  .cs-next {
+    display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--gx); align-items: end;
+    margin-top: clamp(80px, 12vw, 180px); padding-top: 12px; border-top: 1px solid var(--line);
+  }
+  .cs-next-t {
+    display: block; font-size: clamp(48px, 9vw, 150px); letter-spacing: -.065em; line-height: .88;
+    text-transform: lowercase; margin: 14px 0 0 -.05em; transition: color .3s;
+  }
+  .cs-next-img { aspect-ratio: 4 / 5; overflow: hidden; background: var(--pb); }
+  .cs-next-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--out); }
+  @media (hover: hover) {
+    .cs-next:hover .cs-next-t { color: var(--mute); }
+    .cs-next:hover .cs-next-img img { transform: scale(1.05); }
+  }
+  .cs-foot {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gx);
+    padding: clamp(60px, 9vw, 140px) 0 15px;
+  }
+  .cs-foot > :last-child { text-align: right; }
+  body.leaving .cs { opacity: 0; transform: translateY(-14px); transition: opacity .28s var(--out), transform .28s var(--out); }
+
+  @media (max-width: 760px) {
+    .cs-facts > div, .cs-app { grid-template-columns: 1fr 2fr; }
+    .cs-facts dd, .cs-app .cs-desc { grid-column: 2; }
+    .cs-next { grid-template-columns: 1fr 1fr; }
+    .cs-foot { grid-template-columns: 1fr 1fr; row-gap: 10px; }
+    .cs-foot > :last-child { text-align: left; }
+  }
+  @media (max-width: 560px) {
+    .cs-row { flex-direction: column; }
+    .cs-row .cs-fig, .cs-row.solo .cs-fig.tall { width: 100%; flex: none; }
+    .cs-app { grid-template-columns: 1fr; }
+    .cs-app .cs-desc { grid-column: 1; }
+  }
+`;
+
+// rows of gallery media, each one bending into place
 function rowHTML(row, title, start) {
   const one = row.length === 1;
   return `<div class="cs-row${one ? ' solo' : ''}">` + row.map((m, k) => {
     const ar = m.w && m.h ? m.w / m.h : null;
     const style = ar ? ` style="--ar:${m.w} / ${m.h}; --f:${ar.toFixed(4)}"` : '';
-    return `<figure class="cs-fig${ar ? '' : ' free'}${ar && ar < 1.2 ? ' tall' : ''}"${style}>${media(m, `${title}, image ${start + k}`)}</figure>`;
+    return `<figure class="cs-fig warp${ar ? '' : ' free'}${ar && ar < 1.2 ? ' tall' : ''}" data-warp${style}>${media(m, `${title}, image ${start + k}`)}</figure>`;
   }).join('') + `</div>`;
 }
 
-// extra rules for the case study, on top of the home page's own
-const EXTRA_CSS = `
-  .cs { padding: clamp(36px, 5vw, 80px) var(--gx) 0; }
-
-  /* the title at display size, then the work, then what it was: the facts
-     and the words on a two-part measure under the hero, so the piece is the
-     first thing seen and the page still has a left edge to read down */
-  /* set as the Humantold case study sets its title: regular weight, open
-     tracking, in the accent — it names the piece rather than shouting over it */
-  .cs-title {
-    font-family: var(--sans); font-weight: 400;
-    font-size: clamp(38px, 6vw, 76px); letter-spacing: -0.015em; line-height: 0.98;
-    color: var(--accent); text-wrap: balance; max-width: 18ch;
-    margin-bottom: clamp(28px, 3.6vw, 60px);
-  }
-  .cs-intro {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    gap: 24px clamp(24px, 4vw, 72px);
-    margin: clamp(40px, 6vw, 100px) 0 clamp(48px, 7vw, 120px);
-  }
-  .cs-facts { display: grid; gap: 14px; align-content: start; }
-  .cs-facts dt {
-    font-size: 13px; line-height: 1.4;
-    color: color-mix(in srgb, var(--ink) 50%, transparent);
-  }
-  .cs-facts dd { font-size: 16px; line-height: 1.4; font-weight: 500; }
-  .cs-desc {
-    font-size: clamp(19px, 1.7vw, 26px); font-weight: 400;
-    letter-spacing: -0.015em; line-height: 1.4; max-width: 36ch;
-  }
-
-  /* the work: full measure, its own colour behind it while it loads */
-  .cs-hero, .cs-fig { border-radius: var(--r); overflow: hidden; background: var(--pb); }
-  .cs-hero { aspect-ratio: var(--ar, auto); }
-  /* a portrait or square hero is shown whole, not stretched to the width of
-     the sheet: its height caps at the window and the width follows, and the
-     facts and words take the room beside it rather than leaving it empty */
-  .cs-lead.tall {
-    display: grid; grid-template-columns: auto minmax(0, 1fr);
-    gap: clamp(28px, 5vw, 96px); align-items: end;
-    margin-bottom: clamp(48px, 7vw, 120px);
-  }
-  .cs-lead.tall .cs-hero { width: min(58vw, calc(86svh * var(--f))); }
-  .cs-lead.tall .cs-intro { grid-template-columns: 1fr; margin: 0; }
-  .cs-row.solo .cs-fig.tall { width: min(100%, calc(86svh * var(--f))); margin: 0 auto; }
-  /* below a laptop there is no width to share: the hero takes the measure
-     and the words go under it, as they do for a landscape one */
-  @media (max-width: 1000px) {
-    .cs-lead.tall { display: block; margin-bottom: 0; }
-    .cs-lead.tall .cs-hero { width: min(100%, calc(86svh * var(--f))); }
-    .cs-lead.tall .cs-intro { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); margin: clamp(40px, 6vw, 100px) 0 clamp(48px, 7vw, 120px); }
-  }
-  .cs-hero img, .cs-hero video, .cs-fig img, .cs-fig video {
-    display: block; width: 100%; height: 100%; object-fit: cover;
-  }
-  .cs-fig.free img, .cs-fig.free video { height: auto; }
-  .cs-gal { display: grid; gap: clamp(12px, 1.6vw, 28px); }
-  .cs-row { display: flex; gap: clamp(12px, 1.6vw, 28px); align-items: flex-start; }
-  .cs-row .cs-fig { flex: var(--f, 1) 1 0; min-width: 0; aspect-ratio: var(--ar, auto); }
-  .cs-row.solo .cs-fig { flex: none; width: 100%; }
-
-  /* the way on: the next piece in the grid's own order, big enough to be
-     the obvious thing to do once the page runs out */
-  .cs-next {
-    display: grid; grid-template-columns: minmax(0, 1fr);
-    gap: clamp(20px, 4vw, 72px); align-items: end;
-    margin-top: clamp(80px, 12vw, 200px); padding: clamp(28px, 3vw, 44px) 0 0;
-    border-top: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
-    text-decoration: none; color: var(--ink);
-  }
-  .cs-next-k { display: block; font-size: 13px; margin-bottom: 14px;
-    color: color-mix(in srgb, var(--ink) 50%, transparent); }
-  .cs-next-t {
-    display: block; font-weight: 400;
-    font-size: clamp(32px, 4.6vw, 64px); letter-spacing: -0.015em; line-height: 0.98;
-    text-wrap: balance; transition: color 0.2s ease;
-  }
-  @media (hover: hover) {
-    .cs-next:hover .cs-next-t { color: var(--accent-sm); }
-  }
-  .cs-foot {
-    display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
-    padding: clamp(48px, 7vw, 110px) 0 clamp(28px, 4vw, 56px);
-    font-size: 14px; color: color-mix(in srgb, var(--ink) 50%, transparent);
-  }
-  .cs-foot a { color: inherit; text-decoration: none; transition: color 0.2s ease; }
-  .cs-foot a:hover { color: var(--accent-sm); }
-
-  @media (max-width: 760px) {
-    .cs-intro, .cs-lead.tall .cs-intro { grid-template-columns: 1fr; }
-    .cs-facts { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
-    .cs-next { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 560px) {
-    /* a phone has no width to share: everything stacks, whole */
-    .cs-row { flex-direction: column; }
-    .cs-row .cs-fig, .cs-row.solo .cs-fig.tall { width: 100%; flex: none; }
-  }
-
-  /* arriving: the heading settles, then the work comes up under it */
-  .cs-title, .cs-intro, .cs-hero { animation: tileUp 0.6s var(--out) both; }
-  .cs-hero { animation-delay: 70ms; }
-  .cs-intro { animation-delay: 140ms; }
-  body.leaving .cs { opacity: 0; transform: translateY(-12px); transition: opacity 0.26s var(--out), transform 0.26s var(--out); }
-  @media (prefers-reduced-motion: reduce) {
-    .cs-title, .cs-intro, .cs-hero { animation: none; }
-    .cs-next-t, .cs-foot a { transition: none; }
-  }
-`;
+const PAGE_HEAD = html.match(/<script>\/\* paint the right theme[\s\S]*?<\/script>/)[0];
+const year = new Date().getFullYear();
 
 fs.mkdirSync('work', { recursive: true });
 
 for (const p of PROJECTS) {
   if (BESPOKE.has(p.id)) { console.log(`↩ skipping bespoke case study: work/${p.id}.html`); continue; }
+  if (!ASSETS[p.id]) continue;
   const group = isPersonal(p) ? 'sketchbook' : 'work';
-  const run = RUNS[group];
+  const run = RUNS[group].filter(q => ASSETS[q.id]);
   const at = run.indexOf(p);
   const next = run[(at + 1) % run.length], prev = run[(at - 1 + run.length) % run.length];
   const home = group === 'work' ? '../index.html' : '../sketchbook.html';
@@ -215,19 +189,19 @@ for (const p of PROJECTS) {
   if (!hero.w) Object.assign(hero, await dims(hero.kind === 'video' ? `images/posters/${p.id}.jpg` : `images/${hero.file}`));
   const heroAr = hero.w && hero.h ? hero.w / hero.h : null;
   const heroStill = hero.kind === 'video' ? `posters/${p.id}.jpg` : hero.file;
+  const nextStill = ASSETS[next.id].kind === 'video' ? `posters/${next.id}.jpg` : ASSETS[next.id].file;
   const rest = (GALLERY[p.id] || []).filter(m => m.file);
-
 
   const catList = String(p.category || '').split(',').map(s => s.trim()).filter(Boolean).map(cap);
   const cat = catList.join(', ') || 'Illustration';
   const heroImg = `${SITE}/images/${heroStill}`;
-  const desc = (p.desc || p.caption || '').replace(/\s+/g, ' ').trim();
-  const _client = p.client && p.client !== 'Personal' ? p.client : null;
-  const about = desc || (_client
-    ? `${p.title}: ${cat.toLowerCase()} by Alex Tait for ${_client}${p.year ? ', ' + p.year : ''}. Illustration and motion design by a Bath and London based illustrator.`
+  const desc = (p.desc || '').replace(/\s+/g, ' ').trim();
+  const summary = (p.caption || '').replace(/\s+/g, ' ').trim();
+  const client = p.client && p.client !== 'Personal' ? p.client : null;
+  const about = desc || summary || (client
+    ? `${p.title}: ${cat.toLowerCase()} by Alex Tait for ${client}${p.year ? ', ' + p.year : ''}. Illustration and motion design by a Bath and London based illustrator.`
     : `${p.title}: a personal ${cat.toLowerCase()} project${p.year ? ' from ' + p.year : ''} by Alex Tait, an illustrator and motion designer based in Bath and London.`);
   const metaDesc = about.length > 300 ? about.slice(0, 297).trim() + '…' : about;
-  const client = p.client && p.client !== 'Personal' ? p.client : null;
 
   const jsonld = {
     "@context": "https://schema.org", "@type": "VisualArtwork",
@@ -245,20 +219,25 @@ for (const p of PROJECTS) {
   if (client) jsonld.commissioner = { "@type": "Organization", "name": client };
 
   const facts = [
-    client ? ['Client', client] : ['Project', 'Personal'],
+    client ? ['Client', client] : ['Project', p.client || 'Personal'],
     p.year ? ['Year', p.year] : null,
     ['Discipline', catList.filter(c => c !== 'Personal').join(', ') || 'Illustration'],
-  ].filter(Boolean).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
+    p.tags ? ['Tags', p.tags] : null,
+  ].filter(Boolean).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('\n    ');
 
   let n = 2;
   const gallery = rows(rest).map(r => { const h = rowHTML(r, p.title, n); n += r.length; return h; }).join('\n    ');
 
   const heroMedia = hero.kind === 'video'
-    ? `<video src="../images/${hero.file}#t=0.1" poster="../images/${heroStill}" muted loop playsinline preload="auto" data-auto aria-label="${esc(p.title)}"></video>`
+    ? `<video src="../images/${hero.file}" poster="../images/${heroStill}" muted loop playsinline preload="auto" data-auto aria-label="${esc(p.title)}"></video>`
     : media(hero, client ? `${p.title} for ${client}` : p.title, { hero: true });
 
+  const header = HEADER.replace(/<button type="button" data-open="menu"[\s\S]*?<\/button>/,
+    `<a href="${home}" class="back"><span class="roll"><span data-t="All ${groupName.toLowerCase()}">All ${groupName.toLowerCase()}</span></span></a>`)
+    .replace('href="../index.html" id="name-link"', `href="${home}" id="name-link"`);
+
   const page = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="day">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -266,7 +245,7 @@ for (const p of PROJECTS) {
   <meta name="description" content="${esc(metaDesc)}" />
   <meta name="author" content="Alex Tait" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
-  <meta name="theme-color" content="#ff4a1d" />
+  <meta name="theme-color" content="#ebe8e1" />
   <link rel="canonical" href="${SITE}/work/${p.id}.html" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -284,107 +263,64 @@ for (const p of PROJECTS) {
   <script type="application/ld+json">
 ${JSON.stringify(jsonld, null, 2)}
   </script>
+  ${PAGE_HEAD}
   <link rel="preconnect" href="https://api.fontshare.com" />
-  ${FONTS}
+  <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/noa.css" />
   <link rel="preload" as="image" href="../images/${heroStill}" />
-  <style>${CSS}${EXTRA_CSS}</style>
+  <style>${CSS}</style>
 </head>
-<body style="--pb:${esc(p.bg || '#eee')}">
+<body style="--pb:${esc(p.bg || '#d9d5cb')}">
 
-<div class="name"><a href="${home}" id="name-link" aria-label="Alex Tait — back to ${groupName}"><img src="../assets/signature.gif" alt="Alex Tait" /></a></div>
-
-<header>
-  <a class="menu-btn pagelink" id="page-link" href="${home}"><span>${groupName}</span></a>
-  <button class="menu-btn" id="menu-btn" aria-label="Information and menu" aria-expanded="false"><span>Info</span></button>
-</header>
+${header}
 
 <main class="cs">
+  <p class="cs-eye cap mute">${String(at + 1).padStart(2, '0')} — ${esc(catList[0] || 'Illustration')}</p>
   <h1 class="cs-title">${esc(p.title)}</h1>
-  <div class="cs-lead${heroAr && heroAr < 1.2 ? ' tall' : ''}">
-    <figure class="cs-hero"${heroAr ? ` style="--ar:${hero.w} / ${hero.h}; --f:${heroAr.toFixed(4)}"` : ''}>${heroMedia}</figure>
-    <div class="cs-intro">
-      <dl class="cs-facts">${facts}</dl>
-      ${desc ? `<p class="cs-desc">${esc(desc)}</p>` : ''}
-    </div>
-  </div>
+  <dl class="cs-facts cap">
+    ${facts}
+  </dl>
+  ${summary ? `<p class="cs-sum">${esc(summary)}</p>` : `<div class="cs-sum" aria-hidden="true"></div>`}
+
+  <figure class="cs-hero warp${heroAr && heroAr < 1.2 ? ' tall' : ''}" data-warp${heroAr ? ` style="--ar:${hero.w} / ${hero.h}; --f:${heroAr.toFixed(4)}"` : ''}>${heroMedia}</figure>
+
+  ${desc && desc !== summary ? `<div class="cs-app"><p class="cap mute">About the project</p><p class="cs-desc">${esc(desc)}</p></div>` : ''}
+
   ${gallery ? `<div class="cs-gal">
     ${gallery}
   </div>` : ''}
 
-  <a class="cs-next" href="${next.id}.html" style="--pb:${esc(next.bg || '#eee')}">
-    <span><span class="cs-next-k">Next project</span><span class="cs-next-t">${esc(next.title)}</span></span>
+  <a class="cs-next" href="${next.id}.html" style="--pb:${esc(next.bg || '#d9d5cb')}">
+    <span><span class="cap mute">Next project</span><span class="cs-next-t">${esc(next.title)}</span></span>
+    <span class="cs-next-img"><img src="../images/${nextStill}" alt="" loading="lazy" /></span>
   </a>
-  <footer class="cs-foot">
+  <footer class="cs-foot cap">
+    <span class="mute">© ${year} Alex Tait</span>
     <a href="${prev.id}.html">← ${esc(prev.title)}</a>
-    <a href="${home}">All ${groupName.toLowerCase()}</a>
+    <button type="button" data-open="talk" aria-controls="talk" aria-expanded="false" style="text-align:left">Get in touch</button>
+    <a href="#top" onclick="scrollTo({top:0,behavior:'smooth'});return false">Back to top ↑</a>
   </footer>
 </main>
 
-${ABOUT}
+${OVERLAYS}
 
+<div class="grain" aria-hidden="true"></div>
+<script src="../assets/noa.js"></script>
 <script>
-const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* Info: the same panel as the home page, with the same open and close */
-(() => {
-  const btn = document.getElementById('menu-btn');
-  const w = document.getElementById('aboutwrap'), x = document.getElementById('about-x');
-  let t;
-  const open = () => {
-    clearTimeout(t); w.classList.remove('closing'); w.classList.add('open');
-    btn.setAttribute('aria-expanded', 'true'); document.body.style.overflow = 'hidden';
-    if (REDUCE) w.classList.add('in'); else requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('in')));
-    x.focus();
-  };
-  const close = () => {
-    w.classList.remove('in'); btn.setAttribute('aria-expanded', 'false'); document.body.style.overflow = '';
-    if (REDUCE) return w.classList.remove('open');
-    w.classList.add('closing'); t = setTimeout(() => w.classList.remove('open', 'closing'), 220);
-  };
-  btn.addEventListener('click', open);
-  x.addEventListener('click', close);
-  w.addEventListener('click', e => { if (e.target === w) close(); });
-  addEventListener('keydown', e => { if (e.key === 'Escape' && w.classList.contains('open')) close(); });
-})();
-
-/* video plays while it is on screen and rests when it is not; a box with
-   no ratio of its own takes the video's once it knows it */
-(() => {
-  const vids = document.querySelectorAll('video[data-auto]');
-  vids.forEach(v => {
-    const box = v.parentElement;
-    const set = () => { if (v.videoWidth && !box.style.getPropertyValue('--ar')) box.style.aspectRatio = v.videoWidth + ' / ' + v.videoHeight; };
-    v.readyState >= 1 ? set() : v.addEventListener('loadedmetadata', set, { once: true });
-  });
-  if (REDUCE) { vids.forEach(v => v.setAttribute('controls', '')); return; }
-  if (!('IntersectionObserver' in window)) { vids.forEach(v => v.play().catch(() => {})); return; }
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (e.isIntersecting) e.target.play().catch(() => {}); else e.target.pause();
-  }), { rootMargin: '200px 0px', threshold: 0.1 });
-  vids.forEach(v => io.observe(v));
-})();
-
-/* leaving: the page steps away the way the grid does, and comes back
-   whole if the browser restores it from history */
-document.querySelectorAll('a.cs-next, .cs-foot a, #page-link, #name-link').forEach(a =>
+/* leaving fades the page; ← / → step through the run, Esc goes back */
+document.querySelectorAll('a.cs-next, a.back, #name-link, .cs-foot a[href$=".html"]').forEach(a =>
   a.addEventListener('click', e => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || REDUCE) return;
-    e.preventDefault();
-    document.body.classList.add('leaving');
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0 || window.NOA_REDUCE) return;
+    e.preventDefault(); document.body.classList.add('leaving');
     setTimeout(() => { location.href = a.href; }, 260);
   }));
 addEventListener('pageshow', e => { if (e.persisted) document.body.classList.remove('leaving'); });
-
-/* keyboard: ← / → through the run, Esc back to it */
 addEventListener('keydown', e => {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-  if (document.getElementById('aboutwrap').classList.contains('open')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey || document.querySelector('.ov.open')) return;
   if (e.key === 'ArrowRight') location.href = '${next.id}.html';
   else if (e.key === 'ArrowLeft') location.href = '${prev.id}.html';
   else if (e.key === 'Escape') location.href = '${home}';
 });
-
-${ALIGN}
 </script>
 </body>
 </html>`;
